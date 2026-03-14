@@ -1,6 +1,6 @@
 # CLAUDE.md — Stitch Studio
 # Cross Stitch Companion App for Mom
-# Last Updated: 2026-03-13
+# Last Updated: 2026-03-13 (Session 1 end)
 
 ---
 
@@ -819,7 +819,7 @@ NEVER force camera-only. NEVER force upload-only.
 ## ✅ PROGRESS LOG
 
 ### HANDOFF NOTE
-> Session 1 complete. Phase 0 (full foundation) and Phase 1 (Auth + Onboarding) are DONE and pushed to GitHub. A welcome/splash screen was also added (src/app/welcome/page.tsx) — this is now the unauthenticated entry point (middleware redirects to /welcome, not /auth). The Supabase project is live at kendddbcwrfdtqpjoscy.supabase.co with all tables, RLS policies, trigger, and storage buckets created. IMPORTANT: Supabase email confirmation must be OFF (Authentication → Providers → Email → disable "Confirm email") — this was the root cause of 400/422 sign-in errors. Next session starts with Phase 2: Layout + Navigation (BottomNav, SideNav, TopBar, PageWrapper, safe area insets). Do NOT rebuild anything from Phase 0 or Phase 1 — it is complete.
+> Session 1 complete. Phase 0 and Phase 1 are fully DONE. App is deployed and live at https://stitch-studio-three.vercel.app — connected to GitHub (auto-deploys on push to main). Supabase is live at kendddbcwrfdtqpjoscy.supabase.co with Site URL and redirect URLs set to the Vercel domain. IMPORTANT: Supabase email confirmation MUST stay OFF (Authentication → Providers → Email → "Confirm email" = off) — turning it on breaks sign-in. A temporary sign out button exists on the dashboard for testing. A welcome/splash screen (src/app/welcome/page.tsx) is the unauthenticated entry point — middleware redirects to /welcome, not /auth. Next session starts with Phase 2: Layout + Navigation — build BottomNav, TopBar, SideNav, PageWrapper with safe area insets, then wire the dashboard into the layout shell. Do NOT rebuild anything from Phase 0 or Phase 1.
 
 ---
 
@@ -860,7 +860,10 @@ NEVER force camera-only. NEVER force upload-only.
 - [x] Onboarding complete flag — skips onboarding if already done
 - [x] useAuth hook (src/hooks/useAuth.ts)
 - [x] Input component fixed with React.forwardRef (required for react-hook-form)
-- [ ] Session persistence tested on iPhone Safari + Kindle — PENDING (test when deployed)
+- [x] Session persistence tested on live Vercel deployment ✅
+- [x] Sign out button added to dashboard (temporary, for testing) — src/app/dashboard/page.tsx
+- [x] Deployed to Vercel — https://stitch-studio-three.vercel.app
+- [x] Supabase Site URL + redirect URLs configured for Vercel domain
 
 ### Phase 2 — Layout + Navigation — 🔜 NEXT
 - [ ] PageWrapper component (src/components/layout/PageWrapper.tsx)
@@ -868,15 +871,7 @@ NEVER force camera-only. NEVER force upload-only.
 - [ ] BottomNav — 5 tabs, fixed, safe-area-inset-bottom aware (src/components/layout/BottomNav.tsx)
 - [ ] SideNav for iPad >= 768px (src/components/layout/SideNav.tsx)
 - [ ] Responsive breakpoint switching (bottom nav ↔ side nav)
-- [ ] Dashboard placeholder wired up with layout
-
-### Phase 2 — Layout + Navigation
-- [ ] Root layout with safe area insets
-- [ ] PageWrapper component
-- [ ] TopBar component (with back button for detail pages)
-- [ ] BottomNav (5 tabs, fixed, safe-area aware)
-- [ ] SideNav for iPad (>= 768px)
-- [ ] Responsive breakpoint switching (bottom nav ↔ side nav)
+- [ ] Dashboard wired into layout shell (replace temp placeholder)
 
 ### Phase 3 — Home Dashboard
 - [ ] Greeting with display name + dogs
