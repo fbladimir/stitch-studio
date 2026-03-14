@@ -79,6 +79,19 @@
   50%      { box-shadow: 0 0 16px 4px rgba(174, 124, 42, 0.25); }
 }
 
+/* Phase 13 — Tutorial animations */
+
+@keyframes tutorialTooltipPop {
+  0%   { opacity: 0; transform: scale(0.9) translateY(8px); }
+  70%  { transform: scale(1.02) translateY(-2px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes tutorialRokuBounce {
+  0%, 100% { transform: translateY(0); }
+  50%      { transform: translateY(-4px); }
+}
+
 .skeleton {
   background: linear-gradient(90deg, #F0E8E0 25%, #FAF6F0 50%, #F0E8E0 75%);
   background-size: 800px 100%;

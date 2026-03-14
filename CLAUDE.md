@@ -1,6 +1,6 @@
 # CLAUDE.md — Stitch Studio
 # Cross Stitch Companion App for Mom
-# Last Updated: 2026-03-14 (Session 10)
+# Last Updated: 2026-03-14 (Session 11)
 
 ---
 
@@ -897,7 +897,7 @@ NEVER force camera-only. NEVER force upload-only.
 ## ✅ PROGRESS LOG
 
 ### HANDOFF NOTE
-> Session 10 complete. **Phase 15 (Engagement & Delight System) is fully built and deployed.** Schema migration ran successfully in Supabase (9 new columns on profiles + achievements + challenge_progress tables with RLS). Core engagement library (`src/lib/engagement.ts`) handles XP values, 6-level system, streak calculation with weekly freeze, 22 achievements across 5 categories, and 9 rotating monthly challenges. The `useEngagement` hook provides a `recordActivity()` function that updates streak/XP/level/achievements/challenges in one call. 12 new components in `src/components/engagement/`: CelebrationOverlay (full-screen confetti + dog parade), StreakCard + StreakDetail (flame + bottom sheet), AchievementBadge + AchievementShelf (earned/locked grid), ChallengeCard + ChallengeSection (progress bars), LevelBadge + XpBar. Profile page built at `/profile` with avatar, dogs, level, XP bar, streak, achievement shelf, sign out. Dashboard updated with profile avatar link (top-right), level badge, streak card, and monthly challenges. Engagement wired into StatusToggles (kitted/finished → XP + finish celebration), WipTracker (progress → XP), WipJournal (journal → XP). CelebrationOverlay mounted globally in app layout. **Not yet built from Phase 15 spec:** Weekly/Monthly digest cards (15f), Yearly Wrapped (15f), dog-powered notification nudges (15g). These can be Phase 15b. **Next session:** Phase 12 (Polish + Launch) or Phase 13 (App Tutorial with Roku guide). Phase 14 (cross-stitch app import) still deferred.
+> Session 11 complete. **Phase 13 (App Tutorial Onboarding) is fully built.** The tutorial is a guided tour overlay with Roku (the aussie doodle from the intro) as narrator. It uses spotlight cutouts via CSS mask on targeted elements (via `data-tutorial-id` attributes), positioned tooltips with Roku's SVG avatar, and progress dots. 8 steps: greeting → quick actions → recent patterns → 4 bottom nav tabs → final "You're all set!" screen. Auto-triggers on first dashboard load when `tutorial_complete === false` (800ms delay). Skip or complete sets `tutorial_complete = true` in Supabase. "Restart App Tour" button added to Profile page (resets flag + navigates to dashboard). No schema changes needed — `tutorial_complete` and `tutorial_skipped_at` columns already existed from Phase 15 migration. **New files:** `src/hooks/useTutorial.ts`, `src/components/tutorial/TutorialOverlay.tsx`. **Modified:** appStore.ts (tutorial state), dashboard/page.tsx (data-tutorial-id attrs + auto-trigger), layout.tsx (mount TutorialOverlay), profile/page.tsx (restart button), globals.css (2 new keyframes). **Next session:** Phase 12 (Polish + Launch) or Phase 14 (cross-stitch app import). Phase 15b (digests/wrapped/nudges) still deferred.
 
 ---
 
@@ -1237,7 +1237,7 @@ None of these apps have public APIs, so true live sync is not feasible. Instead,
 
 ---
 
-### Phase 13 — App Tutorial Onboarding (Post-Launch, After All Features Done)
+### Phase 13 — App Tutorial Onboarding (Post-Launch, After All Features Done) — ✅ DONE
 
 **Purpose:** After the full app is built, give Mom a guided tour so she knows how to use every
 feature without needing to ask Frank. This is a first-run overlay tutorial — not a re-run of
@@ -1320,7 +1320,7 @@ feature development as nav and component structure must be stable first.**
 - [x] Current streak + longest streak (via StreakCard component)
 - [x] Level badge + XP progress bar (LevelBadge + XpBar components)
 - [x] Achievement shelf — full grid of all 22 badges, earned/locked states, tap for detail modal
-- [ ] "Restart app tour" button — deferred to Phase 13 (tutorial system not yet built)
+- [x] "Restart app tour" button — added in Phase 13 (Session 11)
 - [x] Sign out button (permanent home, removed from dashboard)
 - [x] Back to Dashboard link
 
@@ -1761,6 +1761,31 @@ src/hooks/useEngagement.ts   ← loads streak, achievements, challenges for curr
 - [ ] MonthlyWrap.tsx — month summary card
 - [ ] YearlyWrap.tsx — Stitch Wrapped annual slideshow
 - [ ] Dog-powered notification nudges (15g) — streak-at-risk, WIP neglected messaging
+
+---
+
+### Phase 13 — App Tutorial Onboarding — ✅ DONE (Session 11)
+- [x] TutorialOverlay component — spotlight cutout (CSS mask), positioned tooltip with Roku SVG avatar, progress dots, Next/Skip buttons — src/components/tutorial/TutorialOverlay.tsx
+- [x] useTutorial hook — 8-step definitions, start/skip/complete/restart, Supabase persistence — src/hooks/useTutorial.ts
+- [x] Zustand tutorial state — isTutorialActive, tutorialStep, setters — src/store/appStore.ts
+- [x] Dashboard data-tutorial-id attributes — greeting, quick-actions, recent-patterns sections
+- [x] Nav items already had data-tutorial-id (nav-home, nav-patterns, nav-stash, nav-shop, nav-ai) from Phase 2
+- [x] Auto-trigger on first dashboard load when tutorial_complete === false (800ms delay)
+- [x] Skip or complete → sets tutorial_complete = true in Supabase profiles
+- [x] TutorialOverlay mounted globally in app layout (z-300, above celebrations at z-200)
+- [x] "Restart App Tour" button on Profile page — resets tutorial_complete, navigates to dashboard, re-launches after 800ms
+- [x] CSS animations: tutorialTooltipPop, tutorialRokuBounce — src/app/globals.css
+- [x] No schema changes needed — tutorial_complete + tutorial_skipped_at already existed from Phase 15 migration
+
+**Tutorial steps (in order):**
+1. `greeting` — "Your home base" — dashboard heading
+2. `quick-actions` — "Your magic shortcuts" — 2x2 grid
+3. `recent-patterns` — "Recently touched" — last 3 patterns
+4. `nav-patterns` — "Your collection" — Projects tab
+5. `nav-stash` — "Thread & fabric stash" — Stash tab
+6. `nav-shop` — "In-store helper" — Shop tab
+7. `nav-ai` — "Your AI advisor" — AI tab
+8. Final — "You're all set! Happy stitching! ✿" — center card, no spotlight
 
 ---
 

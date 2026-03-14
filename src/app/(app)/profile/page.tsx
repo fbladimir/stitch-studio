@@ -10,10 +10,12 @@ import { StreakCard } from "@/components/engagement/StreakCard";
 import { AchievementShelf } from "@/components/engagement/AchievementShelf";
 import { LevelBadge } from "@/components/engagement/LevelBadge";
 import { XpBar } from "@/components/engagement/XpBar";
+import { useTutorial } from "@/hooks/useTutorial";
 import type { Profile, Achievement } from "@/types";
 
 export default function ProfilePage() {
   const router = useRouter();
+  const { restartTutorial } = useTutorial();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [achievements, setAchievements] = useState<Achievement[]>([]);
   const [loading, setLoading] = useState(true);
@@ -121,6 +123,13 @@ export default function ProfilePage() {
 
         {/* ── Actions ─────────────────────────────────────── */}
         <section className="space-y-3 mb-6">
+          <button
+            onClick={restartTutorial}
+            className="w-full py-3 rounded-xl bg-[#FDF4F1] border border-[#F0C8BB] text-center font-nunito text-[14px] font-bold text-[#B36050] active:scale-[0.98] transition-transform"
+          >
+            🐾 Restart App Tour
+          </button>
+
           <Link
             href="/dashboard"
             className="block w-full py-3 rounded-xl bg-white border border-[#E4D6C8] text-center font-nunito text-[14px] font-bold text-[#3A2418] active:scale-[0.98] transition-transform"

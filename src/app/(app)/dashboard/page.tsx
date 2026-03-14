@@ -9,6 +9,7 @@ import { StreakCard } from "@/components/engagement/StreakCard";
 import { ChallengeSection } from "@/components/engagement/ChallengeSection";
 import { LevelBadge } from "@/components/engagement/LevelBadge";
 import { getChallengesForMonth, getCurrentMonth } from "@/lib/engagement";
+import { useAppStore } from "@/store/appStore";
 import type { Profile, Pattern, ChallengeProgress } from "@/types";
 
 // ── Types ─────────────────────────────────────────────────────
@@ -116,6 +117,7 @@ export default function DashboardPage() {
   const [recent, setRecent] = useState<RecentPattern[] | null>(null);
   const [wipNudge, setWipNudge] = useState<RecentPattern | null>(null);
   const [challenges, setChallenges] = useState<ChallengeProgress[]>([]);
+  const setTutorialActive = useAppStore((s) => s.setTutorialActive);
 
   useEffect(() => {
     const load = async () => {
@@ -206,10 +208,17 @@ export default function DashboardPage() {
         ch = (data as ChallengeProgress[]) ?? [];
       }
       setChallenges(ch);
+
+      // Auto-trigger tutorial for first-time users
+      if (profileRes.data && !(profileRes.data as Profile).tutorial_complete) {
+        setTimeout(() => {
+          setTutorialActive(true);
+        }, 800);
+      }
     };
 
     load();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loading = !profile || !stats || !recent;
   const allDogs = profile?.dogs ?? [];
@@ -221,7 +230,7 @@ export default function DashboardPage() {
 
       <PageWrapper className="pb-8">
         {/* ── Greeting header ─────────────────────────────────── */}
-        <section className="pt-2 pb-5">
+        <section className="pt-2 pb-5" data-tutorial-id="greeting">
           {loading ? (
             <>
               <Skeleton className="h-8 w-48 mb-2" />
@@ -320,7 +329,7 @@ export default function DashboardPage() {
         )}
 
         {/* ── Quick Actions ────────────────────────────────────── */}
-        <section className="mb-6">
+        <section className="mb-6" data-tutorial-id="quick-actions">
           <h2 className="font-playfair text-lg font-bold text-[#3A2418] mb-3">
             Quick Actions
           </h2>
@@ -381,7 +390,7 @@ export default function DashboardPage() {
         )}
 
         {/* ── Recent Patterns ──────────────────────────────────── */}
-        <section className="mb-6">
+        <section className="mb-6" data-tutorial-id="recent-patterns">
           <div className="flex items-center justify-between mb-3">
             <h2 className="font-playfair text-lg font-bold text-[#3A2418]">
               Recent Patterns
