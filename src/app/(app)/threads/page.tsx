@@ -50,6 +50,12 @@ export default function ThreadsPage() {
       );
     }
 
+    // Sort numerically by color number within each manufacturer
+    result = [...result].sort((a, b) => {
+      if (a.manufacturer !== b.manufacturer) return a.manufacturer.localeCompare(b.manufacturer);
+      return (parseInt(a.color_number ?? "0", 10) || 0) - (parseInt(b.color_number ?? "0", 10) || 0);
+    });
+
     return result;
   }, [threads, activeManufacturer, search]);
 

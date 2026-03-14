@@ -477,12 +477,17 @@ function QuickThreadCheck({ threads }: { threads: ThreadInventoryItem[] }) {
 
   const q = query.toLowerCase().trim();
   const results = q
-    ? threads.filter(
-        (t) =>
-          (t.color_number ?? "").toLowerCase().includes(q) ||
-          (t.color_name ?? "").toLowerCase().includes(q) ||
-          t.manufacturer.toLowerCase().includes(q)
-      )
+    ? threads
+        .filter(
+          (t) =>
+            (t.color_number ?? "").toLowerCase().includes(q) ||
+            (t.color_name ?? "").toLowerCase().includes(q) ||
+            t.manufacturer.toLowerCase().includes(q)
+        )
+        .sort((a, b) => {
+          if (a.manufacturer !== b.manufacturer) return a.manufacturer.localeCompare(b.manufacturer);
+          return (parseInt(a.color_number ?? "0", 10) || 0) - (parseInt(b.color_number ?? "0", 10) || 0);
+        })
     : [];
 
   const hasResults = q && results.length > 0;
@@ -778,10 +783,10 @@ function ShoppingList({
         }
       }
 
-      // Sort by manufacturer then color number
+      // Sort by manufacturer then color number (numeric)
       allMissing.sort((a, b) => {
         if (a.manufacturer !== b.manufacturer) return a.manufacturer.localeCompare(b.manufacturer);
-        return a.color_number.localeCompare(b.color_number);
+        return (parseInt(a.color_number, 10) || 0) - (parseInt(b.color_number, 10) || 0);
       });
 
       setMissingItems(allMissing);
