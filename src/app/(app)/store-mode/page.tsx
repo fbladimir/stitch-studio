@@ -88,22 +88,27 @@ export default function StoreModePage() {
       className="fixed inset-0 z-50 flex flex-col bg-white"
       style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
     >
-      {/* Header — high contrast */}
-      <div className="flex-shrink-0 bg-[#3A2418] px-4 py-3 flex items-center justify-between">
-        <div>
-          <h1 className="font-playfair text-[20px] font-bold text-white">
-            🛍️ Store Mode
-          </h1>
-          <p className="font-nunito text-[11px] text-white/60 mt-0.5">
-            Your in-store shopping assistant
-          </p>
-        </div>
-        <button
-          onClick={() => router.push("/dashboard")}
-          className="h-10 px-4 rounded-full bg-white/15 text-white font-nunito font-semibold text-[13px] active:scale-95 transition-transform"
-        >
-          ← Back
-        </button>
+      {/* Header — exit button is the full-width top bar */}
+      <button
+        onClick={() => router.push("/dashboard")}
+        className="flex-shrink-0 bg-[#B36050] px-4 py-2.5 flex items-center justify-center gap-2 active:bg-[#9A5040] transition-colors"
+      >
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M19 12H5" />
+          <path d="M12 19l-7-7 7-7" />
+        </svg>
+        <span className="font-nunito font-bold text-[14px] text-white">
+          Exit Store Mode
+        </span>
+      </button>
+
+      <div className="flex-shrink-0 bg-[#3A2418] px-4 py-3">
+        <h1 className="font-playfair text-[20px] font-bold text-white text-center">
+          🛍️ Store Mode
+        </h1>
+        <p className="font-nunito text-[11px] text-white/60 mt-0.5 text-center">
+          Your in-store shopping assistant
+        </p>
       </div>
 
       {/* Tab bar — large touch targets, high contrast */}
