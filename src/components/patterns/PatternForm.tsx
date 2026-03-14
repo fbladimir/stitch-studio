@@ -16,6 +16,7 @@ import {
 } from "@/lib/supabase/queries";
 import { findDuplicates, type DuplicateCandidate } from "@/lib/duplicate-detection";
 import { compressImage, fileToBase64 } from "@/lib/image";
+import { useEngagement } from "@/hooks/useEngagement";
 import { DuplicateWarning } from "./DuplicateWarning";
 
 // ── Schema ────────────────────────────────────────────────────
@@ -48,6 +49,7 @@ interface PatternFormProps {
 
 export function PatternForm({ mode, initialData }: PatternFormProps) {
   const router = useRouter();
+  const { recordActivity } = useEngagement();
   const cameraRef = useRef<HTMLInputElement>(null);
   const libraryRef = useRef<HTMLInputElement>(null);
 
@@ -216,6 +218,9 @@ export function PatternForm({ mode, initialData }: PatternFormProps) {
           const { url } = await uploadPatternCover(user.id, created.id, photoFile);
           if (url) await updatePattern(created.id, { cover_photo_url: url });
         }
+
+        // Record engagement
+        recordActivity("add_pattern", { patternCount: 1 });
 
         router.push(`/patterns/${created.id}`);
       } else if (mode === "edit" && initialData) {

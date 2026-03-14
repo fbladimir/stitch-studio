@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState, useCallback, useRef } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useTutorial, TUTORIAL_STEPS } from "@/hooks/useTutorial";
 import { useAppStore } from "@/store/appStore";
 
-// ── Small Roku Avatar (inline SVG, reused from intro) ──────────
+// ── Small Roku Avatar (inline SVG) ─────────────────────────────
 
 function RokuSmall({ size = 56 }: { size?: number }) {
   return (
@@ -60,32 +60,35 @@ function RokuSmall({ size = 56 }: { size?: number }) {
   );
 }
 
-// ── Spotlight + Tooltip overlay ─────────────────────────────────
+// ── Rect type ───────────────────────────────────────────────────
 
-interface Rect {
+interface SpotlightRect {
   top: number;
   left: number;
   width: number;
   height: number;
 }
 
-const PADDING = 10; // spotlight padding around target element
-const TOOLTIP_GAP = 14; // gap between spotlight and tooltip
+const PAD = 10;
+const GAP = 14;
+
+// ── Main overlay component ──────────────────────────────────────
 
 export function TutorialOverlay() {
   const isTutorialActive = useAppStore((s) => s.isTutorialActive);
   const tutorialStep = useAppStore((s) => s.tutorialStep);
   const { currentStep, totalSteps, nextStep, skipTutorial } = useTutorial();
 
-  const [targetRect, setTargetRect] = useState<Rect | null>(null);
-  const [tooltipStyle, setTooltipStyle] = useState<React.CSSProperties>({});
+  const [rect, setRect] = useState<SpotlightRect | null>(null);
   const [animKey, setAnimKey] = useState(0);
-  const overlayRef = useRef<HTMLDivElement>(null);
+  const [vpSize, setVpSize] = useState({ w: 0, h: 0 });
 
-  // Find and measure the target element
-  const measureTarget = useCallback(() => {
+  // Measure viewport + target
+  const measure = useCallback(() => {
+    setVpSize({ w: window.innerWidth, h: window.innerHeight });
+
     if (!currentStep?.targetId) {
-      setTargetRect(null);
+      setRect(null);
       return;
     }
 
@@ -93,144 +96,144 @@ export function TutorialOverlay() {
       `[data-tutorial-id="${currentStep.targetId}"]`
     );
     if (!el) {
-      setTargetRect(null);
+      setRect(null);
       return;
     }
 
-    const rect = el.getBoundingClientRect();
-    setTargetRect({
-      top: rect.top - PADDING,
-      left: rect.left - PADDING,
-      width: rect.width + PADDING * 2,
-      height: rect.height + PADDING * 2,
+    const r = el.getBoundingClientRect();
+    setRect({
+      top: r.top - PAD,
+      left: r.left - PAD,
+      width: r.width + PAD * 2,
+      height: r.height + PAD * 2,
     });
   }, [currentStep]);
 
-  // Re-measure on step change and scroll/resize
+  // Re-measure on step change, resize, scroll
   useEffect(() => {
     if (!isTutorialActive) return;
     setAnimKey((k) => k + 1);
 
-    // Small delay to let DOM settle
-    const timer = setTimeout(measureTarget, 100);
-
-    window.addEventListener("resize", measureTarget);
-    window.addEventListener("scroll", measureTarget, true);
-
+    const timer = setTimeout(measure, 120);
+    window.addEventListener("resize", measure);
+    window.addEventListener("scroll", measure, true);
     return () => {
       clearTimeout(timer);
-      window.removeEventListener("resize", measureTarget);
-      window.removeEventListener("scroll", measureTarget, true);
+      window.removeEventListener("resize", measure);
+      window.removeEventListener("scroll", measure, true);
     };
-  }, [isTutorialActive, tutorialStep, measureTarget]);
+  }, [isTutorialActive, tutorialStep, measure]);
 
-  // Scroll target into view if needed
+  // Scroll non-fixed targets into view
   useEffect(() => {
     if (!isTutorialActive || !currentStep?.targetId) return;
-
     const el = document.querySelector(
       `[data-tutorial-id="${currentStep.targetId}"]`
     );
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "center" });
-    }
+    if (!el) return;
+
+    // Don't scroll if element is in a fixed container (nav)
+    const style = window.getComputedStyle(el.closest("nav") ?? el);
+    if (style.position === "fixed") return;
+
+    el.scrollIntoView({ behavior: "smooth", block: "center" });
   }, [isTutorialActive, currentStep, tutorialStep]);
-
-  // Position tooltip based on target rect
-  useEffect(() => {
-    if (!currentStep) return;
-
-    if (!targetRect || currentStep.position === "center") {
-      // Center the tooltip on screen
-      setTooltipStyle({
-        top: "50%",
-        left: "50%",
-        transform: "translate(-50%, -50%)",
-      });
-      return;
-    }
-
-    const vw = window.innerWidth;
-    const tooltipWidth = Math.min(320, vw - 32);
-    const tooltipLeft = Math.max(
-      16,
-      Math.min(
-        targetRect.left + targetRect.width / 2 - tooltipWidth / 2,
-        vw - tooltipWidth - 16
-      )
-    );
-
-    if (currentStep.position === "top" || currentStep.position === "left" || currentStep.position === "right") {
-      // Place tooltip above the target
-      setTooltipStyle({
-        bottom: `${window.innerHeight - targetRect.top + TOOLTIP_GAP}px`,
-        left: `${tooltipLeft}px`,
-        width: `${tooltipWidth}px`,
-      });
-    } else {
-      // Place tooltip below the target
-      setTooltipStyle({
-        top: `${targetRect.top + targetRect.height + TOOLTIP_GAP}px`,
-        left: `${tooltipLeft}px`,
-        width: `${tooltipWidth}px`,
-      });
-    }
-  }, [targetRect, currentStep]);
 
   if (!isTutorialActive || !currentStep) return null;
 
   const isLastStep = tutorialStep === totalSteps - 1;
-  const isCenterStep = currentStep.position === "center";
+  const isCenterStep = currentStep.position === "center" || !rect;
+
+  // ── Tooltip position ──────────────────────────────────────────
+
+  let tooltipStyle: React.CSSProperties;
+
+  if (isCenterStep) {
+    tooltipStyle = {
+      position: "fixed",
+      top: "50%",
+      left: "50%",
+      transform: "translate(-50%, -50%)",
+      width: Math.min(320, vpSize.w - 32),
+    };
+  } else {
+    const tooltipW = Math.min(320, vpSize.w - 32);
+    const tooltipLeft = Math.max(
+      16,
+      Math.min(
+        rect!.left + rect!.width / 2 - tooltipW / 2,
+        vpSize.w - tooltipW - 16
+      )
+    );
+    // Estimated tooltip height
+    const tooltipH = 170;
+    // Prefer placing above for bottom nav items, below for top content
+    const spaceAbove = rect!.top - GAP;
+    const spaceBelow = vpSize.h - (rect!.top + rect!.height) - GAP;
+    const placeAbove = currentStep.position === "top" || spaceAbove > spaceBelow;
+
+    if (placeAbove && spaceAbove >= tooltipH) {
+      tooltipStyle = {
+        position: "fixed",
+        bottom: vpSize.h - rect!.top + GAP,
+        left: tooltipLeft,
+        width: tooltipW,
+      };
+    } else {
+      tooltipStyle = {
+        position: "fixed",
+        top: rect!.top + rect!.height + GAP,
+        left: tooltipLeft,
+        width: tooltipW,
+      };
+    }
+  }
 
   return (
-    <div
-      ref={overlayRef}
-      className="fixed inset-0 z-[300] select-none"
-      style={{ touchAction: "none" }}
-    >
-      {/* Dimmed backdrop with spotlight cutout via CSS mask */}
-      {targetRect && !isCenterStep ? (
-        <div
-          className="absolute inset-0 transition-all duration-300"
-          style={{
-            background: "rgba(58, 36, 24, 0.6)",
-            maskImage: `
-              linear-gradient(#000 0 0),
-              linear-gradient(#000 0 0)
-            `,
-            WebkitMaskImage: `
-              linear-gradient(#000 0 0),
-              linear-gradient(#000 0 0)
-            `,
-            maskComposite: "exclude",
-            WebkitMaskComposite: "xor",
-            maskPosition: `0 0, ${targetRect.left}px ${targetRect.top}px`,
-            WebkitMaskPosition: `0 0, ${targetRect.left}px ${targetRect.top}px`,
-            maskSize: `100% 100%, ${targetRect.width}px ${targetRect.height}px`,
-            WebkitMaskSize: `100% 100%, ${targetRect.width}px ${targetRect.height}px`,
-            maskRepeat: "no-repeat",
-            WebkitMaskRepeat: "no-repeat",
-          }}
-          onClick={(e) => e.stopPropagation()}
+    <div className="fixed inset-0 z-[300]" style={{ pointerEvents: "none" }}>
+      {/* SVG-based backdrop with spotlight cutout — works on all browsers including iOS Safari */}
+      <svg
+        className="absolute inset-0 w-full h-full"
+        style={{ pointerEvents: "auto" }}
+        onClick={(e) => e.stopPropagation()}
+      >
+        <defs>
+          <mask id="tutorial-spotlight">
+            {/* White = visible (backdrop shows), black = hidden (cutout) */}
+            <rect width="100%" height="100%" fill="white" />
+            {rect && !isCenterStep && (
+              <rect
+                x={rect.left}
+                y={rect.top}
+                width={rect.width}
+                height={rect.height}
+                rx={14}
+                ry={14}
+                fill="black"
+              />
+            )}
+          </mask>
+        </defs>
+        <rect
+          width="100%"
+          height="100%"
+          fill="rgba(58, 36, 24, 0.6)"
+          mask="url(#tutorial-spotlight)"
         />
-      ) : (
-        <div
-          className="absolute inset-0"
-          style={{ background: "rgba(58, 36, 24, 0.65)" }}
-          onClick={(e) => e.stopPropagation()}
-        />
-      )}
+      </svg>
 
       {/* Spotlight ring glow */}
-      {targetRect && !isCenterStep && (
+      {rect && !isCenterStep && (
         <div
-          className="absolute rounded-2xl pointer-events-none transition-all duration-300"
+          className="absolute rounded-2xl pointer-events-none"
           style={{
-            top: targetRect.top,
-            left: targetRect.left,
-            width: targetRect.width,
-            height: targetRect.height,
-            boxShadow: "0 0 0 3px rgba(179, 96, 80, 0.5), 0 0 20px rgba(179, 96, 80, 0.3)",
+            top: rect.top,
+            left: rect.left,
+            width: rect.width,
+            height: rect.height,
+            boxShadow:
+              "0 0 0 3px rgba(179, 96, 80, 0.5), 0 0 20px rgba(179, 96, 80, 0.3)",
+            transition: "all 0.3s ease",
           }}
         />
       )}
@@ -238,16 +241,15 @@ export function TutorialOverlay() {
       {/* Tooltip card */}
       <div
         key={`tooltip-${animKey}`}
-        className="absolute z-10"
         style={{
           ...tooltipStyle,
-          animation: "tutorialTooltipPop 0.35s cubic-bezier(0.34,1.56,0.64,1) both",
+          pointerEvents: "auto",
+          animation:
+            "tutorialTooltipPop 0.35s cubic-bezier(0.34,1.56,0.64,1) both",
         }}
       >
         <div
-          className={`bg-white rounded-2xl border border-[#E4D6C8] px-5 py-5 ${
-            isCenterStep ? "max-w-[320px] w-[320px]" : ""
-          }`}
+          className="bg-white rounded-2xl border border-[#E4D6C8] px-5 py-5"
           style={{ boxShadow: "0 8px 32px rgba(58,36,24,0.15)" }}
         >
           {/* Roku + content */}
@@ -273,7 +275,6 @@ export function TutorialOverlay() {
 
           {/* Progress dots + buttons */}
           <div className="flex items-center justify-between mt-4">
-            {/* Dots */}
             <div className="flex gap-1.5">
               {TUTORIAL_STEPS.map((_, i) => (
                 <div
@@ -293,19 +294,18 @@ export function TutorialOverlay() {
               ))}
             </div>
 
-            {/* Buttons */}
             <div className="flex items-center gap-2">
               {!isLastStep && (
                 <button
                   onClick={skipTutorial}
-                  className="font-nunito text-[12px] font-semibold text-[#B6A090] px-2 py-1 active:opacity-60 transition-opacity"
+                  className="font-nunito text-[12px] font-semibold text-[#B6A090] px-3 py-2 active:opacity-60 transition-opacity"
                 >
                   Skip
                 </button>
               )}
               <button
                 onClick={isLastStep ? skipTutorial : nextStep}
-                className="h-9 px-5 rounded-full text-white font-nunito font-bold text-[13px] active:scale-95 transition-transform"
+                className="h-10 px-6 rounded-full text-white font-nunito font-bold text-[14px] active:scale-95 transition-transform"
                 style={{
                   background: "linear-gradient(135deg, #CA8070, #B36050)",
                   boxShadow: "0 3px 12px rgba(179,96,80,0.3)",

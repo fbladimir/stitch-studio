@@ -13,6 +13,7 @@ import {
   uploadPatternCover,
 } from "@/lib/supabase/queries";
 import { compressImage } from "@/lib/image";
+import { useEngagement } from "@/hooks/useEngagement";
 
 // ── Schema ────────────────────────────────────────────────────
 
@@ -56,6 +57,7 @@ interface EmbroideryFormProps {
 
 export function EmbroideryForm({ mode, initialData }: EmbroideryFormProps) {
   const router = useRouter();
+  const { recordActivity } = useEngagement();
   const cameraRef = useRef<HTMLInputElement>(null);
   const libraryRef = useRef<HTMLInputElement>(null);
 
@@ -191,6 +193,7 @@ export function EmbroideryForm({ mode, initialData }: EmbroideryFormProps) {
           if (url) await updateEmbroidery(created.id, { cover_photo_url: url });
         }
 
+        recordActivity("add_pattern", { patternCount: 1 });
         router.push(`/embroidery/${created.id}`);
       } else if (mode === "edit" && initialData) {
         let photoUrl = initialData.cover_photo_url;

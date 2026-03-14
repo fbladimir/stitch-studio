@@ -20,9 +20,10 @@ export function PageWrapper({
         "pb-[calc(72px+env(safe-area-inset-bottom))]",
         // Tablet+: side nav takes left space, reset bottom padding
         "md:pb-6 md:pl-[220px]",
-        !noPadding && "px-4 pt-4",
+        !noPadding && "px-4",
         className
       )}
+      style={!noPadding ? { paddingTop: "max(16px, env(safe-area-inset-top))" } : undefined}
     >
       {children}
     </main>

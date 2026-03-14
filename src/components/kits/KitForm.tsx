@@ -9,6 +9,7 @@ import type { Pattern, KitStatus } from "@/types";
 import { createClient } from "@/lib/supabase/client";
 import { createKit, updateKit, uploadKitPhoto } from "@/lib/supabase/queries";
 import { compressImage } from "@/lib/image";
+import { useEngagement } from "@/hooks/useEngagement";
 
 // ── Schema ────────────────────────────────────────────────────
 
@@ -53,6 +54,7 @@ const CONTENTS_ITEMS = [
 
 export function KitForm({ mode, initialData }: KitFormProps) {
   const router = useRouter();
+  const { recordActivity } = useEngagement();
   const cameraRef = useRef<HTMLInputElement>(null);
   const libraryRef = useRef<HTMLInputElement>(null);
 
@@ -174,6 +176,7 @@ export function KitForm({ mode, initialData }: KitFormProps) {
           if (url) await updateKit(created.id, { cover_photo_url: url });
         }
 
+        recordActivity("add_pattern", { patternCount: 1 });
         router.push(`/kits/${created.id}`);
       } else if (mode === "edit" && initialData) {
         let photoUrl = initialData.cover_photo_url;

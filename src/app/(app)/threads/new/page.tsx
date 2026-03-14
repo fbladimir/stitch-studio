@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { createThreadInventoryItem } from "@/lib/supabase/queries";
+import { useEngagement } from "@/hooks/useEngagement";
 import { PageWrapper } from "@/components/layout/PageWrapper";
 import { TopBar } from "@/components/layout/TopBar";
 import { ThreadForm } from "@/components/threads/ThreadForm";
@@ -11,6 +12,7 @@ import type { ThreadInventoryItem } from "@/types";
 
 export default function NewThreadPage() {
   const router = useRouter();
+  const { recordActivity } = useEngagement();
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,6 +28,7 @@ export default function NewThreadPage() {
 
       const { error: err } = await createThreadInventoryItem(user.id, values);
       if (err) { setError(err.message); return; }
+      recordActivity("add_thread_inventory");
       router.push("/threads");
     } finally {
       setSubmitting(false);
