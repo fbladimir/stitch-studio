@@ -825,10 +825,9 @@ NEVER force camera-only. NEVER force upload-only.
 12. **Warmth is a feature.** Every empty state, every confirmation, every loading message
     should feel personal and crafting-themed — not generic app copy.
 
-13. **Supabase Storage buckets must be public** for photos to display in `<img>` tags.
-    `getPublicUrl()` only works when the bucket is public. All photo buckets (pattern-covers,
-    fo-photos, ffo-photos, profile-photos, fabric-photos, thread-photos, kit-photos) need
-    public read policies. See Phase 4 KNOWN ISSUE for the SQL. This is safe for a personal
+13. **Supabase Storage buckets are public** — public read policies applied to all 7 buckets
+    (pattern-covers, fo-photos, ffo-photos, profile-photos, fabric-photos, thread-photos, kit-photos).
+    `getPublicUrl()` works correctly. All policies are in `supabase-setup.sql`. Safe for a personal
     app — URLs are UUID-namespaced and not guessable. Revisit with signed URLs in Phase 11 if needed.
 
 ---
@@ -836,7 +835,7 @@ NEVER force camera-only. NEVER force upload-only.
 ## ✅ PROGRESS LOG
 
 ### HANDOFF NOTE
-> Session 3 complete. Phase 4 (Patterns Module) is fully built and TypeScript-clean. All patterns CRUD, status toggles, WIP tracker, WIP journal, per-pattern thread list, FO/FFO photo uploads, duplicate detection, and delete with confirmation are working. Two bugs were fixed post-build: (1) toggle knob visual — switched from translate-x to left/right absolute positioning for cleaner active/inactive state; (2) broken cover photo — root cause is Supabase storage buckets are private; `getPublicUrl()` URLs don't work as `<img>` src without bucket being public. Added `onError` fallback to image tags as a code-level grace, but the REAL fix requires making the storage buckets public in Supabase dashboard (see KEY NOTES #13 below). Custom SVG app icon added at `public/icons/icon.svg` — embroidery hoop design in rose/terracotta with cross-stitch X marks in sage and gold. Added as SVG favicon in layout.tsx. PNG icons for PWA manifest are still placeholder — full icon set to be done in Phase 11. AI question confirmed: Phase 9 cover-page scanner will photograph the pattern cover → Claude fills in name, designer, sizes, thread brand, everything → Mom confirms → saves. Zero manual typing. Next session starts Phase 5: Kits Module.
+> Session 4 start. All Supabase SQL has been fully run and confirmed: all 7 core tables, RLS policies, auto-create profile trigger, storage public read + upload/update/delete policies for all 7 buckets, Phase 13 tutorial columns, and Phase 15 engagement tables. The storage known issue from Phase 4 is now RESOLVED — all photo buckets have public read policies applied. A full reference SQL file exists at `supabase-setup.sql` in the project root (safe to re-run at any time). Starting Phase 5: Kits Module.
 
 ---
 
@@ -944,21 +943,9 @@ NEVER force camera-only. NEVER force upload-only.
 - [x] All DB queries — src/lib/supabase/queries.ts (full CRUD + storage upload helpers)
 - [x] Cover photo upload (camera + library, compress, upload to pattern-covers bucket)
 
-**⚠️ KNOWN ISSUE — Supabase Storage Buckets:**
-The `pattern-covers`, `fo-photos`, `ffo-photos`, and other photo buckets are private.
-`getPublicUrl()` returns a URL that does NOT work as an `<img>` src on private buckets.
-To fix: go to Supabase dashboard → Storage → each bucket → make it Public (toggle).
-OR run this SQL in Supabase SQL editor:
-```sql
-CREATE POLICY "Public read pattern-covers" ON storage.objects FOR SELECT USING (bucket_id = 'pattern-covers');
-CREATE POLICY "Public read fo-photos" ON storage.objects FOR SELECT USING (bucket_id = 'fo-photos');
-CREATE POLICY "Public read ffo-photos" ON storage.objects FOR SELECT USING (bucket_id = 'ffo-photos');
-CREATE POLICY "Public read profile-photos" ON storage.objects FOR SELECT USING (bucket_id = 'profile-photos');
-CREATE POLICY "Public read fabric-photos" ON storage.objects FOR SELECT USING (bucket_id = 'fabric-photos');
-CREATE POLICY "Public read thread-photos" ON storage.objects FOR SELECT USING (bucket_id = 'thread-photos');
-CREATE POLICY "Public read kit-photos" ON storage.objects FOR SELECT USING (bucket_id = 'kit-photos');
-```
-Images currently have an `onError` handler that hides the broken icon gracefully until this is fixed.
+**✅ RESOLVED (Session 4) — Supabase Storage Buckets:**
+All 7 storage buckets now have public read policies + authenticated upload/update/delete policies applied.
+Photos load correctly in `<img>` tags via `getPublicUrl()`. Full SQL is in `supabase-setup.sql`.
 
 ### Phase 5 — Kits Module — 🔜 NEXT
 - [ ] Kits list page

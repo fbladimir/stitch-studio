@@ -2,6 +2,7 @@
 import { createClient } from "./client";
 import type { Pattern, PatternThread, WipJournalEntry } from "@/types";
 
+
 // ── Patterns ─────────────────────────────────────────────────
 
 export async function getPatterns(userId: string) {
@@ -171,5 +172,78 @@ export async function uploadFoPhoto(
   if (uploadError) return { url: null, error: uploadError };
 
   const { data } = supabase.storage.from(bucket).getPublicUrl(path);
+  return { url: data.publicUrl, error: null };
+}
+
+// ── Kits ─────────────────────────────────────────────────────
+// Kits are stored in the patterns table with type = 'kit_cross_stitch' | 'kit_embroidery'
+
+export async function getKits(userId: string) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("patterns")
+    .select("*")
+    .eq("user_id", userId)
+    .in("type", ["kit_cross_stitch", "kit_embroidery"])
+    .order("updated_at", { ascending: false });
+  return { data: data as Pattern[] | null, error };
+}
+
+export async function getKit(id: string) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("patterns")
+    .select("*")
+    .eq("id", id)
+    .single();
+  return { data: data as Pattern | null, error };
+}
+
+export async function createKit(
+  userId: string,
+  kit: Omit<Pattern, "id" | "user_id" | "created_at" | "updated_at">
+) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("patterns")
+    .insert({ ...kit, user_id: userId })
+    .select()
+    .single();
+  return { data: data as Pattern | null, error };
+}
+
+export async function updateKit(id: string, updates: Partial<Pattern>) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("patterns")
+    .update({ ...updates, updated_at: new Date().toISOString() })
+    .eq("id", id)
+    .select()
+    .single();
+  return { data: data as Pattern | null, error };
+}
+
+export async function deleteKit(id: string) {
+  const supabase = createClient();
+  const { error } = await supabase.from("patterns").delete().eq("id", id);
+  return { error };
+}
+
+export async function uploadKitPhoto(
+  userId: string,
+  kitId: string,
+  file: File
+): Promise<{ url: string | null; error: Error | null }> {
+  const supabase = createClient();
+  const ext = file.name.split(".").pop() ?? "jpg";
+  const path = `${userId}/${kitId}/kit.${ext}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("kit-photos")
+    .upload(path, file, { upsert: true });
+
+  if (uploadError) return { url: null, error: uploadError };
+
+  const { data } = supabase.storage.from("kit-photos").getPublicUrl(path);
   return { url: data.publicUrl, error: null };
 }
