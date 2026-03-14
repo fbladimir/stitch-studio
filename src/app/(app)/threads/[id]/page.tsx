@@ -13,6 +13,7 @@ import {
 import { PageWrapper } from "@/components/layout/PageWrapper";
 import { TopBar } from "@/components/layout/TopBar";
 import { ThreadForm } from "@/components/threads/ThreadForm";
+import { toast } from "sonner";
 import type { ThreadInventoryItem, Pattern } from "@/types";
 
 function statusBadge(p: Pattern): { text: string; classes: string } {
@@ -85,13 +86,14 @@ export default function ThreadDetailPage() {
   ) => {
     setSubmitting(true);
     const { data } = await updateThreadInventoryItem(id, values);
-    if (data) { setThread(data); setEditing(false); }
+    if (data) { setThread(data); setEditing(false); toast.success("Thread updated!"); }
     setSubmitting(false);
   };
 
   const handleDelete = async () => {
     setDeleting(true);
     await deleteThreadInventoryItem(id);
+    toast.success("Thread deleted");
     router.push("/threads");
   };
 

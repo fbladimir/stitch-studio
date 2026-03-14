@@ -17,6 +17,7 @@ import {
 import { findDuplicates, type DuplicateCandidate } from "@/lib/duplicate-detection";
 import { compressImage, fileToBase64 } from "@/lib/image";
 import { useEngagement } from "@/hooks/useEngagement";
+import { toast } from "sonner";
 import { DuplicateWarning } from "./DuplicateWarning";
 
 // ── Schema ────────────────────────────────────────────────────
@@ -222,6 +223,7 @@ export function PatternForm({ mode, initialData }: PatternFormProps) {
         // Record engagement
         recordActivity("add_pattern", { patternCount: 1 });
 
+        toast.success("Pattern added to your collection!");
         router.push(`/patterns/${created.id}`);
       } else if (mode === "edit" && initialData) {
         // Upload new photo if selected
@@ -237,10 +239,13 @@ export function PatternForm({ mode, initialData }: PatternFormProps) {
         });
         if (updateErr) throw updateErr;
 
+        toast.success("Changes saved!");
         router.push(`/patterns/${initialData.id}`);
       }
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+      const msg = err instanceof Error ? err.message : "Something went wrong. Please try again.";
+      setError(msg);
+      toast.error(msg);
       setSubmitting(false);
     }
   }

@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { createFabricInventoryItem, updateFabricInventoryItem, uploadFabricPhoto } from "@/lib/supabase/queries";
+import { toast } from "sonner";
 import { PageWrapper } from "@/components/layout/PageWrapper";
 import { TopBar } from "@/components/layout/TopBar";
 import { FabricForm } from "@/components/fabrics/FabricForm";
@@ -33,9 +34,12 @@ export default function NewFabricPage() {
         if (url) await updateFabricInventoryItem(created.id, { photo_url: url });
       }
 
+      toast.success("Fabric added to your stash!");
       router.push(`/fabrics/${created.id}`);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Something went wrong.");
+      const msg = err instanceof Error ? err.message : "Something went wrong.";
+      setError(msg);
+      toast.error(msg);
     } finally {
       setSubmitting(false);
     }

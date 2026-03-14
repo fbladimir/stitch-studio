@@ -51,6 +51,7 @@ export function DuplicateWarning({
                     src={c.cover_photo_url}
                     alt={c.name}
                     className="w-full h-full object-cover"
+                    loading="lazy"
                   />
                 ) : (
                   <span className="text-xl opacity-30">📖</span>

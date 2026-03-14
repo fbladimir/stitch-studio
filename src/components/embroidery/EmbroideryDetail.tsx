@@ -7,6 +7,7 @@ import type { Pattern } from "@/types";
 import { createClient } from "@/lib/supabase/client";
 import { deleteEmbroidery, updateEmbroidery, uploadFoPhoto } from "@/lib/supabase/queries";
 import { compressImage } from "@/lib/image";
+import { toast } from "sonner";
 import { EmbroideryStatusControl } from "./EmbroideryStatusControl";
 import { WipTracker } from "@/components/patterns/WipTracker";
 import { WipJournal } from "@/components/patterns/WipJournal";
@@ -31,6 +32,7 @@ export function EmbroideryDetail({ initialEmbroidery }: EmbroideryDetailProps) {
   async function handleDelete() {
     setDeleting(true);
     await deleteEmbroidery(embroidery.id);
+    toast.success("Embroidery deleted");
     router.push("/embroidery");
   }
 
@@ -56,7 +58,10 @@ export function EmbroideryDetail({ initialEmbroidery }: EmbroideryDetailProps) {
     if (url) {
       const field = type === "fo" ? "fo_photo_url" : "ffo_photo_url";
       const { data } = await updateEmbroidery(embroidery.id, { [field]: url });
-      if (data) setEmbroidery(data);
+      if (data) {
+        setEmbroidery(data);
+        toast.success("Photo uploaded!");
+      }
     }
 
     if (type === "fo") setFoUploading(false);
@@ -76,6 +81,7 @@ export function EmbroideryDetail({ initialEmbroidery }: EmbroideryDetailProps) {
             src={embroidery.cover_photo_url}
             alt={embroidery.name}
             className="w-full h-full object-cover"
+            loading="lazy"
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center gap-2">
@@ -370,7 +376,7 @@ function PhotoUploadBlock({
     <div className="bg-white border border-[#E4D6C8] rounded-2xl overflow-hidden">
       {url ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={url} alt={label} className="w-full aspect-video object-cover" />
+        <img src={url} alt={label} className="w-full aspect-video object-cover" loading="lazy" />
       ) : (
         <div className="aspect-video bg-[#FAF6F0] flex items-center justify-center">
           {uploading ? (

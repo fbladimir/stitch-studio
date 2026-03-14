@@ -7,6 +7,7 @@ import type { Pattern } from "@/types";
 import { createClient } from "@/lib/supabase/client";
 import { deleteKit, updateKit, uploadFoPhoto } from "@/lib/supabase/queries";
 import { compressImage } from "@/lib/image";
+import { toast } from "sonner";
 import { KitStatusControl } from "./KitStatusControl";
 import { WipTracker } from "@/components/patterns/WipTracker";
 import { WipJournal } from "@/components/patterns/WipJournal";
@@ -35,6 +36,7 @@ export function KitDetail({ initialKit }: KitDetailProps) {
   async function handleDelete() {
     setDeleting(true);
     await deleteKit(kit.id);
+    toast.success("Kit deleted");
     router.push("/kits");
   }
 
@@ -60,7 +62,10 @@ export function KitDetail({ initialKit }: KitDetailProps) {
     if (url) {
       const field = type === "fo" ? "fo_photo_url" : "ffo_photo_url";
       const { data } = await updateKit(kit.id, { [field]: url });
-      if (data) setKit(data);
+      if (data) {
+        setKit(data);
+        toast.success("Photo uploaded!");
+      }
     }
 
     if (type === "fo") setFoUploading(false);
@@ -82,6 +87,7 @@ export function KitDetail({ initialKit }: KitDetailProps) {
             src={kit.cover_photo_url}
             alt={kit.name}
             className="w-full h-full object-cover"
+            loading="lazy"
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center gap-2">
@@ -376,7 +382,7 @@ function PhotoUploadBlock({
     <div className="bg-white border border-[#E4D6C8] rounded-2xl overflow-hidden">
       {url ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={url} alt={label} className="w-full aspect-video object-cover" />
+        <img src={url} alt={label} className="w-full aspect-video object-cover" loading="lazy" />
       ) : (
         <div className="aspect-video bg-[#FAF6F0] flex items-center justify-center">
           {uploading ? (

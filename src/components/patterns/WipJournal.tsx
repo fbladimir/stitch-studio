@@ -5,6 +5,7 @@ import type { WipJournalEntry } from "@/types";
 import { getWipJournal, addWipJournalEntry } from "@/lib/supabase/queries";
 import { createClient } from "@/lib/supabase/client";
 import { useEngagement } from "@/hooks/useEngagement";
+import { toast } from "sonner";
 
 interface WipJournalProps {
   patternId: string;
@@ -48,6 +49,7 @@ export function WipJournal({ patternId, currentPct, currentStitches }: WipJourna
       setEntries((prev) => [data, ...prev]);
       setNote("");
       recordActivity("write_journal");
+      toast.success("Note added!");
     }
     setSaving(false);
   }

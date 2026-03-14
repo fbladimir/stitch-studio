@@ -5,6 +5,7 @@ import type { Pattern } from "@/types";
 import { updatePattern } from "@/lib/supabase/queries";
 import { useEngagement } from "@/hooks/useEngagement";
 import { useAppStore } from "@/store/appStore";
+import { toast } from "sonner";
 import { buildFinishCelebration } from "@/lib/engagement";
 import { createClient } from "@/lib/supabase/client";
 
@@ -27,7 +28,10 @@ export function StatusToggles({ pattern, onUpdate }: StatusTogglesProps) {
     });
     if (data) {
       onUpdate(data);
-      if (newVal) recordActivity("mark_kitted");
+      if (newVal) {
+        recordActivity("mark_kitted");
+        toast.success("Marked as kitted!");
+      }
     }
     setSaving(null);
   }

@@ -4,6 +4,7 @@ import { useState } from "react";
 import type { Pattern } from "@/types";
 import { updatePattern } from "@/lib/supabase/queries";
 import { useEngagement } from "@/hooks/useEngagement";
+import { toast } from "sonner";
 
 interface WipTrackerProps {
   pattern: Pattern;
@@ -31,6 +32,7 @@ export function WipTracker({ pattern, onUpdate }: WipTrackerProps) {
     if (data) {
       onUpdate(data);
       recordActivity("log_wip_progress");
+      toast.success("Progress saved!");
     }
     setSaving(false);
     setDirty(false);

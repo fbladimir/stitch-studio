@@ -9,6 +9,7 @@ import {
   uploadFabricPhoto,
 } from "@/lib/supabase/queries";
 import { createClient } from "@/lib/supabase/client";
+import { toast } from "sonner";
 import { PageWrapper } from "@/components/layout/PageWrapper";
 import { TopBar } from "@/components/layout/TopBar";
 import { FabricForm } from "@/components/fabrics/FabricForm";
@@ -60,7 +61,7 @@ export default function FabricDetailPage() {
       }
 
       const { data } = await updateFabricInventoryItem(id, { ...values, photo_url: photoUrl });
-      if (data) { setFabric(data); setEditing(false); }
+      if (data) { setFabric(data); setEditing(false); toast.success("Fabric updated!"); }
     } finally {
       setSubmitting(false);
     }
@@ -69,6 +70,7 @@ export default function FabricDetailPage() {
   const handleDelete = async () => {
     setDeleting(true);
     await deleteFabricInventoryItem(id);
+    toast.success("Fabric deleted");
     router.push("/fabrics");
   };
 
@@ -144,6 +146,7 @@ export default function FabricDetailPage() {
                   src={fabric.photo_url}
                   alt={fabric.color_name ?? "Fabric"}
                   className="w-full h-full object-cover"
+                  loading="lazy"
                 />
               </div>
             )}

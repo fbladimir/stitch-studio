@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Playfair_Display, Nunito } from "next/font/google";
+import { Toaster } from "sonner";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -48,6 +49,19 @@ export default function RootLayout({
       </head>
       <body className="antialiased min-h-screen bg-background">
         {children}
+        <Toaster
+          position="top-center"
+          toastOptions={{
+            style: {
+              fontFamily: "var(--font-nunito), sans-serif",
+              borderRadius: "14px",
+              border: "1px solid #E4D6C8",
+              background: "#FFFFFF",
+              color: "#3A2418",
+              fontSize: "14px",
+            },
+          }}
+        />
       </body>
     </html>
   );

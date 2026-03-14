@@ -256,6 +256,7 @@ export default function DashboardPage() {
                       src={profile.profile_photo_url}
                       alt="Profile"
                       className="w-full h-full object-cover"
+                      loading="lazy"
                     />
                   ) : (
                     <span className="text-lg opacity-40">👤</span>
@@ -438,6 +439,7 @@ export default function DashboardPage() {
                           src={p.cover_photo_url}
                           alt={p.name}
                           className="w-full h-full object-cover"
+                          loading="lazy"
                         />
                       ) : (
                         <span className="text-2xl opacity-40">📖</span>

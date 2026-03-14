@@ -76,6 +76,7 @@ export default function ProfilePage() {
                 src={profile.profile_photo_url}
                 alt={profile.display_name ?? "Profile"}
                 className="w-full h-full object-cover"
+                loading="lazy"
               />
             ) : (
               <span className="text-4xl opacity-40">👤</span>

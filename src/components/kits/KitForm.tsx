@@ -10,6 +10,7 @@ import { createClient } from "@/lib/supabase/client";
 import { createKit, updateKit, uploadKitPhoto } from "@/lib/supabase/queries";
 import { compressImage } from "@/lib/image";
 import { useEngagement } from "@/hooks/useEngagement";
+import { toast } from "sonner";
 
 // ── Schema ────────────────────────────────────────────────────
 
@@ -177,6 +178,7 @@ export function KitForm({ mode, initialData }: KitFormProps) {
         }
 
         recordActivity("add_pattern", { patternCount: 1 });
+        toast.success("Kit added to your collection!");
         router.push(`/kits/${created.id}`);
       } else if (mode === "edit" && initialData) {
         let photoUrl = initialData.cover_photo_url;
@@ -195,12 +197,13 @@ export function KitForm({ mode, initialData }: KitFormProps) {
         });
         if (updateErr) throw updateErr;
 
+        toast.success("Changes saved!");
         router.push(`/kits/${initialData.id}`);
       }
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Something went wrong. Please try again."
-      );
+      const msg = err instanceof Error ? err.message : "Something went wrong. Please try again.";
+      setError(msg);
+      toast.error(msg);
       setSubmitting(false);
     }
   }

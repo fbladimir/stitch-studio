@@ -7,6 +7,7 @@ import type { Pattern } from "@/types";
 import { createClient } from "@/lib/supabase/client";
 import { deletePattern, updatePattern, uploadFoPhoto } from "@/lib/supabase/queries";
 import { compressImage } from "@/lib/image";
+import { toast } from "sonner";
 import { StatusToggles } from "./StatusToggles";
 import { WipTracker } from "./WipTracker";
 import { WipJournal } from "./WipJournal";
@@ -39,6 +40,7 @@ export function PatternDetail({ initialPattern }: PatternDetailProps) {
   async function handleDelete() {
     setDeleting(true);
     await deletePattern(pattern.id);
+    toast.success("Pattern deleted");
     router.push("/patterns");
   }
 
@@ -62,7 +64,10 @@ export function PatternDetail({ initialPattern }: PatternDetailProps) {
     if (url) {
       const field = type === "fo" ? "fo_photo_url" : "ffo_photo_url";
       const { data } = await updatePattern(pattern.id, { [field]: url });
-      if (data) setPattern(data);
+      if (data) {
+        setPattern(data);
+        toast.success("Photo uploaded!");
+      }
     }
 
     if (type === "fo") setFoUploading(false);
@@ -81,6 +86,7 @@ export function PatternDetail({ initialPattern }: PatternDetailProps) {
             src={pattern.cover_photo_url}
             alt={pattern.name}
             className="w-full h-full object-cover"
+            loading="lazy"
           />
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center gap-2">
@@ -378,7 +384,7 @@ function PhotoUploadBlock({
     <div className="bg-white border border-[#E4D6C8] rounded-2xl overflow-hidden">
       {url ? (
         // eslint-disable-next-line @next/next/no-img-element
-        <img src={url} alt={label} className="w-full aspect-video object-cover" />
+        <img src={url} alt={label} className="w-full aspect-video object-cover" loading="lazy" />
       ) : (
         <div className="aspect-video bg-[#FAF6F0] flex items-center justify-center">
           {uploading ? (

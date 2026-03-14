@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { createThreadInventoryItem } from "@/lib/supabase/queries";
 import { useEngagement } from "@/hooks/useEngagement";
+import { toast } from "sonner";
 import { PageWrapper } from "@/components/layout/PageWrapper";
 import { TopBar } from "@/components/layout/TopBar";
 import { ThreadForm } from "@/components/threads/ThreadForm";
@@ -27,8 +28,9 @@ export default function NewThreadPage() {
       if (!user) { setError("Not logged in."); return; }
 
       const { error: err } = await createThreadInventoryItem(user.id, values);
-      if (err) { setError(err.message); return; }
+      if (err) { setError(err.message); toast.error(err.message); return; }
       recordActivity("add_thread_inventory");
+      toast.success("Thread added to your stash!");
       router.push("/threads");
     } finally {
       setSubmitting(false);

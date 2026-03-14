@@ -200,6 +200,7 @@ export default function KittingPage() {
                         src={p.cover_photo_url}
                         alt=""
                         className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
+                        loading="lazy"
                       />
                     ) : (
                       <div className="w-12 h-12 rounded-lg bg-[#FAF6F0] flex items-center justify-center flex-shrink-0">

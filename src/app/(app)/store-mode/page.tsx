@@ -327,6 +327,7 @@ function ChartScanner({ userId, patterns }: { userId: string; patterns: Pattern[
               src={result.pattern.cover_photo_url}
               alt=""
               className="w-32 h-32 rounded-xl object-cover border border-[#E4D6C8]"
+              loading="lazy"
             />
           )}
           <div className="flex items-center gap-2 mt-1">
@@ -382,6 +383,7 @@ function ChartScanner({ userId, patterns }: { userId: string; patterns: Pattern[
                 src={result.pattern.cover_photo_url}
                 alt=""
                 className="w-14 h-14 rounded-lg object-cover flex-shrink-0"
+                loading="lazy"
               />
             )}
             <div className="flex-1 min-w-0">
@@ -666,6 +668,7 @@ function QuickFabricCheck({ fabrics }: { fabrics: FabricInventoryItem[] }) {
                   src={f.photo_url}
                   alt=""
                   className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
+                  loading="lazy"
                 />
               ) : (
                 <div className="w-12 h-12 rounded-lg bg-[#5F7A63]/10 flex items-center justify-center flex-shrink-0">

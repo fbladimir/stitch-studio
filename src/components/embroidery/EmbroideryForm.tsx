@@ -14,6 +14,7 @@ import {
 } from "@/lib/supabase/queries";
 import { compressImage } from "@/lib/image";
 import { useEngagement } from "@/hooks/useEngagement";
+import { toast } from "sonner";
 
 // ── Schema ────────────────────────────────────────────────────
 
@@ -194,6 +195,7 @@ export function EmbroideryForm({ mode, initialData }: EmbroideryFormProps) {
         }
 
         recordActivity("add_pattern", { patternCount: 1 });
+        toast.success("Embroidery added to your collection!");
         router.push(`/embroidery/${created.id}`);
       } else if (mode === "edit" && initialData) {
         let photoUrl = initialData.cover_photo_url;
@@ -208,12 +210,13 @@ export function EmbroideryForm({ mode, initialData }: EmbroideryFormProps) {
         });
         if (updateErr) throw updateErr;
 
+        toast.success("Changes saved!");
         router.push(`/embroidery/${initialData.id}`);
       }
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Something went wrong. Please try again."
-      );
+      const msg = err instanceof Error ? err.message : "Something went wrong. Please try again.";
+      setError(msg);
+      toast.error(msg);
       setSubmitting(false);
     }
   }
