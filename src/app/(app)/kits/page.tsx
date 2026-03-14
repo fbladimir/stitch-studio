@@ -82,19 +82,25 @@ export default function KitsPage() {
     <>
       <TopBar title="My Kits" />
       <PageWrapper className="pb-8">
-        {/* Collection switcher — Patterns / Kits */}
+        {/* Collection switcher — Patterns / Embroidery / Kits */}
         <div
           className="flex rounded-2xl p-1 gap-1 mb-5"
           style={{ backgroundColor: "#EDE5DC" }}
         >
           <Link
             href="/patterns"
-            className="flex-1 flex items-center justify-center gap-1.5 h-10 rounded-xl font-nunito font-bold text-[13px] text-[#B6A090] active:scale-[0.97] transition-transform"
+            className="flex-1 flex items-center justify-center gap-1 h-10 rounded-xl font-nunito font-bold text-[12px] text-[#B6A090] active:scale-[0.97] transition-transform"
           >
             <span>📖</span> Patterns
           </Link>
+          <Link
+            href="/embroidery"
+            className="flex-1 flex items-center justify-center gap-1 h-10 rounded-xl font-nunito font-bold text-[12px] text-[#B6A090] active:scale-[0.97] transition-transform"
+          >
+            <span>🌸</span> Embroidery
+          </Link>
           <div
-            className="flex-1 flex items-center justify-center gap-1.5 h-10 rounded-xl bg-white font-nunito font-bold text-[13px] text-[#3A2418] shadow-sm"
+            className="flex-1 flex items-center justify-center gap-1 h-10 rounded-xl bg-white font-nunito font-bold text-[12px] text-[#3A2418] shadow-sm"
             style={{ boxShadow: "0 1px 4px rgba(58,36,24,0.10)" }}
           >
             <span>🧺</span> Kits

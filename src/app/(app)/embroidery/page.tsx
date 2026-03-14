@@ -3,18 +3,17 @@
 import { useEffect, useState, useMemo } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { getPatterns } from "@/lib/supabase/queries";
+import { getEmbroideries } from "@/lib/supabase/queries";
 import { PageWrapper } from "@/components/layout/PageWrapper";
 import { TopBar } from "@/components/layout/TopBar";
-import { PatternCard } from "@/components/patterns/PatternCard";
+import { EmbroideryCard } from "@/components/embroidery/EmbroideryCard";
 import type { Pattern } from "@/types";
 
-type FilterTab = "all" | "wip" | "kitted" | "finished";
+type FilterTab = "all" | "wip" | "finished";
 
 const TABS: { id: FilterTab; label: string }[] = [
   { id: "all", label: "All" },
-  { id: "wip", label: "WIP" },
-  { id: "kitted", label: "Kitted" },
+  { id: "wip", label: "In Progress" },
   { id: "finished", label: "Finished" },
 ];
 
@@ -22,8 +21,8 @@ function Skeleton({ className }: { className?: string }) {
   return <div className={`skeleton ${className ?? ""}`} />;
 }
 
-export default function PatternsPage() {
-  const [patterns, setPatterns] = useState<Pattern[] | null>(null);
+export default function EmbroideryPage() {
+  const [items, setItems] = useState<Pattern[] | null>(null);
   const [search, setSearch] = useState("");
   const [activeTab, setActiveTab] = useState<FilterTab>("all");
 
@@ -34,61 +33,65 @@ export default function PatternsPage() {
         data: { user },
       } = await supabase.auth.getUser();
       if (!user) return;
-      const { data } = await getPatterns(user.id);
-      setPatterns(data ?? []);
+      const { data } = await getEmbroideries(user.id);
+      setItems(data ?? []);
     };
     load();
   }, []);
 
   const filtered = useMemo(() => {
-    if (!patterns) return null;
-    let result = patterns;
+    if (!items) return null;
+    let result = items;
 
     if (activeTab === "wip") {
-      result = result.filter((p) => p.wip && !p.completion_date);
-    } else if (activeTab === "kitted") {
-      result = result.filter((p) => p.kitted && !p.wip && !p.completion_date);
+      result = result.filter((e) => e.wip && !e.completion_date);
     } else if (activeTab === "finished") {
-      result = result.filter((p) => Boolean(p.completion_date));
+      result = result.filter((e) => Boolean(e.completion_date));
     }
 
     if (search.trim()) {
       const q = search.toLowerCase().trim();
       result = result.filter(
-        (p) =>
-          p.name.toLowerCase().includes(q) ||
-          (p.designer ?? "").toLowerCase().includes(q) ||
-          (p.company ?? "").toLowerCase().includes(q)
+        (e) =>
+          e.name.toLowerCase().includes(q) ||
+          (e.designer ?? "").toLowerCase().includes(q) ||
+          (e.company ?? "").toLowerCase().includes(q)
       );
     }
 
     return result;
-  }, [patterns, activeTab, search]);
+  }, [items, activeTab, search]);
 
-  const loading = patterns === null;
-  const totalCount = patterns?.length ?? 0;
+  function tabCount(tab: FilterTab) {
+    if (!items) return 0;
+    if (tab === "all") return items.length;
+    if (tab === "wip") return items.filter((e) => e.wip && !e.completion_date).length;
+    return items.filter((e) => Boolean(e.completion_date)).length;
+  }
+
+  const loading = items === null;
 
   return (
     <>
-      <TopBar title="My Patterns" />
+      <TopBar title="My Embroidery" />
       <PageWrapper className="pb-8">
         {/* Collection switcher — Patterns / Embroidery / Kits */}
         <div
           className="flex rounded-2xl p-1 gap-1 mb-5"
           style={{ backgroundColor: "#EDE5DC" }}
         >
+          <Link
+            href="/patterns"
+            className="flex-1 flex items-center justify-center gap-1 h-10 rounded-xl font-nunito font-bold text-[12px] text-[#B6A090] active:scale-[0.97] transition-transform"
+          >
+            <span>📖</span> Patterns
+          </Link>
           <div
             className="flex-1 flex items-center justify-center gap-1 h-10 rounded-xl bg-white font-nunito font-bold text-[12px] text-[#3A2418] shadow-sm"
             style={{ boxShadow: "0 1px 4px rgba(58,36,24,0.10)" }}
           >
-            <span>📖</span> Patterns
-          </div>
-          <Link
-            href="/embroidery"
-            className="flex-1 flex items-center justify-center gap-1 h-10 rounded-xl font-nunito font-bold text-[12px] text-[#B6A090] active:scale-[0.97] transition-transform"
-          >
             <span>🌸</span> Embroidery
-          </Link>
+          </div>
           <Link
             href="/kits"
             className="flex-1 flex items-center justify-center gap-1 h-10 rounded-xl font-nunito font-bold text-[12px] text-[#B6A090] active:scale-[0.97] transition-transform"
@@ -104,7 +107,7 @@ export default function PatternsPage() {
           </span>
           <input
             type="text"
-            placeholder="Search patterns, designers…"
+            placeholder="Search embroidery patterns…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className="w-full h-11 pl-10 pr-4 rounded-2xl border border-[#E4D6C8] bg-white font-nunito text-[14px] text-[#3A2418] focus:outline-none focus:border-[#B36050] placeholder:text-[#C4AFA6]"
@@ -122,15 +125,7 @@ export default function PatternsPage() {
         {/* Filter Tabs */}
         <div className="flex gap-2 mb-5 overflow-x-auto pb-1 -mx-4 px-4">
           {TABS.map((tab) => {
-            const count =
-              tab.id === "all"
-                ? totalCount
-                : tab.id === "wip"
-                ? (patterns?.filter((p) => p.wip && !p.completion_date).length ?? 0)
-                : tab.id === "kitted"
-                ? (patterns?.filter((p) => p.kitted && !p.wip && !p.completion_date).length ?? 0)
-                : (patterns?.filter((p) => Boolean(p.completion_date)).length ?? 0);
-
+            const count = tabCount(tab.id);
             const isActive = activeTab === tab.id;
             return (
               <button
@@ -144,7 +139,11 @@ export default function PatternsPage() {
               >
                 {tab.label}
                 {!loading && (
-                  <span className={`ml-1.5 text-[11px] ${isActive ? "opacity-80" : "opacity-60"}`}>
+                  <span
+                    className={`ml-1.5 text-[11px] ${
+                      isActive ? "opacity-80" : "opacity-60"
+                    }`}
+                  >
                     {count}
                   </span>
                 )}
@@ -156,7 +155,7 @@ export default function PatternsPage() {
         {/* List */}
         {loading ? (
           <div className="flex flex-col gap-3">
-            {[...Array(5)].map((_, i) => (
+            {[...Array(4)].map((_, i) => (
               <Skeleton key={i} className="h-[76px]" />
             ))}
           </div>
@@ -164,8 +163,8 @@ export default function PatternsPage() {
           <EmptyState tab={activeTab} search={search} />
         ) : (
           <div className="flex flex-col gap-3">
-            {filtered!.map((p) => (
-              <PatternCard key={p.id} pattern={p} />
+            {filtered!.map((e) => (
+              <EmbroideryCard key={e.id} embroidery={e} />
             ))}
           </div>
         )}
@@ -173,9 +172,9 @@ export default function PatternsPage() {
 
       {/* FAB */}
       <Link
-        href="/patterns/new"
+        href="/embroidery/new"
         className="fixed bottom-[calc(env(safe-area-inset-bottom)+80px)] right-5 w-14 h-14 rounded-full bg-[#B36050] text-white text-3xl flex items-center justify-center shadow-lg active:scale-95 transition-transform z-40 md:bottom-6 md:right-6"
-        aria-label="Add pattern"
+        aria-label="Add embroidery pattern"
       >
         +
       </Link>
@@ -200,24 +199,19 @@ function EmptyState({ tab, search }: { tab: FilterTab; search: string }) {
 
   const messages: Record<FilterTab, { icon: string; title: string; body: string }> = {
     all: {
-      icon: "📖",
-      title: "Your collection is empty!",
-      body: "Tap the + button below to add your first pattern.",
+      icon: "🌸",
+      title: "No embroidery patterns yet!",
+      body: "Tap the + button to add your first embroidery design.",
     },
     wip: {
       icon: "⏱️",
-      title: "No WIPs right now",
-      body: "Open a pattern and toggle 'Work in Progress' to start tracking.",
-    },
-    kitted: {
-      icon: "🧺",
-      title: "Nothing kitted yet",
-      body: "Use Kitting Check to see if you have all your supplies.",
+      title: "Nothing in progress",
+      body: "Open a pattern and set it to In Progress to start tracking.",
     },
     finished: {
       icon: "✅",
       title: "No finished pieces yet",
-      body: "Keep stitching — your completed collection will appear here!",
+      body: "Keep stitching — your completed embroidery will appear here!",
     },
   };
 

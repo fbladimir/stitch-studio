@@ -247,3 +247,57 @@ export async function uploadKitPhoto(
   const { data } = supabase.storage.from("kit-photos").getPublicUrl(path);
   return { url: data.publicUrl, error: null };
 }
+
+// ── Embroidery ────────────────────────────────────────────────
+// Standalone embroidery patterns (type = 'embroidery')
+
+export async function getEmbroideries(userId: string) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("patterns")
+    .select("*")
+    .eq("user_id", userId)
+    .eq("type", "embroidery")
+    .order("updated_at", { ascending: false });
+  return { data: data as Pattern[] | null, error };
+}
+
+export async function getEmbroidery(id: string) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("patterns")
+    .select("*")
+    .eq("id", id)
+    .single();
+  return { data: data as Pattern | null, error };
+}
+
+export async function createEmbroidery(
+  userId: string,
+  embroidery: Omit<Pattern, "id" | "user_id" | "created_at" | "updated_at">
+) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("patterns")
+    .insert({ ...embroidery, user_id: userId, type: "embroidery" })
+    .select()
+    .single();
+  return { data: data as Pattern | null, error };
+}
+
+export async function updateEmbroidery(id: string, updates: Partial<Pattern>) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("patterns")
+    .update({ ...updates, updated_at: new Date().toISOString() })
+    .eq("id", id)
+    .select()
+    .single();
+  return { data: data as Pattern | null, error };
+}
+
+export async function deleteEmbroidery(id: string) {
+  const supabase = createClient();
+  const { error } = await supabase.from("patterns").delete().eq("id", id);
+  return { error };
+}
