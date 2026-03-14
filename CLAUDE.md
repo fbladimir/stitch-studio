@@ -825,17 +825,18 @@ NEVER force camera-only. NEVER force upload-only.
 12. **Warmth is a feature.** Every empty state, every confirmation, every loading message
     should feel personal and crafting-themed — not generic app copy.
 
-13. **Supabase Storage buckets are public** — public read policies applied to all 7 buckets
-    (pattern-covers, fo-photos, ffo-photos, profile-photos, fabric-photos, thread-photos, kit-photos).
-    `getPublicUrl()` works correctly. All policies are in `supabase-setup.sql`. Safe for a personal
-    app — URLs are UUID-namespaced and not guessable. Revisit with signed URLs in Phase 11 if needed.
+13. **Supabase Storage buckets MUST have `public = true` at the bucket level** for `getPublicUrl()`
+    to return accessible URLs. RLS policies alone are NOT enough. Run this SQL in Supabase SQL Editor:
+    `UPDATE storage.buckets SET public = true WHERE id IN ('pattern-covers','fo-photos','ffo-photos','profile-photos','fabric-photos','thread-photos','kit-photos');`
+    This is Section 4 Part A of `supabase-setup.sql`. Safe for a personal app — URLs are
+    UUID-namespaced and not guessable. Revisit with signed URLs in Phase 11 if needed.
 
 ---
 
 ## ✅ PROGRESS LOG
 
 ### HANDOFF NOTE
-> Session 4 complete. Two things done this session: (1) Created `supabase-setup.sql` in the project root — a complete, safe-to-rerun SQL file covering all 7 tables, RLS policies, auto-create profile trigger, storage public read + auth upload/update/delete policies for all 7 buckets, Phase 13 tutorial columns, and Phase 15 engagement tables. Ran in Supabase and confirmed successful — no errors. Storage photo display is now FIXED. (2) Phase 5 (Kits Module) is fully built and TypeScript-clean. Full CRUD, iOS-style segmented status control (Unopened/Started/Finished), pill-style contents checklist, kit photo upload, WIP tracker + journal reused from patterns, FO/FFO photos on finish, skeleton loading, and delete with confirmation. Committed and pushed — Vercel auto-deployed. Next session starts Phase 6: Embroidery Module.
+> Session 4 complete + post-session fixes applied. Phase 5 (Kits Module) is fully built, TypeScript-clean, and Vercel-deploying successfully. Three post-launch bugs fixed: (1) **Kits nav discoverability** — added an iOS-style Patterns ↔ Kits segmented switcher at the top of both list pages so Kits is reachable from the Patterns bottom nav tab without adding a 6th nav item; (2) **Vercel build fail** — 4 ESLint unused-variable errors in kit files fixed; (3) **Images still broken** — root cause identified: `getPublicUrl()` requires the Supabase bucket to have `public = true` set at the **bucket level**, not just RLS policies. Added `UPDATE storage.buckets SET public = true WHERE id IN (...)` to `supabase-setup.sql`. **This SQL must be run in Supabase SQL Editor to fix image display** — run Section 4 (Part A) from supabase-setup.sql. Next session starts Phase 6: Embroidery Module.
 
 ---
 
