@@ -1,6 +1,6 @@
 # CLAUDE.md — Stitch Studio
 # Cross Stitch Companion App for Mom
-# Last Updated: 2026-03-14 (Session 11)
+# Last Updated: 2026-03-14 (Session 12)
 
 ---
 
@@ -768,6 +768,7 @@ stitch-studio/
     ├── hooks/
     │   ├── useAuth.ts
     │   ├── useEngagement.ts            ← streak, XP, achievements, challenges, recordActivity()
+    │   ├── useBottomSheetDrag.ts      ← iOS-native swipe-to-dismiss for bottom sheet modals
     │   ├── usePatterns.ts
     │   ├── useThreads.ts
     │   ├── useFabrics.ts
@@ -897,7 +898,7 @@ NEVER force camera-only. NEVER force upload-only.
 ## ✅ PROGRESS LOG
 
 ### HANDOFF NOTE
-> Session 11 complete. **Phase 13 (App Tutorial Onboarding) is fully built and bug-fixed.** Built the guided tour overlay with Roku narrator, spotlight cutouts, positioned tooltips, and 8 steps. Initially used CSS `mask-composite` for spotlight which broke on iOS Safari — rewrote to use SVG `<mask>` approach which works on all browsers. Also fixed `touchAction: "none"` blocking mobile touch events — switched to `pointerEvents` model. **Engagement system wired into creation flows:** `recordActivity()` now called when adding patterns (PatternForm), kits (KitForm), embroidery (EmbroideryForm), and threads (threads/new) — XP, streaks, achievements, and challenge progress all fire on creation. **Dashboard top safe area fixed:** PageWrapper now uses `max(16px, env(safe-area-inset-top))` so the greeting header doesn't get cut off behind iPhone notch/dynamic island. **Next session: Phase 12 (Polish + Launch)** — toast notifications, error boundaries, 404 page, final Lighthouse audit, then share with Mom. Phase 14 (app import) and Phase 15b (digests/wrapped/nudges) still deferred.
+> Session 12 complete. **Phase 12 (Polish + Launch) is mostly done.** Added sonner toast notifications on all CRUD actions across patterns, kits, embroidery, threads, and fabrics. Created 404 "Lost stitch!" page, error boundaries (root + app-level) with "Dropped stitch!" copy and retry. Added `loading="lazy"` to 15 `<img>` tags across 9 detail/list files. Empty states and loading skeletons were already done from earlier phases. **Tutorial overlay bugs fixed:** last step was off-screen because CSS animation transform overrode centering `translate(-50%, -50%)` — switched to flexbox centering wrapper. Combined 4 individual mobile nav steps into 1 "bottom-nav" step so tutorial doesn't feel stuck. Added z-index layering to fix iOS Safari touch events on tooltip buttons. **iOS-native drag-to-dismiss** added to all 3 bottom sheet modals (StreakDetail, SubstitutionHelper, DuplicateWarning) via new `useBottomSheetDrag` hook. **Next session:** Lighthouse audit, final deploy polish, then share with Mom. Phase 14 (app import) and Phase 15b (digests/wrapped/nudges) still deferred.
 
 ---
 
@@ -1300,15 +1301,15 @@ feature development as nav and component structure must be stable first.**
 
 ---
 
-### Phase 12 — Polish + Launch
-- [ ] Toast notifications (success, error, info)
-- [ ] Empty states (all list pages)
-- [ ] Loading skeletons (all list pages)
-- [ ] Error boundaries
-- [ ] 404 page
-- [ ] Image lazy loading
+### Phase 12 — Polish + Launch — IN PROGRESS (Session 12)
+- [x] Toast notifications (success, error, info)
+- [x] Empty states (all list pages)
+- [x] Loading skeletons (all list pages)
+- [x] Error boundaries
+- [x] 404 page
+- [x] Image lazy loading
 - [ ] Final Lighthouse audit
-- [ ] Deploy to Vercel
+- [x] Deploy to Vercel
 - [ ] Custom domain (if applicable)
 - [ ] Share app URL with Mom
 
@@ -1777,15 +1778,15 @@ src/hooks/useEngagement.ts   ← loads streak, achievements, challenges for curr
 - [x] CSS animations: tutorialTooltipPop, tutorialRokuBounce — src/app/globals.css
 - [x] No schema changes needed — tutorial_complete + tutorial_skipped_at already existed from Phase 15 migration
 
-**Tutorial steps (in order):**
+**Tutorial steps — mobile (5 steps):**
 1. `greeting` — "Your home base" — dashboard heading
 2. `quick-actions` — "Your magic shortcuts" — 2x2 grid
 3. `recent-patterns` — "Recently touched" — last 3 patterns
-4. `nav-patterns` — "Your collection" — Projects tab
-5. `nav-stash` — "Thread & fabric stash" — Stash tab
-6. `nav-shop` — "In-store helper" — Shop tab
-7. `nav-ai` — "Your AI advisor" — AI tab
-8. Final — "You're all set! Happy stitching! ✿" — center card, no spotlight
+4. `bottom-nav` — "Your navigation" — entire bottom nav bar highlighted
+5. Final — "You're all set! Happy stitching! ✿" — flexbox-centered card, no spotlight
+
+**Tutorial steps — desktop/tablet (8 steps):**
+Steps 1-3 same as mobile, then individual side nav items (nav-patterns, nav-stash, nav-shop, nav-ai), then final.
 
 ---
 
@@ -1813,17 +1814,38 @@ src/hooks/useEngagement.ts   ← loads streak, achievements, challenges for curr
 
 ---
 
-### Phase 12 — Polish + Launch
-- [ ] Toast notifications (success, error, info)
-- [ ] Empty states (all list pages)
-- [ ] Loading skeletons (all list pages)
-- [ ] Error boundaries
-- [ ] 404 page
-- [ ] Image lazy loading
+### Phase 12 — Polish + Launch — IN PROGRESS (Session 12)
+- [x] Toast notifications — sonner library, Toaster in root layout, toasts on all CRUD actions across patterns, kits, embroidery, threads, fabrics, WIP progress, journal notes, status toggles, photo uploads
+- [x] Empty states (all list pages) — already done in earlier phases
+- [x] Loading skeletons (all list pages) — already done in earlier phases
+- [x] Error boundaries — root `src/app/error.tsx` + app-level `src/app/(app)/error.tsx`, warm "Dropped stitch!" copy with retry
+- [x] 404 page — `src/app/not-found.tsx`, warm "Lost stitch!" copy with Back to Home link
+- [x] Image lazy loading — `loading="lazy"` on 15+ `<img>` tags across detail pages, dashboard, store mode; form previews left eager
+- [x] Deploy to Vercel — auto-deploys from main, live at stitch-studio-three.vercel.app
 - [ ] Final Lighthouse audit
-- [ ] Deploy to Vercel
 - [ ] Custom domain (if applicable)
 - [ ] Share app URL with Mom
+
+---
+
+### Session 12 Bug Fixes + Polish — ✅ DONE (2026-03-14)
+
+**Tutorial overlay broken on mobile (3 bugs):**
+- [x] Last step ("You're all set!") off-screen — CSS animation `tutorialTooltipPop` transform overrode centering `translate(-50%, -50%)`. Switched to flexbox centering wrapper (`fixed inset-0 flex items-center justify-center`)
+- [x] Nav steps stuck/confusing on mobile — combined 4 individual nav tab steps into 1 `bottom-nav` step. Added `data-tutorial-id="bottom-nav"` to BottomNav `<nav>` element. Desktop/tablet keeps individual side nav steps.
+- [x] Tooltip buttons not responding on iOS Safari — added explicit `z-index: 10` to tooltip (vs z:1 on SVG backdrop)
+- [x] Tutorial now has responsive step sets: `MOBILE_STEPS` (5 steps) vs `DESKTOP_STEPS` (8 steps), chosen by viewport width
+
+**iOS-native drag-to-dismiss on all bottom sheet modals:**
+- [x] Created `useBottomSheetDrag` hook — `src/hooks/useBottomSheetDrag.ts`
+  - Touch drag from handle area (top 48px), 100px threshold to dismiss
+  - Smooth translateY tracking during drag, proportional backdrop fade
+  - Snap-back animation if released below threshold
+  - Slide-out + fade animation on dismiss
+- [x] Wired into StreakDetail — `src/components/engagement/StreakDetail.tsx`
+- [x] Wired into SubstitutionHelper — `src/components/ai/SubstitutionHelper.tsx` (also added drag handle bar)
+- [x] Wired into DuplicateWarning — `src/components/patterns/DuplicateWarning.tsx` (also added drag handle bar, mobile only via `sm:hidden`)
+- [x] All bottom sheets now dismiss via: tap backdrop, drag down from handle, or press close/cancel buttons
 
 ---
 
