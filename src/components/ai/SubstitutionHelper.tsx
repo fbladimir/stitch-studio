@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import type { PatternThread, ThreadInventoryItem } from "@/types";
+import { useBottomSheetDrag } from "@/hooks/useBottomSheetDrag";
 
 interface Suggestion {
   manufacturer: string;
@@ -25,6 +26,8 @@ export function SubstitutionHelper({
   const [suggestions, setSuggestions] = useState<Suggestion[]>([]);
   const [generalAdvice, setGeneralAdvice] = useState<string>("");
   const [error, setError] = useState<string | null>(null);
+  const { sheetRef, handleTouchStart, handleTouchMove, handleTouchEnd } =
+    useBottomSheetDrag({ onClose });
 
   useEffect(() => {
     async function fetchSuggestions() {
@@ -62,11 +65,22 @@ export function SubstitutionHelper({
   }, [missingThread, availableThreads]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/40">
+    <div className="fixed inset-0 z-50 flex items-end justify-center" onClick={onClose}>
+      <div className="absolute inset-0 bg-black/40" data-sheet-backdrop />
       <div
-        className="w-full max-w-lg bg-white rounded-t-3xl px-5 py-6 flex flex-col gap-4 animate-slideUp max-h-[80vh] overflow-y-auto"
+        ref={sheetRef}
+        className="relative w-full max-w-lg bg-white rounded-t-3xl px-5 pt-3 pb-6 flex flex-col gap-4 animate-slideUp max-h-[80vh] overflow-y-auto"
         style={{ paddingBottom: "calc(24px + env(safe-area-inset-bottom, 0px))" }}
+        onClick={(e) => e.stopPropagation()}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
+        {/* Handle */}
+        <div className="flex justify-center py-2 cursor-grab">
+          <div className="w-10 h-1 rounded-full bg-[#D0C4BC]" />
+        </div>
+
         {/* Header */}
         <div className="flex items-start justify-between">
           <div>

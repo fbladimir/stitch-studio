@@ -1,6 +1,7 @@
 "use client";
 
 import { getWeekActivityDots, STREAK_MILESTONES } from "@/lib/engagement";
+import { useBottomSheetDrag } from "@/hooks/useBottomSheetDrag";
 
 interface StreakDetailProps {
   currentStreak: number;
@@ -18,6 +19,8 @@ export function StreakDetail({
   onClose,
 }: StreakDetailProps) {
   const weekDots = getWeekActivityDots(lastActivityDate, currentStreak);
+  const { sheetRef, handleTouchStart, handleTouchMove, handleTouchEnd } =
+    useBottomSheetDrag({ onClose });
 
   // Next milestone
   const nextMilestone = STREAK_MILESTONES.find((m) => m.days > currentStreak);
@@ -25,16 +28,22 @@ export function StreakDetail({
   return (
     <div className="fixed inset-0 z-[150] flex items-end justify-center" onClick={onClose}>
       {/* Backdrop */}
-      <div className="absolute inset-0 bg-black/30" />
+      <div className="absolute inset-0 bg-black/30" data-sheet-backdrop />
 
       {/* Bottom sheet */}
       <div
-        className="relative w-full max-w-lg bg-[#FAF6F0] rounded-t-3xl px-6 pt-6 pb-8 animate-slideUp"
+        ref={sheetRef}
+        className="relative w-full max-w-lg bg-[#FAF6F0] rounded-t-3xl px-6 pt-3 pb-8 animate-slideUp"
         style={{ paddingBottom: "calc(2rem + env(safe-area-inset-bottom))" }}
         onClick={(e) => e.stopPropagation()}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
       >
         {/* Handle */}
-        <div className="w-10 h-1 rounded-full bg-[#E4D6C8] mx-auto mb-5" />
+        <div className="flex justify-center py-2 mb-3 cursor-grab">
+          <div className="w-10 h-1 rounded-full bg-[#D0C4BC]" />
+        </div>
 
         {/* Streak display */}
         <div className="flex items-center justify-center gap-3 mb-6">

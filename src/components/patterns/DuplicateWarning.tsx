@@ -1,6 +1,7 @@
 "use client";
 
 import type { DuplicateCandidate } from "@/lib/duplicate-detection";
+import { useBottomSheetDrag } from "@/hooks/useBottomSheetDrag";
 
 interface DuplicateWarningProps {
   candidates: DuplicateCandidate[];
@@ -15,16 +16,28 @@ export function DuplicateWarning({
   onCancel,
   loading,
 }: DuplicateWarningProps) {
+  const { sheetRef, handleTouchStart, handleTouchMove, handleTouchEnd } =
+    useBottomSheetDrag({ onClose: onCancel });
+
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center">
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" onClick={onCancel}>
       {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-black/40"
-        onClick={onCancel}
-      />
+      <div className="absolute inset-0 bg-black/40" data-sheet-backdrop />
 
       {/* Sheet */}
-      <div className="relative w-full max-w-lg bg-white rounded-t-3xl sm:rounded-3xl p-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] shadow-2xl">
+      <div
+        ref={sheetRef}
+        className="relative w-full max-w-lg bg-white rounded-t-3xl sm:rounded-3xl pt-3 px-6 pb-[max(1.5rem,env(safe-area-inset-bottom))] shadow-2xl animate-slideUp"
+        onClick={(e) => e.stopPropagation()}
+        onTouchStart={handleTouchStart}
+        onTouchMove={handleTouchMove}
+        onTouchEnd={handleTouchEnd}
+      >
+        {/* Handle — visible on mobile only */}
+        <div className="flex justify-center py-2 mb-2 sm:hidden cursor-grab">
+          <div className="w-10 h-1 rounded-full bg-[#D0C4BC]" />
+        </div>
+
         <div className="flex items-center gap-3 mb-1">
           <span className="text-2xl">⚠️</span>
           <h2 className="font-playfair text-[20px] font-bold text-[#3A2418]">
