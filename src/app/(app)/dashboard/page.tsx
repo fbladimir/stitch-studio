@@ -225,14 +225,15 @@ export default function DashboardPage() {
           ) : (
             <div className="grid grid-cols-2 gap-3">
               {[
-                { value: stats!.totalPatterns, label: "Patterns", icon: "📖", color: "text-[#B36050]" },
-                { value: stats!.wips, label: "In Progress", icon: "⏱️", color: "text-[#AE7C2A]" },
-                { value: stats!.finished, label: "Finished", icon: "✓", color: "text-[#5F7A63]" },
-                { value: stats!.threads, label: "Threads", icon: "🧵", color: "text-[#896E66]" },
-              ].map(({ value, label, icon, color }) => (
-                <div
+                { value: stats!.totalPatterns, label: "Patterns", icon: "📖", color: "text-[#B36050]", href: "/patterns" },
+                { value: stats!.wips, label: "In Progress", icon: "⏱️", color: "text-[#AE7C2A]", href: "/patterns?filter=wip" },
+                { value: stats!.finished, label: "Finished", icon: "✓", color: "text-[#5F7A63]", href: "/patterns?filter=finished" },
+                { value: stats!.threads, label: "Threads", icon: "🧵", color: "text-[#896E66]", href: "/threads" },
+              ].map(({ value, label, icon, color, href }) => (
+                <Link
                   key={label}
-                  className="bg-white rounded-2xl border border-[#E4D6C8] px-4 py-4 flex items-center gap-3"
+                  href={href}
+                  className="bg-white rounded-2xl border border-[#E4D6C8] px-4 py-4 flex items-center gap-3 active:scale-[0.97] transition-transform"
                   style={{ boxShadow: "0 2px 10px rgba(58,36,24,0.05)" }}
                 >
                   <span className="text-2xl">{icon}</span>
@@ -244,7 +245,7 @@ export default function DashboardPage() {
                       {label}
                     </p>
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           )}

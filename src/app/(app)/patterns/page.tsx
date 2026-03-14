@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { Suspense, useEffect, useState, useMemo } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { getPatterns } from "@/lib/supabase/queries";
 import { PageWrapper } from "@/components/layout/PageWrapper";
@@ -23,9 +24,33 @@ function Skeleton({ className }: { className?: string }) {
 }
 
 export default function PatternsPage() {
+  return (
+    <Suspense fallback={
+      <>
+        <TopBar title="My Patterns" />
+        <PageWrapper className="pb-8">
+          <div className="flex flex-col gap-3 mt-4">
+            {[...Array(5)].map((_, i) => (
+              <Skeleton key={i} className="h-[76px]" />
+            ))}
+          </div>
+        </PageWrapper>
+      </>
+    }>
+      <PatternsContent />
+    </Suspense>
+  );
+}
+
+function PatternsContent() {
+  const searchParams = useSearchParams();
+  const initialFilter = (searchParams.get("filter") as FilterTab) || "all";
+
   const [patterns, setPatterns] = useState<Pattern[] | null>(null);
   const [search, setSearch] = useState("");
-  const [activeTab, setActiveTab] = useState<FilterTab>("all");
+  const [activeTab, setActiveTab] = useState<FilterTab>(
+    ["all", "wip", "kitted", "finished"].includes(initialFilter) ? initialFilter : "all"
+  );
 
   useEffect(() => {
     const load = async () => {

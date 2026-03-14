@@ -6,6 +6,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { FABRIC_MANUFACTURERS } from "@/types";
 import type { FabricInventoryItem, FabricType, FabricCount } from "@/types";
+import { fileToBase64 } from "@/lib/image";
 
 const FABRIC_COUNTS: FabricCount[] = ["14", "16", "18", "20", "22", "25", "28", "32", "36"];
 
@@ -50,7 +51,11 @@ export function FabricForm({ mode, initial, onSubmit, submitting }: FabricFormPr
     initial?.count ?? null
   );
 
-  const { register, handleSubmit } = useForm<FormValues>({
+  const [aiScanning, setAiScanning] = useState(false);
+  const [aiScanDone, setAiScanDone] = useState(false);
+  const [aiError, setAiError] = useState<string | null>(null);
+
+  const { register, handleSubmit, setValue } = useForm<FormValues>({
     resolver: zodResolver(schema),
     defaultValues: {
       manufacturer: initial?.manufacturer ?? "",
@@ -69,6 +74,57 @@ export function FabricForm({ mode, initial, onSubmit, submitting }: FabricFormPr
     setPhotoFile(compressed);
     setPhotoPreview(URL.createObjectURL(compressed));
     e.target.value = "";
+  }
+
+  async function handleAIScan() {
+    if (!photoFile) return;
+    setAiScanning(true);
+    setAiError(null);
+
+    try {
+      const base64 = await fileToBase64(photoFile);
+      const res = await fetch("/api/ai/scan-fabric", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: base64 }),
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || "Scan failed");
+      }
+
+      const result = await res.json();
+
+      // Auto-fill form fields
+      if (result.manufacturer) {
+        // Match to our known manufacturers
+        const match = FABRIC_MANUFACTURERS.find(
+          (m) => m.toLowerCase() === result.manufacturer.toLowerCase()
+        );
+        setValue("manufacturer", match || "Other");
+      }
+      if (result.color_name) setValue("color_name", result.color_name);
+      if (result.size) setValue("size", result.size);
+      if (result.fabric_type) {
+        const validTypes: FabricType[] = ["aida", "linen", "evenweave", "other"];
+        if (validTypes.includes(result.fabric_type)) {
+          setFabricType(result.fabric_type);
+        }
+      }
+      if (result.count) {
+        const validCounts: FabricCount[] = ["14", "16", "18", "20", "22", "25", "28", "32", "36"];
+        if (validCounts.includes(result.count)) {
+          setFabricCount(result.count);
+        }
+      }
+
+      setAiScanDone(true);
+    } catch (err) {
+      setAiError(err instanceof Error ? err.message : "AI scan failed. You can still fill in the fields manually.");
+    } finally {
+      setAiScanning(false);
+    }
   }
 
   const handleFormSubmit = async (values: FormValues) => {
@@ -134,6 +190,45 @@ export function FabricForm({ mode, initial, onSubmit, submitting }: FabricFormPr
             🖼️ Choose from Library
           </button>
         </div>
+        {/* AI Scan Button — shown when photo is selected and in add mode */}
+        {photoFile && mode === "add" && (
+          <div className="mt-3">
+            {aiScanDone ? (
+              <div className="flex items-center gap-2 bg-[#EBF2EC] border border-[#5F7A63]/20 rounded-xl px-4 py-3">
+                <span className="text-lg">✅</span>
+                <p className="font-nunito text-[13px] text-[#5F7A63] font-semibold">
+                  AI filled in the details — review below and save!
+                </p>
+              </div>
+            ) : (
+              <button
+                type="button"
+                onClick={handleAIScan}
+                disabled={aiScanning}
+                className="w-full h-12 rounded-xl bg-gradient-to-r from-[#B36050] to-[#CA8070] text-white font-nunito font-bold text-[14px] flex items-center justify-center gap-2 active:scale-[0.98] transition-transform shadow-md disabled:opacity-70"
+              >
+                {aiScanning ? (
+                  <>
+                    <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                    Identifying fabric...
+                  </>
+                ) : (
+                  <>
+                    <span>✨</span> Auto-fill with AI
+                  </>
+                )}
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* AI Error */}
+        {aiError && (
+          <div className="mt-2 bg-[#FDF0EE] border border-[#B03020]/20 rounded-xl px-4 py-3">
+            <p className="font-nunito text-[13px] text-[#B03020]">{aiError}</p>
+          </div>
+        )}
+
         <input ref={cameraRef} type="file" accept="image/*" capture="environment" onChange={handlePhotoSelect} className="hidden" />
         <input ref={libraryRef} type="file" accept="image/*" onChange={handlePhotoSelect} className="hidden" />
       </section>
