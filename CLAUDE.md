@@ -1154,4 +1154,393 @@ feature development as nav and component structure must be stable first.**
 
 ---
 
+### Phase 15 — Engagement & Delight System (Duolingo-Inspired)
+
+**Background:** Mom has a 400+ day Duolingo streak. What she loves: the streak habit loop,
+visible progress, celebration moments, monthly challenges, and community rank. All of this
+translates naturally to a stitching companion. The goal is to make the app feel alive and
+rewarding — not just a database, but a companion that celebrates her craft with her.
+
+**Design philosophy:**
+- Every meaningful action earns a response — adding a pattern, finishing a WIP, hitting a streak
+- Celebrations feel personal (her dogs are involved)
+- Progress is always visible — she can see herself growing as a stitcher
+- Solo experience is complete and satisfying; community features layer on top naturally later
+- Copy tone: warm, playful, never corporate. "You're on fire! 🔥" not "Achievement unlocked."
+
+---
+
+#### 15a — Stitching Streak 🔥
+
+The habit loop. One of the most powerful engagement mechanics from Duolingo.
+
+**What counts as a streak day:**
+- Logging WIP progress on any pattern
+- Marking a pattern as Kitted, WIP started, or Finished
+- Adding a new pattern, thread, or fabric to her collection
+- Adding a progress journal entry
+
+**Streak rules:**
+- One qualifying action per day = streak maintained
+- Streak resets at midnight local time if no action that day
+- One "streak freeze" available per week — auto-activates on the first missed day (grace period)
+  so a single day away doesn't break a long streak (same as Duolingo)
+- Longest streak is stored separately — losing current streak doesn't erase the record
+
+**Dashboard display:**
+- Flame emoji 🔥 with the streak count — prominent on dashboard below the greeting
+- "Day 1 · Today's the day!" → "Day 7 · One week! 🎉" → "Day 30 · A whole month! 🔥"
+- Subtle pulse animation on the flame when it increases
+- Tap the streak card → opens Streak Detail sheet showing current streak, longest streak,
+  this week's activity dots (filled/empty), and next milestone
+
+**Streak milestone celebrations (full-screen):**
+- 3 days: "You're building a habit! 🌱"
+- 7 days: "One full week! Rex is proud of you 🐾"
+- 14 days: "Two weeks strong! 🔥"
+- 30 days: "A whole month of stitching! You're incredible ✿"
+- 50 days: "Fifty days! You're basically a stitching machine 🧵"
+- 100 days: "ONE HUNDRED DAYS! This deserves a party 🎉🎉🎉" (extra confetti)
+- 365 days: "A full year! You are a Grand Master Stitcher. 👑"
+
+---
+
+#### 15b — Achievements & Badges 🏅
+
+Visible shelf of earned badges. Locked badges are shown grayed out so she can see what's coming.
+
+**Collection badges:**
+- 🪡 "First Stitch" — added your first pattern
+- 📚 "Growing Collection" — 10 patterns added
+- 📖 "Bookshelf" — 25 patterns added
+- 🏛️ "The Library" — 50 patterns added
+- 👑 "The Archive" — 100 patterns added
+
+**Finishing badges:**
+- ✂️ "Snip Snip" — finished your first WIP
+- ✨ "Maker" — 5 finished pieces
+- 🎨 "Prolific" — 10 finished pieces
+- 🏆 "Master Finisher" — 25 finished pieces
+
+**Stash badges:**
+- 🧵 "Color Me Happy" — 25 threads in stash
+- 🌈 "Rainbow Stash" — 100 threads in stash
+- 🗄️ "The Stash Whisperer" — 250 threads in stash
+
+**Streak badges:**
+- 🔥 "Spark" — 3-day streak
+- 🔥🔥 "On Fire" — 7-day streak
+- 💪 "Dedicated" — 30-day streak
+- 🌟 "Unstoppable" — 100-day streak
+- 👑 "Legendary" — 365-day streak
+
+**Special badges:**
+- 🧺 "Kit Ready" — first pattern marked Kitted
+- 📷 "Organized" — 10 patterns with cover photos
+- 📓 "Journal Keeper" — 10 WIP journal entries written
+- 🛍️ "Smart Shopper" — used Store Mode
+- 🤖 "Tech-Savvy Stitcher" — used AI cover scan
+- 🐾 "Fur Baby's Biggest Fan" — added 3+ pets in onboarding
+
+**Badge display (Achievement Shelf page):**
+- Grid of badge cards — earned ones in full color with earn date, locked ones grayed out
+- Tapping a locked badge shows: name + "Earn this by: [action]"
+- Tapping earned badge shows: name + earn date + a warm personal note
+- Accessible from dashboard stats or profile page
+
+---
+
+#### 15c — Celebrations & Confetti 🎉
+
+These are the dopamine moments. Full-screen overlays with animation, warm copy, personal touches.
+
+**Trigger: Pattern marked Finished**
+This is the biggest celebration. Full-screen takeover:
+- Confetti burst (rose, sage, gold colors)
+- Dog emoji parade across the screen (animated, same as DailyGreeting dogs)
+- Large "✿ Finished! ✿" in Playfair Display
+- Pattern name + cover photo shown
+- Personalized copy: "You did it! [Name], this is beautiful 🎉"
+- Dog line: "[Dog name] is SO proud of you! 🐾"
+- Stats shown: days worked on it, total journal entries, stitches completed
+- Two buttons: "Add FO Photo 📷" | "Back to My Collection"
+- Shareable card option (Phase 16): one-tap image with pattern + stats + Stitch Studio branding
+
+**Trigger: Streak milestone hit (see 15a above)**
+- Smaller confetti burst, badge animation flies in
+- "[X] day streak! [Copy]" with flame animation
+- "Keep going! Come back tomorrow to keep your streak alive."
+
+**Trigger: New badge earned**
+- Badge "pops" into view from below (spring animation)
+- "You earned a new badge! 🏅" with badge name + icon
+- Dismisses automatically after 3 seconds or on tap
+
+**Trigger: First pattern added (first-time only)**
+- Warm overlay: "Your collection has begun! ✿"
+- "Every great archive starts with one. This is yours."
+- CTA: "Add cover photo 📷" | "Keep going →"
+
+**Trigger: Monthly challenge completed (see 15d)**
+- Challenge-specific celebration with badge
+
+**Animation specs:**
+- Confetti: rose (#B36050), sage (#5F7A63), gold (#AE7C2A), cream (#FDF4F1) particles
+- All celebrations: `fadeSlideUp` entry, auto-dismiss or tap-anywhere-to-close
+- Never block critical navigation — always has visible close button
+- Max duration before auto-dismiss: 6 seconds (except "Pattern Finished" which stays until dismissed)
+
+---
+
+#### 15d — Monthly Challenges 🎯
+
+Rotating monthly goals that give her something to work toward. Resets on the 1st of each month.
+She sees active challenges on the dashboard below Quick Actions.
+
+**Challenge types (rotate monthly, 2-3 active at once):**
+- **"Stitch Sprint"** — Log WIP progress 5 days this month (progress: 0/5 days)
+- **"Scan-a-thon"** — Add 3 new patterns to your collection (progress: 0/3)
+- **"Finish Line"** — Complete 1 WIP this month (progress: 0/1)
+- **"Stash Keeper"** — Add 10 threads to your inventory (progress: 0/10)
+- **"Kitting Day"** — Kit 2 patterns (progress: 0/2)
+- **"Photo Day"** — Add cover photos to 5 patterns (progress: 0/5)
+- **"Journal Habit"** — Write 3 journal entries (progress: 0/3)
+- **"The Deep Dive"** — Scan a color key and add all threads to a pattern (progress: 0/1)
+- **"Collection Spring Clean"** — Review and update 5 existing patterns (progress: 0/5)
+
+**Challenge card UI (on dashboard):**
+- Card with challenge name, emoji, description, progress bar (X/Y filled)
+- Deadline shown: "Ends in 12 days"
+- When complete: card turns sage green, checkmark, "Completed! ✓" badge
+- Tap for details and challenge-specific tips
+
+**Challenge completion reward:**
+- Special achievement badge for each completed challenge
+- "Monthly Champion" badge if all 3 challenges completed in one month
+
+**Challenge logic:**
+- Progress tracked automatically — she doesn't manually mark anything
+- End of month: completed challenges archived, new ones generated for next month
+- "Current Challenges" section visible on dashboard when at least 1 is active
+
+---
+
+#### 15e — Level & XP System ⭐
+
+Persistent level shown on profile. Gives a sense of growing mastery over time.
+
+**XP earnings:**
+| Action | XP |
+|--------|-----|
+| Add a pattern | 10 XP |
+| Add cover photo to a pattern | 5 XP |
+| Add threads to a pattern (per color) | 2 XP |
+| Mark pattern as Kitted | 15 XP |
+| Log WIP progress | 10 XP |
+| Write a journal entry | 8 XP |
+| Mark pattern as Finished | 50 XP |
+| Add FO photo | 10 XP |
+| Add FFO photo | 10 XP |
+| Add thread to inventory | 1 XP |
+| Complete a monthly challenge | 100 XP |
+| 7-day streak | 75 XP bonus |
+| 30-day streak | 300 XP bonus |
+
+**Level thresholds:**
+| Level | Title | XP Required |
+|-------|-------|-------------|
+| 1 | Apprentice Stitcher | 0 |
+| 2 | Journeyman Stitcher | 200 |
+| 3 | Skilled Stitcher | 600 |
+| 4 | Expert Stitcher | 1,500 |
+| 5 | Master Stitcher | 3,500 |
+| 6 | Grand Master Stitcher | 7,000 |
+
+**Display:**
+- Level badge + title shown on profile page
+- XP progress bar toward next level
+- When leveling up: celebration overlay "You reached [Level]! 🌟" with new title revealed
+- Dashboard: small level badge next to her name (optional toggle)
+
+---
+
+#### 15f — Collection Insights & Wrapped 📊
+
+Periodic recaps that make her feel the growth of her collection.
+
+**Weekly Digest (shown Monday morning on dashboard):**
+- "Your week in stitches ✿" card — collapsible
+- Patterns added this week, progress logged, streaks maintained
+- Warm copy: "What a week! You added 2 patterns and logged 4 stitching sessions."
+
+**Monthly Summary (shown on 1st of each month):**
+- Full-screen card: "Here's your [Month] in stitches!"
+- Stats: patterns added, threads added, WIPs updated, journal entries, streak days
+- Most stitched pattern (most WIP updates)
+- Badge of the month (biggest achievement earned)
+
+**Yearly "Stitch Wrapped" (January 1st or anniversary):**
+- Duolingo Year in Review equivalent
+- Full animated slideshow:
+  - "You stitched for [X] days this year!"
+  - "You finished [X] pieces! 🎉"
+  - "Your collection grew to [X] patterns!"
+  - "You added [X] threads to your stash!"
+  - "Your longest streak was [X] days!"
+  - "Your most-stitched pattern: [name]"
+  - Final screen: level + title earned + shareable card
+
+---
+
+#### 15g — Personality & Dog Integration 🐾
+
+The dogs aren't just in onboarding — they're the personality of the whole engagement system.
+
+**Dog-powered notifications/nudges:**
+- Streak at risk (hasn't logged today, evening): "[Dog name] is waiting by your hoop! 🐾 Log some progress to keep your streak alive."
+- WIP neglected 7+ days: "[Dog name] thinks you should check on [pattern name]! It misses you."
+- Streak milestone: "[Dog name] did a happy dance when they heard! 🐾"
+- New badge earned: "[Dog name] is barking with excitement! You just earned [Badge]! 🏅"
+
+**Dog parade on celebrations:**
+- On Pattern Finished screen: all her dogs animate across the bottom of the screen
+- Same popIn → float/wiggle animation as DailyGreeting
+- Staggered entry, each dog appears with her name, then floats
+
+---
+
+#### 15h — Community Features (Phase 16, when she invites her stitch group)
+
+These are separate from solo engagement — build Phase 15 first, add community later.
+
+**Core community features:**
+- Follow friends by username or invite link
+- **Friends' Feed** — a scrollable feed of friends' finished pieces with photos
+- **Cheer** — tap a heart/clap/flame reaction on a friend's finished piece (no text comments needed)
+- **Group Challenges** — a shared monthly challenge with friend group (e.g., "Who finishes first?")
+- **Leaderboard** — weekly XP ranking within her friend group (resets weekly, like Duolingo leagues)
+- **Community Challenges** — app-wide challenge everyone participates in (e.g., "Stitch Studio Holiday Sprint")
+
+**Social design philosophy:**
+- No public posts, no strangers — friends only (she chooses who to follow)
+- No comments section (to avoid negativity) — only reactions (cheer, love, fire)
+- Sharing is always optional — she controls what appears in her feed
+- Community leaderboard is friends-only, not global — keeps it cozy, not competitive
+
+**Schema additions for Phase 16:**
+```sql
+CREATE TABLE follows (
+  follower_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  following_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  PRIMARY KEY (follower_id, following_id)
+);
+
+CREATE TABLE finished_shares (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  pattern_id UUID REFERENCES patterns(id) ON DELETE CASCADE,
+  photo_url TEXT,
+  caption TEXT,
+  shared_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+CREATE TABLE cheers (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  share_id UUID REFERENCES finished_shares(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  reaction TEXT DEFAULT 'cheer', -- 'cheer' | 'love' | 'fire'
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(share_id, user_id)
+);
+```
+
+---
+
+**Schema additions for Phase 15 (add to profiles + new tables):**
+```sql
+-- Add to profiles table
+ALTER TABLE profiles ADD COLUMN current_streak INTEGER DEFAULT 0;
+ALTER TABLE profiles ADD COLUMN longest_streak INTEGER DEFAULT 0;
+ALTER TABLE profiles ADD COLUMN last_activity_date DATE;
+ALTER TABLE profiles ADD COLUMN total_xp INTEGER DEFAULT 0;
+ALTER TABLE profiles ADD COLUMN level INTEGER DEFAULT 1;
+ALTER TABLE profiles ADD COLUMN streak_freeze_used_this_week BOOLEAN DEFAULT FALSE;
+ALTER TABLE profiles ADD COLUMN freeze_week_start DATE;
+
+-- Achievements earned
+CREATE TABLE achievements (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  achievement_id TEXT NOT NULL,
+  earned_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, achievement_id)
+);
+
+-- Monthly challenge progress
+CREATE TABLE challenge_progress (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  challenge_id TEXT NOT NULL,
+  month TEXT NOT NULL,  -- '2026-03'
+  progress INTEGER DEFAULT 0,
+  goal INTEGER NOT NULL,
+  completed BOOLEAN DEFAULT FALSE,
+  completed_at TIMESTAMPTZ,
+  UNIQUE(user_id, challenge_id, month)
+);
+```
+
+**Components needed for Phase 15:**
+```
+src/components/engagement/
+  StreakCard.tsx              ← dashboard streak display (flame, count, tap for detail)
+  StreakDetail.tsx            ← bottom sheet: current/longest, week dots, milestones
+  CelebrationOverlay.tsx     ← SHARED full-screen celebration: confetti, dogs, copy, CTA
+  AchievementBadge.tsx       ← single badge component (earned/locked states)
+  AchievementShelf.tsx       ← full grid of all badges
+  ChallengeCard.tsx          ← single challenge with progress bar
+  ChallengeSection.tsx       ← dashboard section showing active challenges
+  LevelBadge.tsx             ← level + title display
+  XpBar.tsx                  ← progress bar toward next level
+  WeeklyDigest.tsx           ← Monday "your week in stitches" card
+  MonthlyWrap.tsx            ← month summary card
+  YearlyWrap.tsx             ← Stitch Wrapped annual slideshow
+  DogParade.tsx              ← animated dogs across bottom (reused from DailyGreeting)
+
+src/lib/engagement.ts        ← XP calculation, streak logic, achievement checking, challenge tracking
+src/hooks/useEngagement.ts   ← loads streak, achievements, challenges for current user
+```
+
+**Build order within Phase 15:**
+1. Schema migration (ALTER + new tables)
+2. `src/lib/engagement.ts` — all logic (XP, streak check, achievement unlock, challenge progress)
+3. `useEngagement.ts` hook
+4. `CelebrationOverlay.tsx` — used everywhere, build first
+5. `StreakCard.tsx` + `StreakDetail.tsx` — visible on dashboard immediately
+6. `AchievementBadge.tsx` + `AchievementShelf.tsx`
+7. `ChallengeCard.tsx` + `ChallengeSection.tsx`
+8. Wire celebrations into pattern actions (Finished, milestone streaks, badges)
+9. `LevelBadge.tsx` + `XpBar.tsx` on profile
+10. Weekly/Monthly digest cards
+11. Yearly Wrapped (can be deferred to Phase 15b)
+
+**Build Phase 15 AFTER Phase 12 (core app complete). Community (Phase 16) after Phase 15.**
+
+---
+
+### Phase 12 — Polish + Launch
+- [ ] Toast notifications (success, error, info)
+- [ ] Empty states (all list pages)
+- [ ] Loading skeletons (all list pages)
+- [ ] Error boundaries
+- [ ] 404 page
+- [ ] Image lazy loading
+- [ ] Final Lighthouse audit
+- [ ] Deploy to Vercel
+- [ ] Custom domain (if applicable)
+- [ ] Share app URL with Mom
+
+---
+
 *End of CLAUDE.md — keep this file updated every session.*
