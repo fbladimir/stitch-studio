@@ -1,6 +1,6 @@
 // All database query functions
 import { createClient } from "./client";
-import type { Pattern, PatternThread, WipJournalEntry, ThreadInventoryItem } from "@/types";
+import type { Pattern, PatternThread, WipJournalEntry, ThreadInventoryItem, FabricInventoryItem } from "@/types";
 
 
 // ── Patterns ─────────────────────────────────────────────────
@@ -371,4 +371,78 @@ export async function getPatternsUsingThread(
     .eq("color_number", colorNumber)
     .eq("patterns.user_id", userId);
   return { data, error };
+}
+
+// ── Fabric Inventory ──────────────────────────────────────────
+
+export async function getFabricInventory(userId: string) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("fabric_inventory")
+    .select("*")
+    .eq("user_id", userId)
+    .order("created_at", { ascending: false });
+  return { data: data as FabricInventoryItem[] | null, error };
+}
+
+export async function getFabricInventoryItem(id: string) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("fabric_inventory")
+    .select("*")
+    .eq("id", id)
+    .single();
+  return { data: data as FabricInventoryItem | null, error };
+}
+
+export async function createFabricInventoryItem(
+  userId: string,
+  item: Omit<FabricInventoryItem, "id" | "user_id" | "created_at">
+) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("fabric_inventory")
+    .insert({ ...item, user_id: userId })
+    .select()
+    .single();
+  return { data: data as FabricInventoryItem | null, error };
+}
+
+export async function updateFabricInventoryItem(
+  id: string,
+  updates: Partial<Omit<FabricInventoryItem, "id" | "user_id" | "created_at">>
+) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("fabric_inventory")
+    .update(updates)
+    .eq("id", id)
+    .select()
+    .single();
+  return { data: data as FabricInventoryItem | null, error };
+}
+
+export async function deleteFabricInventoryItem(id: string) {
+  const supabase = createClient();
+  const { error } = await supabase.from("fabric_inventory").delete().eq("id", id);
+  return { error };
+}
+
+export async function uploadFabricPhoto(
+  userId: string,
+  fabricId: string,
+  file: File
+): Promise<{ url: string | null; error: Error | null }> {
+  const supabase = createClient();
+  const ext = file.name.split(".").pop() ?? "jpg";
+  const path = `${userId}/${fabricId}/fabric.${ext}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("fabric-photos")
+    .upload(path, file, { upsert: true });
+
+  if (uploadError) return { url: null, error: uploadError };
+
+  const { data } = supabase.storage.from("fabric-photos").getPublicUrl(path);
+  return { url: data.publicUrl, error: null };
 }
