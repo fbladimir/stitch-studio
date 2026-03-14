@@ -1,6 +1,6 @@
 # CLAUDE.md — Stitch Studio
 # Cross Stitch Companion App for Mom
-# Last Updated: 2026-03-14 (Session 5)
+# Last Updated: 2026-03-14 (Session 6)
 
 ---
 
@@ -836,7 +836,7 @@ NEVER force camera-only. NEVER force upload-only.
 ## ✅ PROGRESS LOG
 
 ### HANDOFF NOTE
-> Session 5 complete. Phase 6 (Embroidery Module) is fully built and deployed. Additionally: (1) **Roku pre-signup intro** — 4-step guided pre-signup experience narrated by Roku the aussie doodle dog, with a hand-crafted inline SVG dog avatar (golden/brown, curly fur, tongue out), speech bubbles, animated slide transitions, and "skip" functionality. Lives at `/intro`. First-time unauthenticated visitors are redirected here from `/welcome` via localStorage key `ss_roku_intro_seen`. (2) **Dashboard dog display** — now shows 2 randomly selected dogs (day-seeded, rotates daily) instead of all 8 in the header subline. (3) **Dashboard bugs fixed** — `&apos;` rendering bug in WIP nudge text fixed; testing sign-out button removed from dashboard. (4) **Nav tab renamed** — "Patterns" bottom nav tab renamed to "Projects" to feel natural for stitchers who do cross stitch, embroidery, AND kits. (5) **3-way switcher** — Patterns/Kits 2-way switcher became 📖 Patterns | 🌸 Embroidery | 🧺 Kits across all three list pages. Next session: Phase 7 (Thread Inventory) or Phase 8 (Fabric Inventory). Profile page with photo display + Phase 15 (streaks, XP, achievements) is planned for after core modules are complete.
+> Session 6 complete. **Phase 7 (Thread Inventory) and Phase 8 (Fabric Inventory) are both fully built and deployed.** Thread inventory: list with 🧵/🪢 Threads/Fabrics switcher, search, dynamic manufacturer filter tabs (only shows tabs for manufacturers you actually own), ThreadCard (color swatch + number + quantity badge), ThreadForm (dropdown, +/- quantity buttons, thread type pills), thread detail page with live quantity editing, patterns cross-reference list, and delete. Fabric inventory: same Threads/Fabrics switcher, search, fabric type filter tabs (All/Aida/Linen/Evenweave/Other), FabricCard (photo thumbnail, type + count badges), FabricForm (photo upload camera+library, manufacturer dropdown, color/size fields, type pills, count pills 14–36ct), fabric detail with full photo display, inline edit, and delete. Both modules committed and pushed (Vercel deployed). **Next session: Phase 9 — AI Features** (PhotoScanner shared component, /api/ai/scan-cover, /api/ai/scan-colorkey, /api/ai/scan-stash, /api/ai/advisor streaming SSE, /api/ai/kitting-suggest, AI integrated into PatternForm and thread list, Kitting Check flow, AI Advisor chat page). Profile page + Phase 15 (streaks, XP, achievements) remains planned for after all core modules are complete.
 
 ---
 
@@ -1029,20 +1029,28 @@ Photos load correctly in `<img>` tags via `getPublicUrl()`. Full SQL is in `supa
 - `ss_greeted` — daily greeting overlay (value = today's date string)
 - `ss_roku_intro_seen` — Roku pre-signup intro (value = 'true')
 
-### Phase 7 — Thread Inventory
-- [ ] Thread list (search + filter by manufacturer)
-- [ ] ThreadCard (manufacturer, number, color name, quantity)
-- [ ] ThreadForm (add/edit)
-- [ ] Quantity +/- buttons
-- [ ] Thread → patterns cross-reference view
-- [ ] Delete thread with confirmation
+### Phase 7 — Thread Inventory — ✅ DONE
+- [x] Thread list (search + dynamic manufacturer filter tabs) — src/app/(app)/threads/page.tsx
+- [x] 🧵 Threads / 🪢 Fabrics switcher at top of stash section
+- [x] ThreadCard (manufacturer, color number swatch, color name, quantity badge) — src/components/threads/ThreadCard.tsx
+- [x] ThreadForm (manufacturer dropdown, color number + name fields, +/- quantity buttons, thread type pills, notes) — src/components/threads/ThreadForm.tsx
+- [x] threads/new page — src/app/(app)/threads/new/page.tsx
+- [x] threads/[id] detail page — live quantity +/- on detail, inline edit mode, patterns cross-reference list, delete with confirmation — src/app/(app)/threads/[id]/page.tsx
+- [x] Thread inventory CRUD queries + getPatternsUsingThread — src/lib/supabase/queries.ts
 
-### Phase 8 — Fabric Inventory
-- [ ] Fabric list (filter by count, type)
-- [ ] FabricCard
-- [ ] FabricForm (add/edit)
-- [ ] Fabric photo upload (camera + gallery)
-- [ ] Delete fabric with confirmation
+**Thread inventory notes:**
+- Manufacturer filter tabs are dynamic — only shows tabs for manufacturers that exist in stash
+- Cross-reference joins pattern_threads → patterns to show patterns using a specific thread
+- `fabric_inventory` table has no `updated_at` column — sort by `created_at` only
+
+### Phase 8 — Fabric Inventory — ✅ DONE
+- [x] Fabric list (search + fabric type filter tabs: All/Aida/Linen/Evenweave/Other) — src/app/(app)/fabrics/page.tsx
+- [x] 🧵 Threads / 🪢 Fabrics switcher (Fabrics tab active here)
+- [x] FabricCard (photo thumbnail, color name, manufacturer + size, type + count badges) — src/components/fabrics/FabricCard.tsx
+- [x] FabricForm (photo upload camera+library+compress, manufacturer dropdown, color/size text fields, fabric type pills, count pills 14–36ct, notes) — src/components/fabrics/FabricForm.tsx
+- [x] fabrics/new page — src/app/(app)/fabrics/new/page.tsx
+- [x] fabrics/[id] detail page — full photo display, inline edit mode, delete with confirmation — src/app/(app)/fabrics/[id]/page.tsx
+- [x] Fabric inventory CRUD queries + uploadFabricPhoto (fabric-photos bucket) — src/lib/supabase/queries.ts
 
 ### Phase 9 — AI Features
 - [ ] PhotoScanner shared component (camera + upload, preview, compress, confirm)
