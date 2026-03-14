@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import type { PatternThread, StitchType } from "@/types";
+import { useEffect, useRef, useState } from "react";
+import type { PatternThread, StitchType, AIScanThreadResult } from "@/types";
 import { THREAD_MANUFACTURERS } from "@/types";
 import {
   getPatternThreads,
@@ -9,6 +9,7 @@ import {
   updatePatternThread,
   deletePatternThread,
 } from "@/lib/supabase/queries";
+import { compressImage, fileToBase64 } from "@/lib/image";
 
 interface ThreadListProps {
   patternId: string;
@@ -38,6 +39,14 @@ export function ThreadList({ patternId }: ThreadListProps) {
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  // AI scan state
+  const scanCameraRef = useRef<HTMLInputElement>(null);
+  const scanLibraryRef = useRef<HTMLInputElement>(null);
+  const [aiScanning, setAiScanning] = useState(false);
+  const [aiResults, setAiResults] = useState<AIScanThreadResult[] | null>(null);
+  const [aiError, setAiError] = useState<string | null>(null);
+  const [aiImporting, setAiImporting] = useState(false);
 
   useEffect(() => {
     getPatternThreads(patternId).then(({ data }) => {
@@ -112,6 +121,68 @@ export function ThreadList({ patternId }: ThreadListProps) {
     setThreads((prev) => prev.filter((t) => t.id !== id));
     setDeletingId(null);
     if (editingId === id) cancelForm();
+  }
+
+  // ── AI Color Key Scan ──────────────────────────────────────
+
+  async function handleScanPhoto(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    e.target.value = "";
+
+    setAiScanning(true);
+    setAiError(null);
+    setAiResults(null);
+
+    try {
+      const compressed = await compressImage(file);
+      const base64 = await fileToBase64(compressed);
+
+      const res = await fetch("/api/ai/scan-colorkey", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: base64 }),
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || "Scan failed");
+      }
+
+      const data = await res.json();
+      setAiResults(data.threads || []);
+    } catch (err) {
+      setAiError(err instanceof Error ? err.message : "Failed to scan. Please try again.");
+    } finally {
+      setAiScanning(false);
+    }
+  }
+
+  async function importAiThreads() {
+    if (!aiResults || aiResults.length === 0) return;
+    setAiImporting(true);
+
+    try {
+      for (let i = 0; i < aiResults.length; i++) {
+        const t = aiResults[i];
+        const { data } = await addPatternThread({
+          pattern_id: patternId,
+          manufacturer: t.manufacturer || "DMC",
+          color_number: t.color_number || null,
+          color_name: t.color_name || null,
+          strands: t.strands || "2",
+          stitch_type: (t.stitch_type as StitchType) || "full",
+          skeins_needed: t.skeins_needed || 1,
+          sort_order: threads.length + i,
+        });
+        if (data) setThreads((prev) => [...prev, data]);
+      }
+      setAiResults(null);
+    } catch {
+      setAiError("Some threads could not be imported. You can add them manually.");
+    } finally {
+      setAiImporting(false);
+    }
   }
 
   if (loading) {
@@ -213,15 +284,118 @@ export function ThreadList({ patternId }: ThreadListProps) {
         </div>
       )}
 
-      {/* Add button */}
-      {!showAdd && !editingId && (
-        <button
-          onClick={openAdd}
-          className="flex items-center justify-center gap-2 h-11 rounded-full border border-dashed border-[#B36050] text-[#B36050] font-nunito font-semibold text-[13px] active:scale-[0.98] transition-transform"
-        >
-          <span className="text-lg leading-none">+</span> Add thread
-        </button>
+      {/* AI Scan Results Preview */}
+      {aiResults && aiResults.length > 0 && (
+        <div className="bg-[#FBF5E8] border border-[#AE7C2A]/20 rounded-2xl p-4 flex flex-col gap-3">
+          <div className="flex items-center justify-between">
+            <p className="font-nunito font-bold text-[13px] text-[#3A2418]">
+              ✨ Found {aiResults.length} thread{aiResults.length !== 1 ? "s" : ""}
+            </p>
+            <button
+              onClick={() => setAiResults(null)}
+              className="text-[11px] font-nunito text-[#896E66] underline"
+            >
+              Dismiss
+            </button>
+          </div>
+
+          <div className="flex flex-col gap-1.5 max-h-48 overflow-y-auto">
+            {aiResults.map((t, i) => (
+              <div
+                key={i}
+                className="bg-white/70 rounded-lg px-3 py-2 flex items-center gap-2"
+              >
+                <div className="w-6 h-6 rounded bg-[#E4D6C8] flex-shrink-0 flex items-center justify-center">
+                  <span className="text-[9px] font-bold font-nunito text-[#896E66]">
+                    {t.manufacturer?.slice(0, 1)}
+                  </span>
+                </div>
+                <p className="font-nunito text-[12px] text-[#3A2418] truncate flex-1">
+                  {t.manufacturer} {t.color_number}
+                  {t.color_name ? ` · ${t.color_name}` : ""}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <button
+            onClick={importAiThreads}
+            disabled={aiImporting}
+            className="w-full h-11 rounded-full bg-[#5F7A63] text-white font-nunito font-bold text-[13px] active:scale-[0.98] disabled:opacity-60 flex items-center justify-center gap-2"
+          >
+            {aiImporting ? (
+              <>
+                <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                Adding threads...
+              </>
+            ) : (
+              <>Add all {aiResults.length} threads</>
+            )}
+          </button>
+        </div>
       )}
+
+      {/* AI Scan Error */}
+      {aiError && (
+        <div className="bg-[#FDF0EE] border border-[#B03020]/20 rounded-xl px-4 py-3">
+          <p className="font-nunito text-[13px] text-[#B03020]">{aiError}</p>
+        </div>
+      )}
+
+      {/* Action buttons */}
+      {!showAdd && !editingId && (
+        <div className="flex flex-col gap-2">
+          {/* AI Scan buttons */}
+          {aiScanning ? (
+            <div className="flex items-center justify-center gap-2 h-11 rounded-full bg-gradient-to-r from-[#B36050] to-[#CA8070] text-white font-nunito font-bold text-[13px]">
+              <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+              Scanning color key...
+            </div>
+          ) : (
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => scanCameraRef.current?.click()}
+                className="flex-1 flex items-center justify-center gap-1.5 h-11 rounded-full bg-gradient-to-r from-[#B36050] to-[#CA8070] text-white font-nunito font-bold text-[12px] active:scale-[0.98] shadow-sm"
+              >
+                📷 Scan Color Key
+              </button>
+              <button
+                type="button"
+                onClick={() => scanLibraryRef.current?.click()}
+                className="flex-1 flex items-center justify-center gap-1.5 h-11 rounded-full bg-gradient-to-r from-[#CA8070] to-[#B36050] text-white font-nunito font-bold text-[12px] active:scale-[0.98] shadow-sm"
+              >
+                🖼️ From Library
+              </button>
+            </div>
+          )}
+
+          {/* Manual add button */}
+          <button
+            onClick={openAdd}
+            className="flex items-center justify-center gap-2 h-11 rounded-full border border-dashed border-[#B36050] text-[#B36050] font-nunito font-semibold text-[13px] active:scale-[0.98] transition-transform"
+          >
+            <span className="text-lg leading-none">+</span> Add thread manually
+          </button>
+        </div>
+      )}
+
+      {/* Hidden file inputs for AI scan */}
+      <input
+        ref={scanCameraRef}
+        type="file"
+        accept="image/*"
+        capture="environment"
+        onChange={handleScanPhoto}
+        className="hidden"
+      />
+      <input
+        ref={scanLibraryRef}
+        type="file"
+        accept="image/*"
+        onChange={handleScanPhoto}
+        className="hidden"
+      />
     </div>
   );
 }

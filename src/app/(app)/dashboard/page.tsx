@@ -65,7 +65,7 @@ const QUICK_ACTIONS = [
     icon: "🧺",
     label: "Kitting Check",
     desc: "What do I have?",
-    href: "/patterns",
+    href: "/kitting",
     bg: "bg-[#EBF2EC]",
     border: "border-[#C0D4C2]",
     iconBg: "bg-[#C8DEC9]",

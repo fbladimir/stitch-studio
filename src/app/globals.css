@@ -41,6 +41,15 @@
   100% { background-position: 400px 0; }
 }
 
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to   { transform: translateY(0); }
+}
+
+.animate-slideUp {
+  animation: slideUp 0.3s ease-out;
+}
+
 .skeleton {
   background: linear-gradient(90deg, #F0E8E0 25%, #FAF6F0 50%, #F0E8E0 75%);
   background-size: 800px 100%;

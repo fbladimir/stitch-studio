@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { Pattern, ChartType } from "@/types";
+import type { Pattern, ChartType, AIScanCoverResult } from "@/types";
 import { THREAD_MANUFACTURERS } from "@/types";
 import { createClient } from "@/lib/supabase/client";
 import {
@@ -15,7 +15,7 @@ import {
   getPatternsForDuplicateCheck,
 } from "@/lib/supabase/queries";
 import { findDuplicates, type DuplicateCandidate } from "@/lib/duplicate-detection";
-import { compressImage } from "@/lib/image";
+import { compressImage, fileToBase64 } from "@/lib/image";
 import { DuplicateWarning } from "./DuplicateWarning";
 
 // ── Schema ────────────────────────────────────────────────────
@@ -59,11 +59,14 @@ export function PatternForm({ mode, initialData }: PatternFormProps) {
   const [error, setError] = useState<string | null>(null);
   const [duplicates, setDuplicates] = useState<DuplicateCandidate[]>([]);
   const [pendingValues, setPendingValues] = useState<FormValues | null>(null);
+  const [aiScanning, setAiScanning] = useState(false);
+  const [aiScanDone, setAiScanDone] = useState(false);
 
   const {
     register,
     handleSubmit,
     watch,
+    setValue,
     formState: { errors },
   } = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -95,6 +98,46 @@ export function PatternForm({ mode, initialData }: PatternFormProps) {
     setPhotoPreview(URL.createObjectURL(compressed));
     // Reset input so same file can be selected again
     e.target.value = "";
+  }
+
+  // ── AI Cover Scan ─────────────────────────────────────────
+
+  async function handleAIScan() {
+    if (!photoFile) return;
+    setAiScanning(true);
+    setError(null);
+
+    try {
+      const base64 = await fileToBase64(photoFile);
+      const res = await fetch("/api/ai/scan-cover", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: base64 }),
+      });
+
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || "Scan failed");
+      }
+
+      const result: AIScanCoverResult = await res.json();
+
+      // Auto-fill form fields from scan results
+      if (result.name) setValue("name", result.name);
+      if (result.designer) setValue("designer", result.designer);
+      if (result.company) setValue("company", result.company);
+      if (result.size_inches) setValue("size_inches", result.size_inches);
+      if (result.size_stitches) setValue("size_stitches", result.size_stitches);
+      if (result.rec_thread_brand) setValue("rec_thread_brand", result.rec_thread_brand);
+      if (result.rec_fabric) setValue("rec_fabric", result.rec_fabric);
+      if (result.chart_type) setValue("chart_type", result.chart_type);
+
+      setAiScanDone(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "AI scan failed. You can still fill in the fields manually.");
+    } finally {
+      setAiScanning(false);
+    }
   }
 
   // ── Submit ─────────────────────────────────────────────────
@@ -263,6 +306,38 @@ export function PatternForm({ mode, initialData }: PatternFormProps) {
               🖼️ Choose from Library
             </button>
           </div>
+          {/* AI Scan Button — shown when photo is selected and in create mode */}
+          {photoFile && mode === "create" && (
+            <div className="mt-3">
+              {aiScanDone ? (
+                <div className="flex items-center gap-2 bg-[#EBF2EC] border border-[#5F7A63]/20 rounded-xl px-4 py-3">
+                  <span className="text-lg">✅</span>
+                  <p className="font-nunito text-[13px] text-[#5F7A63] font-semibold">
+                    AI filled in the details — review below and save!
+                  </p>
+                </div>
+              ) : (
+                <button
+                  type="button"
+                  onClick={handleAIScan}
+                  disabled={aiScanning}
+                  className="w-full h-12 rounded-xl bg-gradient-to-r from-[#B36050] to-[#CA8070] text-white font-nunito font-bold text-[14px] flex items-center justify-center gap-2 active:scale-[0.98] transition-transform shadow-md disabled:opacity-70"
+                >
+                  {aiScanning ? (
+                    <>
+                      <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      Reading cover page...
+                    </>
+                  ) : (
+                    <>
+                      <span>✨</span> Auto-fill with AI
+                    </>
+                  )}
+                </button>
+              )}
+            </div>
+          )}
+
           <input
             ref={cameraRef}
             type="file"
