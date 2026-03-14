@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useTutorial, TUTORIAL_STEPS } from "@/hooks/useTutorial";
+import { useTutorial } from "@/hooks/useTutorial";
 import { useAppStore } from "@/store/appStore";
 
 // ── Small Roku Avatar (inline SVG) ─────────────────────────────
@@ -77,7 +77,8 @@ const GAP = 14;
 export function TutorialOverlay() {
   const isTutorialActive = useAppStore((s) => s.isTutorialActive);
   const tutorialStep = useAppStore((s) => s.tutorialStep);
-  const { currentStep, totalSteps, nextStep, skipTutorial } = useTutorial();
+  const { currentStep, totalSteps, steps, nextStep, skipTutorial } =
+    useTutorial();
 
   const [rect, setRect] = useState<SpotlightRect | null>(null);
   const [animKey, setAnimKey] = useState(0);
@@ -133,8 +134,11 @@ export function TutorialOverlay() {
     if (!el) return;
 
     // Don't scroll if element is in a fixed container (nav)
-    const style = window.getComputedStyle(el.closest("nav") ?? el);
-    if (style.position === "fixed") return;
+    const closest = el.closest("nav");
+    if (closest) {
+      const style = window.getComputedStyle(closest);
+      if (style.position === "fixed") return;
+    }
 
     el.scrollIntoView({ behavior: "smooth", block: "center" });
   }, [isTutorialActive, currentStep, tutorialStep]);
@@ -144,49 +148,61 @@ export function TutorialOverlay() {
   const isLastStep = tutorialStep === totalSteps - 1;
   const isCenterStep = currentStep.position === "center" || !rect;
 
+  // Is the target a fixed bottom element (bottom nav)?
+  const isBottomNavTarget = currentStep.targetId === "bottom-nav";
+
   // ── Tooltip position ──────────────────────────────────────────
+
+  const tooltipW = Math.min(320, vpSize.w - 32);
 
   let tooltipStyle: React.CSSProperties;
 
   if (isCenterStep) {
+    // Center step: use flexbox centering (no transform needed)
+    tooltipStyle = {
+      width: tooltipW,
+    };
+  } else if (isBottomNavTarget && rect) {
+    // Bottom nav: place tooltip well above the nav bar, centered horizontally
     tooltipStyle = {
       position: "fixed",
-      top: "50%",
-      left: "50%",
-      transform: "translate(-50%, -50%)",
-      width: Math.min(320, vpSize.w - 32),
+      bottom: vpSize.h - rect.top + GAP,
+      left: Math.max(16, (vpSize.w - tooltipW) / 2),
+      width: tooltipW,
     };
-  } else {
-    const tooltipW = Math.min(320, vpSize.w - 32);
+  } else if (rect) {
     const tooltipLeft = Math.max(
       16,
       Math.min(
-        rect!.left + rect!.width / 2 - tooltipW / 2,
+        rect.left + rect.width / 2 - tooltipW / 2,
         vpSize.w - tooltipW - 16
       )
     );
     // Estimated tooltip height
     const tooltipH = 170;
-    // Prefer placing above for bottom nav items, below for top content
-    const spaceAbove = rect!.top - GAP;
-    const spaceBelow = vpSize.h - (rect!.top + rect!.height) - GAP;
-    const placeAbove = currentStep.position === "top" || spaceAbove > spaceBelow;
+    // Prefer placing above for bottom items, below for top content
+    const spaceAbove = rect.top - GAP;
+    const spaceBelow = vpSize.h - (rect.top + rect.height) - GAP;
+    const placeAbove =
+      currentStep.position === "top" || spaceAbove > spaceBelow;
 
     if (placeAbove && spaceAbove >= tooltipH) {
       tooltipStyle = {
         position: "fixed",
-        bottom: vpSize.h - rect!.top + GAP,
+        bottom: vpSize.h - rect.top + GAP,
         left: tooltipLeft,
         width: tooltipW,
       };
     } else {
       tooltipStyle = {
         position: "fixed",
-        top: rect!.top + rect!.height + GAP,
+        top: rect.top + rect.height + GAP,
         left: tooltipLeft,
         width: tooltipW,
       };
     }
+  } else {
+    tooltipStyle = { width: tooltipW };
   }
 
   return (
@@ -194,7 +210,7 @@ export function TutorialOverlay() {
       {/* SVG-based backdrop with spotlight cutout — works on all browsers including iOS Safari */}
       <svg
         className="absolute inset-0 w-full h-full"
-        style={{ pointerEvents: "auto" }}
+        style={{ pointerEvents: "auto", zIndex: 1 }}
         onClick={(e) => e.stopPropagation()}
       >
         <defs>
@@ -225,8 +241,10 @@ export function TutorialOverlay() {
       {/* Spotlight ring glow */}
       {rect && !isCenterStep && (
         <div
-          className="absolute rounded-2xl pointer-events-none"
+          className="absolute rounded-2xl"
           style={{
+            pointerEvents: "none",
+            zIndex: 2,
             top: rect.top,
             left: rect.left,
             width: rect.width,
@@ -238,83 +256,143 @@ export function TutorialOverlay() {
         />
       )}
 
-      {/* Tooltip card */}
-      <div
-        key={`tooltip-${animKey}`}
-        style={{
-          ...tooltipStyle,
-          pointerEvents: "auto",
-          animation:
-            "tutorialTooltipPop 0.35s cubic-bezier(0.34,1.56,0.64,1) both",
-        }}
-      >
+      {/* Tooltip card — render as centered container for center steps, fixed-positioned for others */}
+      {isCenterStep ? (
         <div
-          className="bg-white rounded-2xl border border-[#E4D6C8] px-5 py-5"
-          style={{ boxShadow: "0 8px 32px rgba(58,36,24,0.15)" }}
+          className="fixed inset-0 flex items-center justify-center"
+          style={{ pointerEvents: "none", zIndex: 10 }}
         >
-          {/* Roku + content */}
-          <div className="flex items-start gap-3">
+          <div
+            key={`tooltip-${animKey}`}
+            style={{
+              width: tooltipW,
+              pointerEvents: "auto",
+              animation:
+                "tutorialTooltipPop 0.35s cubic-bezier(0.34,1.56,0.64,1) both",
+            }}
+          >
+            <TooltipContent
+              currentStep={currentStep}
+              isLastStep={isLastStep}
+              isCenterStep
+              steps={steps}
+              tutorialStep={tutorialStep}
+              nextStep={nextStep}
+              skipTutorial={skipTutorial}
+            />
+          </div>
+        </div>
+      ) : (
+        <div
+          key={`tooltip-${animKey}`}
+          style={{
+            ...tooltipStyle,
+            pointerEvents: "auto",
+            zIndex: 10,
+            animation:
+              "tutorialTooltipPop 0.35s cubic-bezier(0.34,1.56,0.64,1) both",
+          }}
+        >
+          <TooltipContent
+            currentStep={currentStep}
+            isLastStep={isLastStep}
+            isCenterStep={false}
+            steps={steps}
+            tutorialStep={tutorialStep}
+            nextStep={nextStep}
+            skipTutorial={skipTutorial}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
+// ── Tooltip content (shared between center and positioned renders) ──
+
+function TooltipContent({
+  currentStep,
+  isLastStep,
+  isCenterStep,
+  steps,
+  tutorialStep,
+  nextStep,
+  skipTutorial,
+}: {
+  currentStep: { title: string; description: string };
+  isLastStep: boolean;
+  isCenterStep: boolean;
+  steps: { targetId: string | null }[];
+  tutorialStep: number;
+  nextStep: () => void;
+  skipTutorial: () => void;
+}) {
+  return (
+    <div
+      className="bg-white rounded-2xl border border-[#E4D6C8] px-5 py-5"
+      style={{ boxShadow: "0 8px 32px rgba(58,36,24,0.15)" }}
+    >
+      {/* Roku + content */}
+      <div className="flex items-start gap-3">
+        <div
+          className="flex-shrink-0"
+          style={{
+            animation: "tutorialRokuBounce 2s ease-in-out infinite",
+          }}
+        >
+          <RokuSmall size={isCenterStep ? 64 : 48} />
+        </div>
+
+        <div className="flex-1 min-w-0">
+          <p className="font-playfair text-[16px] font-bold text-[#3A2418] leading-tight">
+            {currentStep.title}
+          </p>
+          <p className="font-nunito text-[13px] text-[#896E66] mt-1 leading-relaxed">
+            {currentStep.description}
+          </p>
+        </div>
+      </div>
+
+      {/* Progress dots + buttons */}
+      <div className="flex items-center justify-between mt-4">
+        <div className="flex gap-1.5">
+          {steps.map((_, i) => (
             <div
-              className="flex-shrink-0"
+              key={i}
+              className="rounded-full transition-all duration-300"
               style={{
-                animation: "tutorialRokuBounce 2s ease-in-out infinite",
+                width: i === tutorialStep ? 16 : 6,
+                height: 6,
+                backgroundColor:
+                  i === tutorialStep
+                    ? "#B36050"
+                    : i < tutorialStep
+                    ? "#F0C8BB"
+                    : "#E4D6C8",
               }}
+            />
+          ))}
+        </div>
+
+        <div className="flex items-center gap-2">
+          {!isLastStep && (
+            <button
+              onClick={skipTutorial}
+              className="font-nunito text-[12px] font-semibold text-[#B6A090] px-3 py-2 active:opacity-60 transition-opacity"
             >
-              <RokuSmall size={isCenterStep ? 64 : 48} />
-            </div>
-
-            <div className="flex-1 min-w-0">
-              <p className="font-playfair text-[16px] font-bold text-[#3A2418] leading-tight">
-                {currentStep.title}
-              </p>
-              <p className="font-nunito text-[13px] text-[#896E66] mt-1 leading-relaxed">
-                {currentStep.description}
-              </p>
-            </div>
-          </div>
-
-          {/* Progress dots + buttons */}
-          <div className="flex items-center justify-between mt-4">
-            <div className="flex gap-1.5">
-              {TUTORIAL_STEPS.map((_, i) => (
-                <div
-                  key={i}
-                  className="rounded-full transition-all duration-300"
-                  style={{
-                    width: i === tutorialStep ? 16 : 6,
-                    height: 6,
-                    backgroundColor:
-                      i === tutorialStep
-                        ? "#B36050"
-                        : i < tutorialStep
-                        ? "#F0C8BB"
-                        : "#E4D6C8",
-                  }}
-                />
-              ))}
-            </div>
-
-            <div className="flex items-center gap-2">
-              {!isLastStep && (
-                <button
-                  onClick={skipTutorial}
-                  className="font-nunito text-[12px] font-semibold text-[#B6A090] px-3 py-2 active:opacity-60 transition-opacity"
-                >
-                  Skip
-                </button>
-              )}
-              <button
-                onClick={isLastStep ? skipTutorial : nextStep}
-                className="h-10 px-6 rounded-full text-white font-nunito font-bold text-[14px] active:scale-95 transition-transform"
-                style={{
-                  background: "linear-gradient(135deg, #CA8070, #B36050)",
-                  boxShadow: "0 3px 12px rgba(179,96,80,0.3)",
-                }}
-              >
-                {isLastStep ? "Let's go!" : "Next"}
-              </button>
-            </div>
-          </div>
+              Skip
+            </button>
+          )}
+          <button
+            onClick={isLastStep ? skipTutorial : nextStep}
+            className="h-10 px-6 rounded-full text-white font-nunito font-bold text-[14px] active:scale-95 transition-transform"
+            style={{
+              background: "linear-gradient(135deg, #CA8070, #B36050)",
+              boxShadow: "0 3px 12px rgba(179,96,80,0.3)",
+            }}
+          >
+            {isLastStep ? "Let's go!" : "Next"}
+          </button>
         </div>
       </div>
     </div>

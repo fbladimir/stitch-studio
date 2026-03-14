@@ -9,6 +9,7 @@ export function BottomNav() {
 
   return (
     <nav
+      data-tutorial-id="bottom-nav"
       className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-sm border-t border-[#E4D6C8] md:hidden"
       style={{ paddingBottom: "env(safe-area-inset-bottom)" }}
     >
