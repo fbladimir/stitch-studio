@@ -21,12 +21,14 @@ export function AdvisorChat() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [streaming, setStreaming] = useState(false);
-  const messagesEndRef = useRef<HTMLDivElement>(null);
+  const scrollRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
   const abortRef = useRef<AbortController | null>(null);
 
   const scrollToBottom = useCallback(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    if (scrollRef.current) {
+      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    }
   }, []);
 
   useEffect(() => {
@@ -52,6 +54,11 @@ export function AdvisorChat() {
     setInput("");
     setStreaming(true);
 
+    // Auto-resize textarea back to 1 row
+    if (inputRef.current) {
+      inputRef.current.style.height = "44px";
+    }
+
     // Build message history for API
     const history = [...messages, userMsg].map((m) => ({
       role: m.role,
@@ -69,7 +76,8 @@ export function AdvisorChat() {
       });
 
       if (!res.ok) {
-        throw new Error("Failed to connect to advisor");
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body.error || "Failed to connect to advisor");
       }
 
       const reader = res.body?.getReader();
@@ -111,15 +119,13 @@ export function AdvisorChat() {
       }
     } catch (err) {
       if (err instanceof DOMException && err.name === "AbortError") return;
+      const errorMsg =
+        err instanceof Error
+          ? err.message
+          : "I had trouble connecting. Please try again in a moment. ✿";
       setMessages((prev) =>
         prev.map((m) =>
-          m.id === assistantMsg.id
-            ? {
-                ...m,
-                content:
-                  "I had trouble connecting. Please try again in a moment. ✿",
-              }
-            : m
+          m.id === assistantMsg.id ? { ...m, content: errorMsg } : m
         )
       );
     } finally {
@@ -140,29 +146,42 @@ export function AdvisorChat() {
     }
   }
 
+  // Auto-grow textarea
+  function handleInputChange(e: React.ChangeEvent<HTMLTextAreaElement>) {
+    setInput(e.target.value);
+    const el = e.target;
+    el.style.height = "44px";
+    el.style.height = Math.min(el.scrollHeight, 112) + "px";
+  }
+
   return (
-    <div className="flex flex-col h-full">
-      {/* Messages area */}
-      <div className="flex-1 overflow-y-auto px-4 py-4 flex flex-col gap-3">
+    <div className="flex flex-col h-full min-h-0">
+      {/* Messages — this is the ONLY scrollable area */}
+      <div
+        ref={scrollRef}
+        className="flex-1 overflow-y-auto overscroll-contain px-4 py-4 flex flex-col gap-3"
+      >
         {messages.length === 0 && (
-          <div className="flex flex-col items-center gap-4 pt-8">
-            <div className="text-5xl">🪡</div>
+          <div className="flex flex-col items-center gap-4 pt-6">
+            <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#F0C8BB] to-[#B36050] flex items-center justify-center">
+              <span className="text-2xl">🪡</span>
+            </div>
             <div className="text-center">
               <p className="font-playfair font-bold text-[18px] text-[#3A2418]">
                 Your Stitch Advisor
               </p>
-              <p className="font-nunito text-[13px] text-[#896E66] mt-1 max-w-[280px]">
+              <p className="font-nunito text-[13px] text-[#896E66] mt-1 max-w-[280px] mx-auto">
                 Ask me anything about cross stitch, threads, fabric, techniques, or finishing!
               </p>
             </div>
 
             {/* Quick question chips */}
-            <div className="flex flex-wrap gap-2 justify-center mt-2 max-w-sm">
+            <div className="flex flex-wrap gap-2 justify-center mt-1 max-w-sm">
               {QUICK_QUESTIONS.map((q) => (
                 <button
                   key={q}
                   onClick={() => sendMessage(q)}
-                  className="px-3 py-2 rounded-full bg-[#FAF6F0] border border-[#E4D6C8] font-nunito text-[12px] text-[#3A2418] active:scale-[0.97] transition-transform"
+                  className="px-3.5 py-2 rounded-2xl bg-white border border-[#E4D6C8] font-nunito text-[12px] text-[#3A2418] active:scale-[0.97] active:bg-[#FDF4F1] transition-all shadow-sm"
                 >
                   {q}
                 </button>
@@ -176,56 +195,63 @@ export function AdvisorChat() {
             key={msg.id}
             className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
           >
+            {msg.role === "assistant" && (
+              <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#F0C8BB] to-[#B36050] flex items-center justify-center flex-shrink-0 mr-2 mt-1">
+                <span className="text-[11px]">🪡</span>
+              </div>
+            )}
             <div
-              className={`max-w-[85%] rounded-2xl px-4 py-3 ${
+              className={`max-w-[80%] rounded-2xl px-4 py-2.5 ${
                 msg.role === "user"
                   ? "bg-[#B36050] text-white rounded-br-md"
-                  : "bg-white border border-[#E4D6C8] text-[#3A2418] rounded-bl-md"
+                  : "bg-white border border-[#E4D6C8] text-[#3A2418] rounded-bl-md shadow-sm"
               }`}
             >
               <p
-                className={`font-nunito text-[14px] leading-relaxed whitespace-pre-wrap ${
+                className={`font-nunito text-[14px] leading-[1.55] whitespace-pre-wrap ${
                   msg.role === "user" ? "text-white" : "text-[#3A2418]"
                 }`}
               >
                 {msg.content}
                 {msg.role === "assistant" && streaming && msg.content === "" && (
-                  <span className="inline-block w-2 h-4 bg-[#B36050] animate-pulse ml-0.5" />
+                  <span className="inline-flex gap-1 ml-0.5">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#B36050] animate-bounce" style={{ animationDelay: "0ms" }} />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#B36050] animate-bounce" style={{ animationDelay: "150ms" }} />
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#B36050] animate-bounce" style={{ animationDelay: "300ms" }} />
+                  </span>
                 )}
                 {msg.role === "assistant" &&
                   streaming &&
                   msg === messages[messages.length - 1] &&
                   msg.content !== "" && (
-                    <span className="inline-block w-1.5 h-4 bg-[#B36050] animate-pulse ml-0.5" />
+                    <span className="inline-block w-1.5 h-4 bg-[#B36050] animate-pulse ml-0.5 rounded-sm" />
                   )}
               </p>
             </div>
           </div>
         ))}
-
-        <div ref={messagesEndRef} />
       </div>
 
-      {/* Input area */}
+      {/* Input area — pinned to bottom, above the bottom nav */}
       <form
         onSubmit={handleSubmit}
-        className="border-t border-[#E4D6C8] bg-white px-4 py-3 flex items-end gap-2"
-        style={{ paddingBottom: "calc(12px + env(safe-area-inset-bottom, 0px))" }}
+        className="flex-shrink-0 border-t border-[#E4D6C8] bg-white/95 backdrop-blur-sm px-4 py-2.5 flex items-end gap-2"
+        style={{ paddingBottom: "calc(68px + env(safe-area-inset-bottom, 0px))" }}
       >
         <textarea
           ref={inputRef}
           value={input}
-          onChange={(e) => setInput(e.target.value)}
+          onChange={handleInputChange}
           onKeyDown={handleKeyDown}
           placeholder="Ask about stitching..."
           rows={1}
-          className="flex-1 resize-none rounded-2xl border border-[#E4D6C8] bg-[#FAF6F0] px-4 py-2.5 font-nunito text-[14px] text-[#3A2418] placeholder:text-[#B6A090] focus:outline-none focus:border-[#B36050] max-h-28"
-          style={{ minHeight: 44 }}
+          className="flex-1 resize-none rounded-2xl border border-[#E4D6C8] bg-[#FAF6F0] px-4 py-2.5 font-nunito text-[14px] text-[#3A2418] placeholder:text-[#B6A090] focus:outline-none focus:border-[#B36050] focus:ring-1 focus:ring-[#B36050]/20 transition-colors"
+          style={{ height: 44, maxHeight: 112 }}
         />
         <button
           type="submit"
           disabled={!input.trim() || streaming}
-          className="w-11 h-11 rounded-full bg-[#B36050] text-white flex items-center justify-center flex-shrink-0 disabled:opacity-40 active:scale-95 transition-transform"
+          className="w-11 h-11 rounded-full bg-[#B36050] text-white flex items-center justify-center flex-shrink-0 disabled:opacity-30 active:scale-90 transition-transform shadow-sm"
         >
           <svg
             width="18"
@@ -237,8 +263,8 @@ export function AdvisorChat() {
             strokeLinecap="round"
             strokeLinejoin="round"
           >
-            <line x1="22" y1="2" x2="11" y2="13" />
-            <polygon points="22 2 15 22 11 13 2 9 22 2" />
+            <path d="M22 2L11 13" />
+            <path d="M22 2L15 22L11 13L2 9L22 2Z" />
           </svg>
         </button>
       </form>

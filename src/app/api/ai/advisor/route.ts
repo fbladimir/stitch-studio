@@ -42,15 +42,28 @@ ${context ? `\nHere is context about the user's collection and current projects:
 
 Keep responses focused and helpful. If the user asks about something outside of needlework/crafting, gently redirect to how you can help with their stitching.`;
 
-    const stream = await anthropic.messages.stream({
-      model: AI_MODEL,
-      max_tokens: 1024,
-      system: systemPrompt,
-      messages: messages.map((m) => ({
-        role: m.role,
-        content: m.content,
-      })),
-    });
+    let stream;
+    try {
+      stream = await anthropic.messages.stream({
+        model: AI_MODEL,
+        max_tokens: 1024,
+        system: systemPrompt,
+        messages: messages.map((m) => ({
+          role: m.role,
+          content: m.content,
+        })),
+      });
+    } catch (err: unknown) {
+      console.error("advisor API error:", err);
+      const message =
+        err instanceof Error && err.message?.includes("credit balance")
+          ? "The AI service needs credits to work. Please add credits at console.anthropic.com."
+          : "Could not connect to the AI advisor right now. Please try again in a moment.";
+      return new Response(JSON.stringify({ error: message }), {
+        status: 502,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
 
     // Create SSE ReadableStream
     const encoder = new TextEncoder();

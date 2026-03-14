@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { TopBar } from "@/components/layout/TopBar";
 import { AdvisorChat } from "@/components/ai/AdvisorChat";
 import { PhotoScanner } from "@/components/ai/PhotoScanner";
 import type { AIScanThreadResult } from "@/types";
@@ -14,11 +13,21 @@ export default function AIPage() {
   const [stashResult, setStashResult] = useState<{ threads: { manufacturer: string; color_number: string; color_name: string | null; quantity: number }[]; confidence: number } | null>(null);
 
   return (
-    <>
-      <TopBar title="AI Advisor" />
+    <div
+      className="fixed inset-0 flex flex-col bg-[#FAF6F0] md:pl-[220px]"
+      style={{ paddingTop: "env(safe-area-inset-top, 0px)" }}
+    >
+      {/* Header */}
+      <div className="flex-shrink-0 bg-[#FAF6F0]/95 backdrop-blur-sm border-b border-[#E4D6C8]">
+        <div className="flex items-center px-4 h-14">
+          <h1 className="font-playfair text-xl font-bold text-[#3A2418]">
+            AI Advisor
+          </h1>
+        </div>
+      </div>
 
       {/* Tab switcher */}
-      <div className="sticky top-0 z-10 bg-[#FAF6F0] border-b border-[#E4D6C8] px-4 pt-2 pb-0">
+      <div className="flex-shrink-0 bg-[#FAF6F0] border-b border-[#E4D6C8] px-4 py-2">
         <div className="flex bg-white rounded-xl border border-[#E4D6C8] p-1">
           {([
             { key: "chat" as Tab, label: "🪡 Advisor" },
@@ -40,15 +49,19 @@ export default function AIPage() {
         </div>
       </div>
 
-      {/* Tab content */}
+      {/* Chat tab — fills remaining space */}
       {tab === "chat" && (
-        <div className="flex-1" style={{ height: "calc(100vh - 180px)" }}>
+        <div className="flex-1 flex flex-col min-h-0">
           <AdvisorChat />
         </div>
       )}
 
+      {/* Scan tab */}
       {tab === "scan" && (
-        <div className="px-4 py-5 flex flex-col gap-5 pb-8">
+        <div
+          className="flex-1 overflow-y-auto px-4 py-5 flex flex-col gap-5"
+          style={{ paddingBottom: "calc(80px + env(safe-area-inset-bottom, 0px))" }}
+        >
           <PhotoScanner
             mode="colorkey"
             onScanComplete={(result) => setScanResult(result as { threads: AIScanThreadResult[]; confidence: number })}
@@ -63,8 +76,12 @@ export default function AIPage() {
         </div>
       )}
 
+      {/* Stash tab */}
       {tab === "stash" && (
-        <div className="px-4 py-5 flex flex-col gap-5 pb-8">
+        <div
+          className="flex-1 overflow-y-auto px-4 py-5 flex flex-col gap-5"
+          style={{ paddingBottom: "calc(80px + env(safe-area-inset-bottom, 0px))" }}
+        >
           <PhotoScanner
             mode="stash"
             onScanComplete={(result) => setStashResult(result as { threads: { manufacturer: string; color_number: string; color_name: string | null; quantity: number }[]; confidence: number })}
@@ -78,7 +95,7 @@ export default function AIPage() {
           )}
         </div>
       )}
-    </>
+    </div>
   );
 }
 
@@ -173,7 +190,6 @@ function StashResultPreview({
   async function handleImport() {
     setImporting(true);
     try {
-      // Import directly using the Supabase client
       const { createClient } = await import("@/lib/supabase/client");
       const { createThreadInventoryItem } = await import("@/lib/supabase/queries");
       const supabase = createClient();
