@@ -898,7 +898,7 @@ NEVER force camera-only. NEVER force upload-only.
 ## ✅ PROGRESS LOG
 
 ### HANDOFF NOTE
-> Session 13 complete. **Fixed two new-user signup bugs:** (1) DailyGreeting + Tutorial collision — both overlays fired simultaneously for new users; fixed by adding `onDismiss`/`onSkipped` callbacks to DailyGreeting so tutorial only starts after greeting is dismissed. (2) InstallBanner overlapping onboarding — the "Add to Home Screen" banner appeared 2s after dashboard load, covering greeting/tutorial; fixed by checking `isTutorialActive` from Zustand to suppress it during tutorial. Also ran a full code-level Lighthouse audit identifying accessibility issues (alt text, aria-labels, dialog roles, contrast). **Next session:** Fix Lighthouse accessibility issues (quick wins — alt text, aria-labels, dialog roles, contrast fix from #896E66 to ~#6B544D), then share with Mom. Phase 14 (app import) and Phase 15b (digests/wrapped/nudges) still deferred.
+> Session 13 complete. **Fixed two new-user signup bugs:** (1) DailyGreeting + Tutorial collision, (2) InstallBanner overlapping onboarding. Ran full Lighthouse code audit (accessibility issues identified). **Mom tested the app and loves it!** Fixed her 4 feedback items: (1) WIP start date is now tappable/editable via date picker in WipTracker. (2) AI color key scan now deduplicates threads by manufacturer+color_number before showing results (fixes repeated threads for french knots/backstitching). (3) Added 3 pet-themed challenges to monthly rotation: "Fur Baby Breaks", "Stitch Buddy", "Treat Yourself". (4) PWA icons regenerated — all 8 PNGs were 70-byte empty stubs causing plain green square on home screen; now real renders of the cross-stitch hoop SVG. **Next session:** Lighthouse accessibility fixes (alt text, aria-labels, dialog roles, contrast), then continue iterating on Mom's feedback. Phase 14 (app import) and Phase 15b (digests/wrapped/nudges) still deferred.
 
 ---
 
@@ -1861,6 +1861,12 @@ Steps 1-3 same as mobile, then individual side nav items (nav-patterns, nav-stas
 - [x] Bug: InstallBanner showed 2s after landing on dashboard, overlapping DailyGreeting and tutorial for new users
 - [x] Fix: InstallBanner now reads `isTutorialActive` from Zustand — suppressed while tutorial is active — src/components/layout/InstallBanner.tsx
 - [x] Banner re-evaluates when `isTutorialActive` changes, so it shows naturally after tutorial completes (if on iOS Safari)
+
+**Mom's feedback (all 4 items fixed):**
+- [x] WIP start date not editable — added tappable date that opens a date picker in WipTracker.tsx; saves on blur
+- [x] AI color key scan repeated threads for french knots/backstitching — added deduplication by manufacturer+color_number in ThreadList.tsx before showing AI results
+- [x] Pet challenges — added 3 pet-themed monthly challenges: "Fur Baby Breaks" (🐾 log 3x + hug pets), "Stitch Buddy" (🐶 log 7 days with fur baby nearby), "Treat Yourself" (🦴 finish a project, treat yourself + pets) — src/lib/engagement.ts
+- [x] Home screen icon was plain green square — all 8 PWA PNG icons were 70-byte empty stubs; regenerated from icon.svg using macOS `sips` (now 4KB–41KB real images showing the cross-stitch hoop design)
 
 **Lighthouse code audit completed (issues identified, fixes deferred to next session):**
 - 4 empty `alt=""` on images (store-mode, kitting)
