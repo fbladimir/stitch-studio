@@ -1,6 +1,6 @@
 # CLAUDE.md — Stitch Studio
 # Cross Stitch Companion App for Mom
-# Last Updated: 2026-03-14 (Session 7)
+# Last Updated: 2026-03-14 (Session 8)
 
 ---
 
@@ -644,7 +644,7 @@ stitch-studio/
     │       │   ├── advisor/route.ts       ← streaming SSE
     │       │   └── kitting-suggest/route.ts
     │       └── places/
-    │           └── nearby/route.ts       ← Google Maps Places proxy
+    │           └── nearby/route.ts       ← Google Maps Places text search proxy, haversine distance
     │
     ├── components/
     │   ├── ui/                          ← shadcn/ui components (auto-generated)
@@ -841,7 +841,7 @@ NEVER force camera-only. NEVER force upload-only.
 ## ✅ PROGRESS LOG
 
 ### HANDOFF NOTE
-> Session 7 complete. **Phase 9 (AI Features) is fully built and deployed.** All 6 AI API routes are live: scan-cover, scan-colorkey, scan-stash, scan-fabric (added this session beyond original plan), advisor (streaming SSE), and kitting-suggest. AI auto-fill is integrated into PatternForm (cover photo → pre-fills all fields), ThreadList (color key photo → bulk-import threads with preview), and FabricForm (fabric photo → fills manufacturer, type, count, color, size). AI Advisor chat page has 3 tabs (Advisor streaming chat with quick question chips + bouncing dot typing indicator, Color Key scanner, Stash Import scanner) using a fixed full-viewport iMessage-style layout. Kitting Check flow at `/kitting` lets you select a pattern, compares threads/fabric against inventory, shows have/missing with progress bar, and offers AI-powered thread substitution suggestions via bottom sheet. Dashboard stats cards are now tappable Links (Patterns → /patterns, In Progress → /patterns?filter=wip, Finished → /patterns?filter=finished, Threads → /threads). Dashboard "Kitting Check" quick action now links to `/kitting`. **Next session: Phase 10 — Store Mode** (full-screen in-store shopping assistant with chart scanner, thread/fabric quick check, shopping list, nearby stores). Profile page + Phase 15 (streaks, XP, achievements) remains planned for after all core modules are complete.
+> Session 8 complete. **Phase 9 (AI Features) and Phase 10 (Store Mode) are both fully built and deployed.** Session covered: Phase 9 — all 6 AI API routes (scan-cover, scan-colorkey, scan-stash, scan-fabric, advisor SSE, kitting-suggest), AI auto-fill in PatternForm/ThreadList/FabricForm, AI Advisor chat page (3 tabs, iMessage-style layout, streaming, quick question chips), Kitting Check flow at `/kitting`, KittingResult + SubstitutionHelper components, dashboard stats now tappable Links with ?filter= query params. Phase 10 — Store Mode full-screen takeover with dark header + prominent "Exit Store Mode" terracotta bar at top, 5 tabs: Scan (chart cover → AI → duplicate check with ✅ owned / ⚠️ duplicate / 🆕 new results), Threads (instant stash lookup by number/name with large input), Fabric (filter by type + count pills), List (auto-generated shopping list from all patterns' missing threads grouped by manufacturer), Nearby (geolocation → Google Maps Places API → sorted by distance with open/closed status → tap to open Apple Maps). Also: `/api/places/nearby` route with haversine distance, `/api/ai/scan-fabric` route for fabric photo identification, slideUp CSS animation, credit balance error handling in advisor. **Next session: Phase 11 — PWA + Device Polish** (iOS install banner, service worker caching, offline mode, Kindle Fire testing, safe area verification, iPad two-column, Lighthouse audit). Profile page + Phase 15 (streaks, XP, achievements) remains planned for after all core modules are complete.
 
 ---
 
@@ -1087,16 +1087,25 @@ Photos load correctly in `<img>` tags via `getPublicUrl()`. Full SQL is in `supa
 - Input bar properly positioned above bottom nav with safe area insets
 - Error handling in advisor route surfaces credit balance issues clearly to user
 
-### Phase 10 — Store Mode (In-Store Shopping Assistant)
-- [ ] Store Mode full-screen shell
-- [ ] Chart scanner in store (camera → AI → duplicate check → result)
-- [ ] Quick thread check (type number → instant inventory result)
-- [ ] Quick fabric check
-- [ ] Shopping list view (consolidated from all kitting checks)
-- [ ] Nearby stores tab (geolocation permission request)
-- [ ] Google Maps Places API integration (/api/places/nearby route)
-- [ ] Store results display (name, distance, hours, tap to open maps)
-- [ ] Geolocation graceful deny handling
+### Phase 10 — Store Mode (In-Store Shopping Assistant) — ✅ DONE
+- [x] Store Mode full-screen shell — fixed inset-0 z-50 takeover, dark header (#3A2418), 5-tab navigation — src/app/(app)/store-mode/page.tsx
+- [x] Prominent "Exit Store Mode" bar — full-width terracotta (#B36050) button at very top with arrow icon, impossible to miss
+- [x] Chart scanner in store — camera/library → /api/ai/scan-cover → duplicate check via findDuplicates() → result: ✅ owned (with status badge + view details link), ⚠️ duplicate (fuzzy match % + view existing), 🆕 new (with add to collection link)
+- [x] Quick thread check — large 18px centered input, instant filter against thread inventory, shows manufacturer + color number + quantity per match, ❌ "Not in your stash" for no results
+- [x] Quick fabric check — filter pills for type (All/Aida/Linen/Evenweave/Other) + count (14ct–36ct), shows matching fabrics with photo thumbnails + type/count/size badges
+- [x] Shopping list view — auto-generated from all active (non-finished) patterns' thread lists vs thread inventory, deduped, grouped by manufacturer, sorted by color number
+- [x] Nearby stores tab — graceful geolocation permission request with privacy explanation, denied/error states
+- [x] Google Maps Places API integration — /api/places/nearby route with multi-query search (craft store, needlework shop, cross stitch store, quilting fabric store), haversine distance calc, deduped by place_id, sorted by distance, top 15 results
+- [x] Store results display — name, address, distance (ft/mi), open/closed badge, tap to open in Apple Maps via maps.apple.com URL
+- [x] Geolocation graceful deny handling — clear explanation of why location is needed, "Location access denied" state with retry, error state with retry
+
+**Store Mode UX decisions:**
+- Full-screen z-50 takeover (no bottom nav visible) — Store Mode is its own focused experience
+- "Exit Store Mode" is a full-width terracotta bar at the very top — not a small button in a corner
+- Tab bar uses white-on-dark for active state (high contrast for bright store lighting)
+- Thread check input is 18px centered for readability in-store
+- Shopping list builds dynamically from pattern_threads vs thread_inventory (no separate shopping_list table queries needed)
+- Nearby stores uses text search API (not nearby search) for better craft store coverage
 
 ### Phase 11 — PWA + Device Polish
 - [ ] iOS "Add to Home Screen" install banner/instructions
