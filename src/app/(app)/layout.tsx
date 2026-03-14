@@ -1,6 +1,7 @@
 import { BottomNav } from "@/components/layout/BottomNav";
 import { SideNav } from "@/components/layout/SideNav";
 import { InstallBanner } from "@/components/layout/InstallBanner";
+import { CelebrationOverlay } from "@/components/engagement/CelebrationOverlay";
 
 export default function AppLayout({
   children,
@@ -12,6 +13,7 @@ export default function AppLayout({
       <SideNav />
       <BottomNav />
       <InstallBanner />
+      <CelebrationOverlay />
       {children}
     </div>
   );

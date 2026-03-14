@@ -5,7 +5,11 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { PageWrapper } from "@/components/layout/PageWrapper";
 import { DailyGreeting } from "@/components/dashboard/DailyGreeting";
-import type { Profile, Pattern } from "@/types";
+import { StreakCard } from "@/components/engagement/StreakCard";
+import { ChallengeSection } from "@/components/engagement/ChallengeSection";
+import { LevelBadge } from "@/components/engagement/LevelBadge";
+import { getChallengesForMonth, getCurrentMonth } from "@/lib/engagement";
+import type { Profile, Pattern, ChallengeProgress } from "@/types";
 
 // ── Types ─────────────────────────────────────────────────────
 
@@ -111,6 +115,7 @@ export default function DashboardPage() {
   const [stats, setStats] = useState<Stats | null>(null);
   const [recent, setRecent] = useState<RecentPattern[] | null>(null);
   const [wipNudge, setWipNudge] = useState<RecentPattern | null>(null);
+  const [challenges, setChallenges] = useState<ChallengeProgress[]>([]);
 
   useEffect(() => {
     const load = async () => {
@@ -120,7 +125,9 @@ export default function DashboardPage() {
       } = await supabase.auth.getUser();
       if (!user) return;
 
-      const [profileRes, patternsRes, threadCountRes, staleWipRes] =
+      const month = getCurrentMonth();
+
+      const [profileRes, patternsRes, threadCountRes, staleWipRes, challengesRes] =
         await Promise.all([
           supabase
             .from("profiles")
@@ -152,6 +159,12 @@ export default function DashboardPage() {
               ).toISOString()}`
             )
             .limit(1),
+
+          supabase
+            .from("challenge_progress")
+            .select("*")
+            .eq("user_id", user.id)
+            .eq("month", month),
         ]);
 
       if (profileRes.data) setProfile(profileRes.data as Profile);
@@ -173,6 +186,26 @@ export default function DashboardPage() {
       if (staleWipRes.data?.[0]) {
         setWipNudge(staleWipRes.data[0] as unknown as RecentPattern);
       }
+
+      // Initialize challenges if needed
+      let ch = (challengesRes.data as ChallengeProgress[]) ?? [];
+      if (ch.length === 0) {
+        const defs = getChallengesForMonth(month);
+        const newCh = defs.map((d) => ({
+          user_id: user.id,
+          challenge_id: d.id,
+          month,
+          progress: 0,
+          goal: d.goal,
+          completed: false,
+        }));
+        const { data } = await supabase
+          .from("challenge_progress")
+          .upsert(newCh, { onConflict: "user_id,challenge_id,month" })
+          .select();
+        ch = (data as ChallengeProgress[]) ?? [];
+      }
+      setChallenges(ch);
     };
 
     load();
@@ -196,19 +229,43 @@ export default function DashboardPage() {
             </>
           ) : (
             <>
-              <h1 className="font-playfair text-[28px] font-bold text-[#3A2418] leading-tight">
-                {getTimeGreeting()},{" "}
-                <span className="text-[#B36050]">
-                  {profile?.display_name ?? "friend"}
-                </span>
-                ! ✿
-              </h1>
+              <div className="flex items-start justify-between">
+                <h1 className="font-playfair text-[28px] font-bold text-[#3A2418] leading-tight flex-1">
+                  {getTimeGreeting()},{" "}
+                  <span className="text-[#B36050]">
+                    {profile?.display_name ?? "friend"}
+                  </span>
+                  ! ✿
+                </h1>
+                <Link
+                  href="/profile"
+                  className="w-10 h-10 rounded-full bg-[#F5EEE8] border-2 border-white shadow-sm overflow-hidden flex items-center justify-center flex-shrink-0 ml-3 active:scale-95 transition-transform"
+                >
+                  {profile?.profile_photo_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={profile.profile_photo_url}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <span className="text-lg opacity-40">👤</span>
+                  )}
+                </Link>
+              </div>
 
               {allDogs.length > 0 && (
                 <p className="font-nunito text-[13px] text-[#896E66] mt-1.5">
                   {dogs.map((d) => `${d.emoji} ${d.name}`).join(" & ")}{" "}
                   send tail wags 🐾
                 </p>
+              )}
+
+              {/* Level badge */}
+              {(profile?.level ?? 1) > 0 && (
+                <div className="mt-2">
+                  <LevelBadge level={profile?.level ?? 1} size="sm" />
+                </div>
               )}
             </>
           )}
@@ -251,6 +308,17 @@ export default function DashboardPage() {
           )}
         </section>
 
+        {/* ── Streak card ──────────────────────────────────────── */}
+        {!loading && profile && (
+          <section className="mb-6">
+            <StreakCard
+              currentStreak={profile.current_streak ?? 0}
+              longestStreak={profile.longest_streak ?? 0}
+              lastActivityDate={profile.last_activity_date}
+            />
+          </section>
+        )}
+
         {/* ── Quick Actions ────────────────────────────────────── */}
         <section className="mb-6">
           <h2 className="font-playfair text-lg font-bold text-[#3A2418] mb-3">
@@ -281,6 +349,11 @@ export default function DashboardPage() {
             ))}
           </div>
         </section>
+
+        {/* ── Monthly Challenges ─────────────────────────────── */}
+        {!loading && challenges.length > 0 && (
+          <ChallengeSection challenges={challenges} />
+        )}
 
         {/* ── WIP nudge ────────────────────────────────────────── */}
         {wipNudge && (

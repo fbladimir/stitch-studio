@@ -3,6 +3,10 @@
 import { useState } from "react";
 import type { Pattern } from "@/types";
 import { updatePattern } from "@/lib/supabase/queries";
+import { useEngagement } from "@/hooks/useEngagement";
+import { useAppStore } from "@/store/appStore";
+import { buildFinishCelebration } from "@/lib/engagement";
+import { createClient } from "@/lib/supabase/client";
 
 interface StatusTogglesProps {
   pattern: Pattern;
@@ -11,6 +15,8 @@ interface StatusTogglesProps {
 
 export function StatusToggles({ pattern, onUpdate }: StatusTogglesProps) {
   const [saving, setSaving] = useState<"kitted" | "wip" | "finished" | null>(null);
+  const { recordActivity } = useEngagement();
+  const pushCelebration = useAppStore((s) => s.pushCelebration);
 
   async function toggleKitted() {
     setSaving("kitted");
@@ -19,7 +25,10 @@ export function StatusToggles({ pattern, onUpdate }: StatusTogglesProps) {
       kitted: newVal,
       kitted_date: newVal ? new Date().toISOString() : null,
     });
-    if (data) onUpdate(data);
+    if (data) {
+      onUpdate(data);
+      if (newVal) recordActivity("mark_kitted");
+    }
     setSaving(null);
   }
 
@@ -63,7 +72,31 @@ export function StatusToggles({ pattern, onUpdate }: StatusTogglesProps) {
         wip: false,
         wip_pct: 100,
       });
-      if (data) onUpdate(data);
+      if (data) {
+        onUpdate(data);
+
+        // Celebration + XP
+        const supabase = createClient();
+        const { data: { user } } = await supabase.auth.getUser();
+        const { data: profileData } = user
+          ? await supabase.from("profiles").select("display_name, dogs").eq("id", user.id).single()
+          : { data: null };
+        const displayName = profileData?.display_name || "friend";
+        const allDogs = Array.isArray(profileData?.dogs) ? profileData.dogs : [];
+        const dogName = allDogs.length > 0 ? `${allDogs[0].emoji} ${allDogs[0].name}` : null;
+
+        pushCelebration(
+          buildFinishCelebration(
+            pattern.name,
+            pattern.cover_photo_url,
+            displayName,
+            dogName,
+            { daysWorked: days ?? undefined, stitches: pattern.wip_stitches || undefined }
+          )
+        );
+
+        recordActivity("mark_finished");
+      }
     }
     setSaving(null);
   }

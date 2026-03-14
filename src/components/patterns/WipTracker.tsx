@@ -3,6 +3,7 @@
 import { useState } from "react";
 import type { Pattern } from "@/types";
 import { updatePattern } from "@/lib/supabase/queries";
+import { useEngagement } from "@/hooks/useEngagement";
 
 interface WipTrackerProps {
   pattern: Pattern;
@@ -14,6 +15,7 @@ export function WipTracker({ pattern, onUpdate }: WipTrackerProps) {
   const [stitches, setStitches] = useState(pattern.wip_stitches);
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
+  const { recordActivity } = useEngagement();
 
   const hasChanges =
     pct !== pattern.wip_pct || stitches !== pattern.wip_stitches;
@@ -26,7 +28,10 @@ export function WipTracker({ pattern, onUpdate }: WipTrackerProps) {
       wip_stitches: stitches,
       last_progress_date: new Date().toISOString(),
     });
-    if (data) onUpdate(data);
+    if (data) {
+      onUpdate(data);
+      recordActivity("log_wip_progress");
+    }
     setSaving(false);
     setDirty(false);
   }

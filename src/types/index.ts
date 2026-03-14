@@ -17,8 +17,60 @@ export interface Profile {
   profile_photo_url: string | null;
   dogs: Dog[];
   onboarding_complete: boolean;
+  // Engagement (Phase 15)
+  current_streak: number;
+  longest_streak: number;
+  last_activity_date: string | null;
+  total_xp: number;
+  level: number;
+  streak_freeze_used_this_week: boolean;
+  freeze_week_start: string | null;
+  tutorial_complete: boolean;
+  tutorial_skipped_at: string | null;
   created_at: string;
   updated_at: string;
+}
+
+// ── Engagement (Phase 15) ─────────────────────────────────────
+
+export interface Achievement {
+  id: string;
+  user_id: string;
+  achievement_id: string;
+  earned_at: string;
+}
+
+export interface ChallengeProgress {
+  id: string;
+  user_id: string;
+  challenge_id: string;
+  month: string;
+  progress: number;
+  goal: number;
+  completed: boolean;
+  completed_at: string | null;
+}
+
+export type CelebrationType =
+  | "pattern_finished"
+  | "streak_milestone"
+  | "badge_earned"
+  | "first_pattern"
+  | "challenge_complete"
+  | "level_up";
+
+export interface CelebrationData {
+  type: CelebrationType;
+  title: string;
+  subtitle: string;
+  dogLine?: string;
+  patternName?: string;
+  coverPhotoUrl?: string;
+  badgeIcon?: string;
+  badgeName?: string;
+  streakCount?: number;
+  levelTitle?: string;
+  stats?: { label: string; value: string }[];
 }
 
 // ── Patterns ─────────────────────────────────────────────────

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import type { WipJournalEntry } from "@/types";
 import { getWipJournal, addWipJournalEntry } from "@/lib/supabase/queries";
 import { createClient } from "@/lib/supabase/client";
+import { useEngagement } from "@/hooks/useEngagement";
 
 interface WipJournalProps {
   patternId: string;
@@ -16,6 +17,7 @@ export function WipJournal({ patternId, currentPct, currentStitches }: WipJourna
   const [note, setNote] = useState("");
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
+  const { recordActivity } = useEngagement();
 
   useEffect(() => {
     getWipJournal(patternId).then(({ data }) => {
@@ -45,6 +47,7 @@ export function WipJournal({ patternId, currentPct, currentStitches }: WipJourna
     if (data) {
       setEntries((prev) => [data, ...prev]);
       setNote("");
+      recordActivity("write_journal");
     }
     setSaving(false);
   }
