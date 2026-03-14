@@ -5,7 +5,6 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { PageWrapper } from "@/components/layout/PageWrapper";
 import { DailyGreeting } from "@/components/dashboard/DailyGreeting";
-import { useAuth } from "@/hooks/useAuth";
 import type { Profile, Pattern } from "@/types";
 
 // ── Types ─────────────────────────────────────────────────────
@@ -91,10 +90,23 @@ const QUICK_ACTIONS = [
   },
 ];
 
+// ── Pick 2 daily-random dogs ──────────────────────────────────
+
+function pickTwoDogs(dogs: Profile["dogs"]): Profile["dogs"] {
+  if (dogs.length <= 2) return dogs;
+  // Seed by day-of-year so the pair is stable within a day but rotates daily
+  const dayOfYear = Math.floor(
+    (Date.now() - new Date(new Date().getFullYear(), 0, 0).getTime()) / 86400000
+  );
+  const i1 = dayOfYear % dogs.length;
+  const i2 = (dayOfYear + Math.ceil(dogs.length / 2)) % dogs.length;
+  if (i1 === i2) return [dogs[i1], dogs[(i1 + 1) % dogs.length]];
+  return [dogs[i1], dogs[i2]];
+}
+
 // ── Main page ─────────────────────────────────────────────────
 
 export default function DashboardPage() {
-  const { signOut } = useAuth();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [stats, setStats] = useState<Stats | null>(null);
   const [recent, setRecent] = useState<RecentPattern[] | null>(null);
@@ -167,7 +179,8 @@ export default function DashboardPage() {
   }, []);
 
   const loading = !profile || !stats || !recent;
-  const dogs = profile?.dogs ?? [];
+  const allDogs = profile?.dogs ?? [];
+  const dogs = pickTwoDogs(allDogs);
 
   return (
     <>
@@ -191,22 +204,10 @@ export default function DashboardPage() {
                 ! ✿
               </h1>
 
-              {dogs.length > 0 && (
-                <p className="font-nunito text-[13px] text-[#896E66] mt-1.5 flex flex-wrap items-center gap-1">
-                  {dogs.slice(0, 5).map((d, i) => (
-                    <span key={d.id || i}>
-                      {d.emoji} {d.name}
-                      {i < Math.min(dogs.length, 5) - 1 && (
-                        <span className="text-[#E4D6C8]"> ·</span>
-                      )}
-                    </span>
-                  ))}
-                  {dogs.length > 5 && (
-                    <span className="text-[#B6A090]">
-                      &amp; {dogs.length - 5} more
-                    </span>
-                  )}
-                  <span className="ml-0.5">send tail wags 🐾</span>
+              {allDogs.length > 0 && (
+                <p className="font-nunito text-[13px] text-[#896E66] mt-1.5">
+                  {dogs.map((d) => `${d.emoji} ${d.name}`).join(" & ")}{" "}
+                  send tail wags 🐾
                 </p>
               )}
             </>
@@ -296,7 +297,7 @@ export default function DashboardPage() {
                   <p className="font-nunito text-[12px] text-[#896E66] mt-0.5">
                     {wipNudge.last_progress_date
                       ? `No update in ${daysSince(wipNudge.last_progress_date)} days — ready to keep going?`
-                      : "You haven&apos;t logged any progress yet — ready to start?"}
+                      : "You haven't logged any progress yet — ready to start?"}
                   </p>
                 </div>
                 <span className="text-[#AE7C2A] font-bold text-lg">›</span>
@@ -383,15 +384,6 @@ export default function DashboardPage() {
           )}
         </section>
 
-        {/* ── Temp sign-out (testing) ──────────────────────────── */}
-        <div className="flex justify-center pt-2">
-          <button
-            onClick={signOut}
-            className="px-5 py-2.5 rounded-full border border-[#E4D6C8] bg-white text-[12px] font-semibold font-nunito text-[#896E66] hover:text-[#B03020] hover:border-[#B03020] transition-colors"
-          >
-            Sign out (testing)
-          </button>
-        </div>
       </PageWrapper>
     </>
   );

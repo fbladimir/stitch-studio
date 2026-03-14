@@ -1,6 +1,6 @@
 # CLAUDE.md — Stitch Studio
 # Cross Stitch Companion App for Mom
-# Last Updated: 2026-03-13 (Session 2)
+# Last Updated: 2026-03-14 (Session 5)
 
 ---
 
@@ -836,7 +836,7 @@ NEVER force camera-only. NEVER force upload-only.
 ## ✅ PROGRESS LOG
 
 ### HANDOFF NOTE
-> Session 4 complete + post-session fixes applied. Phase 5 (Kits Module) is fully built, TypeScript-clean, and Vercel-deploying successfully. Three post-launch bugs fixed: (1) **Kits nav discoverability** — added an iOS-style Patterns ↔ Kits segmented switcher at the top of both list pages so Kits is reachable from the Patterns bottom nav tab without adding a 6th nav item; (2) **Vercel build fail** — 4 ESLint unused-variable errors in kit files fixed; (3) **Images still broken** — root cause identified: `getPublicUrl()` requires the Supabase bucket to have `public = true` set at the **bucket level**, not just RLS policies. Added `UPDATE storage.buckets SET public = true WHERE id IN (...)` to `supabase-setup.sql`. **This SQL must be run in Supabase SQL Editor to fix image display** — run Section 4 (Part A) from supabase-setup.sql. Next session starts Phase 6: Embroidery Module.
+> Session 5 complete. Phase 6 (Embroidery Module) is fully built and deployed. Additionally: (1) **Roku pre-signup intro** — 4-step guided pre-signup experience narrated by Roku the aussie doodle dog, with a hand-crafted inline SVG dog avatar (golden/brown, curly fur, tongue out), speech bubbles, animated slide transitions, and "skip" functionality. Lives at `/intro`. First-time unauthenticated visitors are redirected here from `/welcome` via localStorage key `ss_roku_intro_seen`. (2) **Dashboard dog display** — now shows 2 randomly selected dogs (day-seeded, rotates daily) instead of all 8 in the header subline. (3) **Dashboard bugs fixed** — `&apos;` rendering bug in WIP nudge text fixed; testing sign-out button removed from dashboard. (4) **Nav tab renamed** — "Patterns" bottom nav tab renamed to "Projects" to feel natural for stitchers who do cross stitch, embroidery, AND kits. (5) **3-way switcher** — Patterns/Kits 2-way switcher became 📖 Patterns | 🌸 Embroidery | 🧺 Kits across all three list pages. Next session: Phase 7 (Thread Inventory) or Phase 8 (Fabric Inventory). Profile page with photo display + Phase 15 (streaks, XP, achievements) is planned for after core modules are complete.
 
 ---
 
@@ -988,10 +988,46 @@ Photos load correctly in `<img>` tags via `getPublicUrl()`. Full SQL is in `supa
 17. **Filter tabs** — with kits in different statuses, confirm each tab filters correctly (Unopened shows only unopened kits, etc.).
 18. **Search** — type a kit name or brand and confirm list filters live.
 
-### Phase 6 — Embroidery Module — 🔜 NEXT
-- [ ] Embroidery list page
-- [ ] Embroidery add/edit form
-- [ ] Status tracking
+### Phase 6 — Embroidery Module — ✅ DONE
+- [x] Embroidery list page (search + filter tabs: All/In Progress/Finished) — src/app/(app)/embroidery/page.tsx
+- [x] EmbroideryCard component — src/components/embroidery/EmbroideryCard.tsx
+- [x] EmbroideryForm (cover photo, name/designer/company, stitch type chips, thread type + fabric pills, notes) — src/components/embroidery/EmbroideryForm.tsx
+- [x] EmbroideryStatusControl — iOS segmented control (🌱 Not Started / 🌸 In Progress / ✅ Finished) using wip/completion_date pattern — src/components/embroidery/EmbroideryStatusControl.tsx
+- [x] EmbroideryDetail — full detail view reusing WipTracker, WipJournal, FO/FFO photo upload — src/components/embroidery/EmbroideryDetail.tsx
+- [x] New, [id], [id]/edit pages in src/app/(app)/embroidery/
+- [x] Embroidery CRUD queries added (getEmbroideries, getEmbroidery, createEmbroidery, updateEmbroidery, deleteEmbroidery) — src/lib/supabase/queries.ts
+- [x] Stitch types stored as TEXT[] in stitch_types; thread type → rec_thread_brand; fabric → rec_fabric
+- [x] 2-way Patterns/Kits switcher expanded to 3-way: 📖 Patterns | 🌸 Embroidery | 🧺 Kits
+
+**DB field mapping for Embroidery:**
+- `stitch_types TEXT[]` — chip-style free-form input (e.g. "satin stitch", "chain stitch")
+- `rec_thread_brand` — repurposed for Thread Type (Stranded Cotton / Perle Cotton / Wool / Silk / Mixed)
+- `rec_fabric` — repurposed for Fabric (Linen / Cotton / Interfaced / Hoop frame / Other)
+- Status uses `wip` + `completion_date` (same as cross stitch patterns, NOT kit_status)
+
+### Session 5 Extras — ✅ DONE (2026-03-14)
+
+**Roku Pre-Signup Intro** — `src/app/intro/page.tsx`
+- 4-step guided intro experience for first-time unauthenticated visitors
+- Narrator: Roku, an aussie doodle (golden/brown, curly fur) — built as inline SVG avatar with: floppy ears, big expressive eyes, happy tongue, cheek blush, paw prints
+- Speech bubble + animated slide-up content per step; Roku avatar bounces with CSS float animation
+- Step 1: "Woof! Hi, I'm Roku!" | Step 2: Features overview | Step 3: AI scanning demo | Step 4: Ready to begin?
+- Progress dots at top, Skip button always visible, "I already have an account" shown on last step
+- On complete/skip: sets localStorage key `ss_roku_intro_seen = 'true'`, routes to /auth
+- `/welcome` now checks localStorage on mount → if intro not seen, redirects to `/intro` → prevents flash with blank screen guard
+
+**Dashboard fixes**
+- Dogs subline: now shows 2 randomly-selected dogs, day-seeded (stable within a day, rotates daily). With 8 dogs, shows "🐕 Rex & 🐩 Bella send tail wags 🐾" instead of all 8
+- Fixed `&apos;` bug in WIP nudge text (was rendering literally as `&apos;` in JS string context)
+- Removed "Sign out (testing)" button from dashboard
+- Removed stale `useAuth` import
+
+**Navigation**
+- Bottom nav "Patterns" tab renamed to **"Projects"** — more natural for a user who does cross stitch, embroidery, AND kits
+
+**Key localStorage keys:**
+- `ss_greeted` — daily greeting overlay (value = today's date string)
+- `ss_roku_intro_seen` — Roku pre-signup intro (value = 'true')
 
 ### Phase 7 — Thread Inventory
 - [ ] Thread list (search + filter by manufacturer)
@@ -1174,6 +1210,19 @@ feature development as nav and component structure must be stable first.**
 - [ ] Share app URL with Mom
 
 ---
+
+### Profile Page — planned for Phase 15 build
+
+The user's profile photo from onboarding is not currently displayed anywhere in the app. The profile page will be built as part of Phase 15 (engagement system) and will include:
+- Profile photo (from onboarding)
+- Display name + dog list
+- Current streak + longest streak
+- Level badge + XP progress bar
+- Achievement shelf (earned badges)
+- "Restart app tour" button (triggers Roku intro again)
+- Sign out button (permanent home for it, removed from dashboard)
+
+**Route:** `src/app/(app)/profile/page.tsx`
 
 ### Phase 15 — Engagement & Delight System (Duolingo-Inspired)
 

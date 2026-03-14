@@ -3,16 +3,28 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
+const INTRO_KEY = "ss_roku_intro_seen";
+
 export default function WelcomePage() {
   const router = useRouter();
   const [phase, setPhase] = useState<"intro" | "content" | "ready">("intro");
+  const [checked, setChecked] = useState(false);
 
   useEffect(() => {
+    // First-time visitors get redirected to the Roku intro
+    if (!localStorage.getItem(INTRO_KEY)) {
+      router.replace("/intro");
+      return;
+    }
+    setChecked(true);
     // Sequence: show logo first, then content fades in
     const t1 = setTimeout(() => setPhase("content"), 400);
     const t2 = setTimeout(() => setPhase("ready"), 1200);
     return () => { clearTimeout(t1); clearTimeout(t2); };
-  }, []);
+  }, [router]);
+
+  // Prevent flash before redirect
+  if (!checked) return <div className="min-h-screen bg-[#FAF6F0]" />;
 
   return (
     <div className="min-h-screen bg-[#FAF6F0] flex flex-col overflow-hidden relative">
