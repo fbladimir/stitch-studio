@@ -898,7 +898,7 @@ NEVER force camera-only. NEVER force upload-only.
 ## ✅ PROGRESS LOG
 
 ### HANDOFF NOTE
-> Session 13 complete. **Fixed two new-user signup bugs:** (1) DailyGreeting + Tutorial collision, (2) InstallBanner overlapping onboarding. Ran full Lighthouse code audit (accessibility issues identified). **Mom tested the app and loves it!** Fixed her 4 feedback items: (1) WIP start date is now tappable/editable via date picker in WipTracker. (2) AI color key scan now deduplicates threads by manufacturer+color_number before showing results (fixes repeated threads for french knots/backstitching). (3) Added 3 pet-themed challenges to monthly rotation: "Fur Baby Breaks", "Stitch Buddy", "Treat Yourself". (4) PWA icons regenerated — all 8 PNGs were 70-byte empty stubs causing plain green square on home screen; now real renders of the cross-stitch hoop SVG. **Next session:** Lighthouse accessibility fixes (alt text, aria-labels, dialog roles, contrast), then continue iterating on Mom's feedback. Phase 14 (app import) and Phase 15b (digests/wrapped/nudges) still deferred.
+> Session 13 complete. **Mom tested the app and loves it!** Fixed two new-user signup bugs (DailyGreeting+Tutorial collision, InstallBanner overlapping onboarding). Ran full Lighthouse code audit (accessibility issues identified, not yet fixed). Fixed all 5 of Mom's feedback items: (1) WIP start date now tappable/editable. (2) AI color key scan deduplicates threads. (3) 3 pet-themed challenges added. (4) PWA icons regenerated from SVG (were empty stubs → green square on home screen). (5) Thread numbers now sort numerically (301, 402, 3782) instead of alphabetically across stash list, store mode search, and shopping list. **Note:** iOS doesn't auto-update home screen icons — Mom needs to remove and re-add the app to see the new icon. **Next session:** Lighthouse accessibility fixes (alt text, aria-labels, dialog roles, contrast #896E66→~#6B544D), then continue with Mom's feedback as she adds her WIPs. Phase 14 (app import) and Phase 15b (digests/wrapped/nudges) still deferred.
 
 ---
 
@@ -1867,6 +1867,12 @@ Steps 1-3 same as mobile, then individual side nav items (nav-patterns, nav-stas
 - [x] AI color key scan repeated threads for french knots/backstitching — added deduplication by manufacturer+color_number in ThreadList.tsx before showing AI results
 - [x] Pet challenges — added 3 pet-themed monthly challenges: "Fur Baby Breaks" (🐾 log 3x + hug pets), "Stitch Buddy" (🐶 log 7 days with fur baby nearby), "Treat Yourself" (🦴 finish a project, treat yourself + pets) — src/lib/engagement.ts
 - [x] Home screen icon was plain green square — all 8 PWA PNG icons were 70-byte empty stubs; regenerated from icon.svg using macOS `sips` (now 4KB–41KB real images showing the cross-stitch hoop design)
+
+**Thread numbers sorted alphabetically instead of numerically:**
+- [x] Stash list (threads/page.tsx) — added numeric sort by `parseInt(color_number)` in `useMemo` after filtering
+- [x] Store mode quick thread search — added numeric sort to filtered results
+- [x] Store mode shopping list — changed `localeCompare` to numeric `parseInt` comparison
+- [x] All thread displays now show 301, 402, 3782 instead of 301, 3782, 402
 
 **Lighthouse code audit completed (issues identified, fixes deferred to next session):**
 - 4 empty `alt=""` on images (store-mode, kitting)
