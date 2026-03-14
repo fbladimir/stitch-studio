@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { PageWrapper } from "@/components/layout/PageWrapper";
@@ -118,6 +118,7 @@ export default function DashboardPage() {
   const [wipNudge, setWipNudge] = useState<RecentPattern | null>(null);
   const [challenges, setChallenges] = useState<ChallengeProgress[]>([]);
   const setTutorialActive = useAppStore((s) => s.setTutorialActive);
+  const needsTutorialRef = useRef(false);
 
   useEffect(() => {
     const load = async () => {
@@ -209,16 +210,22 @@ export default function DashboardPage() {
       }
       setChallenges(ch);
 
-      // Auto-trigger tutorial for first-time users
+      // Mark that this user needs tutorial — but don't start it yet.
+      // It will start after the DailyGreeting is dismissed (or skipped).
       if (profileRes.data && !(profileRes.data as Profile).tutorial_complete) {
-        setTimeout(() => {
-          setTutorialActive(true);
-        }, 800);
+        needsTutorialRef.current = true;
       }
     };
 
     load();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const startTutorialIfNeeded = useCallback(() => {
+    if (needsTutorialRef.current) {
+      needsTutorialRef.current = false;
+      setTimeout(() => setTutorialActive(true), 800);
+    }
+  }, [setTutorialActive]);
 
   const loading = !profile || !stats || !recent;
   const allDogs = profile?.dogs ?? [];
@@ -226,7 +233,7 @@ export default function DashboardPage() {
 
   return (
     <>
-      <DailyGreeting />
+      <DailyGreeting onDismiss={startTutorialIfNeeded} onSkipped={startTutorialIfNeeded} />
 
       <PageWrapper className="pb-8">
         {/* ── Greeting header ─────────────────────────────────── */}

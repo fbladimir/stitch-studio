@@ -1,6 +1,6 @@
 # CLAUDE.md — Stitch Studio
 # Cross Stitch Companion App for Mom
-# Last Updated: 2026-03-14 (Session 12)
+# Last Updated: 2026-03-14 (Session 13)
 
 ---
 
@@ -898,7 +898,7 @@ NEVER force camera-only. NEVER force upload-only.
 ## ✅ PROGRESS LOG
 
 ### HANDOFF NOTE
-> Session 12 complete. **Phase 12 (Polish + Launch) is mostly done.** Added sonner toast notifications on all CRUD actions across patterns, kits, embroidery, threads, and fabrics. Created 404 "Lost stitch!" page, error boundaries (root + app-level) with "Dropped stitch!" copy and retry. Added `loading="lazy"` to 15 `<img>` tags across 9 detail/list files. Empty states and loading skeletons were already done from earlier phases. **Tutorial overlay bugs fixed:** last step was off-screen because CSS animation transform overrode centering `translate(-50%, -50%)` — switched to flexbox centering wrapper. Combined 4 individual mobile nav steps into 1 "bottom-nav" step so tutorial doesn't feel stuck. Added z-index layering to fix iOS Safari touch events on tooltip buttons. **iOS-native drag-to-dismiss** added to all 3 bottom sheet modals (StreakDetail, SubstitutionHelper, DuplicateWarning) via new `useBottomSheetDrag` hook. **Next session:** Lighthouse audit, final deploy polish, then share with Mom. Phase 14 (app import) and Phase 15b (digests/wrapped/nudges) still deferred.
+> Session 13. **Fixed new-user signup bug:** DailyGreeting overlay and TutorialOverlay were both firing simultaneously for new users — tutorial started while greeting covered the screen, so users couldn't see what was being highlighted. Fix: DailyGreeting now accepts `onDismiss`/`onSkipped` callbacks; dashboard defers tutorial start until greeting is dismissed (or skipped if already seen today). Also ran a code-level Lighthouse audit identifying: 4 empty alt texts, icon-only buttons missing aria-labels, modals missing `role="dialog"`, and muted text color contrast issues (#896E66 on #FAF6F0 fails WCAG AA). **Next session:** Fix Lighthouse accessibility issues, then share with Mom. Phase 14 (app import) and Phase 15b (digests/wrapped/nudges) still deferred.
 
 ---
 
@@ -1846,6 +1846,24 @@ Steps 1-3 same as mobile, then individual side nav items (nav-patterns, nav-stas
 - [x] Wired into SubstitutionHelper — `src/components/ai/SubstitutionHelper.tsx` (also added drag handle bar)
 - [x] Wired into DuplicateWarning — `src/components/patterns/DuplicateWarning.tsx` (also added drag handle bar, mobile only via `sm:hidden`)
 - [x] All bottom sheets now dismiss via: tap backdrop, drag down from handle, or press close/cancel buttons
+
+### Session 13 Bug Fixes — ✅ DONE (2026-03-14)
+
+**New-user signup: DailyGreeting + Tutorial collision:**
+- [x] Bug: new users saw DailyGreeting overlay AND TutorialOverlay simultaneously — tutorial highlighted elements behind the full-screen greeting, making it useless
+- [x] Root cause: dashboard `useEffect` triggered tutorial via `setTimeout(800ms)` independently of greeting visibility
+- [x] Fix: DailyGreeting now accepts `onDismiss` + `onSkipped` callbacks — src/components/dashboard/DailyGreeting.tsx
+- [x] Dashboard uses `needsTutorialRef` to defer tutorial start until greeting is dismissed or skipped — src/app/(app)/dashboard/page.tsx
+- [x] Flow: greeting shows → user taps "Let's stitch!" → greeting dismisses → `onDismiss` fires → tutorial starts after 800ms
+- [x] If greeting already seen today: `onSkipped` fires immediately → tutorial starts right away (no delay from greeting)
+
+**Lighthouse code audit completed (issues identified, fixes deferred to next session):**
+- 4 empty `alt=""` on images (store-mode, kitting)
+- Icon-only close buttons missing `aria-label` (PhotoScanner, SubstitutionHelper)
+- 5+ modals missing `role="dialog"` + `aria-modal="true"`
+- Color contrast: `#896E66` on `#FAF6F0` fails WCAG AA (3.2:1, needs 4.5:1) — affects 15+ files
+- StatusToggles buttons should have `role="switch"` + `aria-checked`
+- No page-specific metadata (all pages show "Stitch Studio" in browser tab)
 
 ---
 

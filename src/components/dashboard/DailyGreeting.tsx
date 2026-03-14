@@ -92,7 +92,12 @@ function DogCell({ dog, index }: { dog: Dog; index: number }) {
 
 // ── Main component ────────────────────────────────────────────
 
-export function DailyGreeting() {
+interface DailyGreetingProps {
+  onDismiss?: () => void;
+  onSkipped?: () => void;
+}
+
+export function DailyGreeting({ onDismiss, onSkipped }: DailyGreetingProps) {
   const [visible, setVisible] = useState(false);
   const [animateIn, setAnimateIn] = useState(false);
   const [profile, setProfile] = useState<GreetingProfile | null>(null);
@@ -100,13 +105,20 @@ export function DailyGreeting() {
   useEffect(() => {
     const init = async () => {
       const today = new Date().toDateString();
-      if (localStorage.getItem("ss_greeted") === today) return;
+      if (localStorage.getItem("ss_greeted") === today) {
+        // Greeting already seen today — notify parent immediately
+        onSkipped?.();
+        return;
+      }
 
       const supabase = createClient();
       const {
         data: { user },
       } = await supabase.auth.getUser();
-      if (!user) return;
+      if (!user) {
+        onSkipped?.();
+        return;
+      }
 
       const { data } = await supabase
         .from("profiles")
@@ -121,15 +133,20 @@ export function DailyGreeting() {
         });
         setVisible(true);
         setTimeout(() => setAnimateIn(true), 60);
+      } else {
+        onSkipped?.();
       }
     };
     init();
-  }, []);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const dismiss = () => {
     localStorage.setItem("ss_greeted", new Date().toDateString());
     setAnimateIn(false);
-    setTimeout(() => setVisible(false), 280);
+    setTimeout(() => {
+      setVisible(false);
+      onDismiss?.();
+    }, 280);
   };
 
   if (!visible || !profile) return null;
