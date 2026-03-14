@@ -1,6 +1,6 @@
 # CLAUDE.md — Stitch Studio
 # Cross Stitch Companion App for Mom
-# Last Updated: [UPDATE THIS EVERY END-OF-CHAT SESSION]
+# Last Updated: 2026-03-13
 
 ---
 
@@ -819,50 +819,56 @@ NEVER force camera-only. NEVER force upload-only.
 ## ✅ PROGRESS LOG
 
 ### HANDOFF NOTE
-> PROJECT NOT STARTED. First session task: initialize the Next.js 14 project with TypeScript
-> and Tailwind, install shadcn/ui, configure next-pwa, load Google Fonts in layout.tsx, set up
-> the design system CSS variables in globals.css, create the TypeScript types file, configure
-> Supabase client (browser + server), scaffold the complete folder structure, and set up
-> .env.local with all required variable names (empty values). Do NOT start building features
-> until the entire foundation is confirmed working. Commit after foundation is complete.
+> Session 1 complete. Phase 0 (full foundation) and Phase 1 (Auth + Onboarding) are DONE and pushed to GitHub. A welcome/splash screen was also added (src/app/welcome/page.tsx) — this is now the unauthenticated entry point (middleware redirects to /welcome, not /auth). The Supabase project is live at kendddbcwrfdtqpjoscy.supabase.co with all tables, RLS policies, trigger, and storage buckets created. IMPORTANT: Supabase email confirmation must be OFF (Authentication → Providers → Email → disable "Confirm email") — this was the root cause of 400/422 sign-in errors. Next session starts with Phase 2: Layout + Navigation (BottomNav, SideNav, TopBar, PageWrapper, safe area insets). Do NOT rebuild anything from Phase 0 or Phase 1 — it is complete.
 
 ---
 
-### Phase 0 — Project Foundation
-- [ ] Next.js 14 init (App Router, TypeScript, Tailwind)
-- [ ] shadcn/ui installed and configured
-- [ ] next-pwa installed and configured
-- [ ] PWA manifest.json created with correct theme colors
-- [ ] PWA icons generated (all sizes)
-- [ ] Google Fonts: Playfair Display + Nunito in layout.tsx via next/font
-- [ ] Design system CSS variables in globals.css
-- [ ] TypeScript types defined in src/types/index.ts
-- [ ] .env.local template created with all variable names
-- [ ] Supabase project created (external — done by Frank)
-- [ ] Supabase browser client configured (src/lib/supabase/client.ts)
-- [ ] Supabase server client configured (src/lib/supabase/server.ts)
-- [ ] All DB tables created in Supabase with correct schema
-- [ ] RLS policies created for all tables
-- [ ] All storage buckets created in Supabase
-- [ ] Complete folder structure scaffolded
-- [ ] Anthropic client configured (src/lib/anthropic.ts)
-- [ ] Image compression utility (src/lib/image.ts)
-- [ ] Duplicate detection utility (src/lib/duplicate-detection.ts)
-- [ ] Auth middleware (middleware.ts — redirect unauthenticated users)
-- [ ] Root page.tsx redirect logic (authed → /dashboard, unauthed → /auth)
+### Phase 0 — Project Foundation — ✅ DONE
+- [x] Next.js 14 init (App Router, TypeScript, Tailwind)
+- [x] shadcn/ui installed and configured (Nova/Radix preset)
+- [x] next-pwa installed
+- [x] PWA manifest.json created with correct theme colors
+- [x] PWA icons created (placeholder PNGs, all sizes — real icons to be added later)
+- [x] Google Fonts: Playfair Display + Nunito in layout.tsx via next/font
+- [x] Design system CSS variables in globals.css (rose, sage, gold, brown palette)
+- [x] TypeScript types defined in src/types/index.ts (all models)
+- [x] .env.local filled with all Supabase + Anthropic keys
+- [x] Supabase project created — kendddbcwrfdtqpjoscy.supabase.co
+- [x] Supabase browser client (src/lib/supabase/client.ts)
+- [x] Supabase server client (src/lib/supabase/server.ts)
+- [x] All 7 DB tables created (profiles, patterns, pattern_threads, thread_inventory, fabric_inventory, wip_journal, shopping_list)
+- [x] RLS policies on all tables + auto-create profile trigger on signup
+- [x] All 7 storage buckets created (pattern-covers, fo-photos, ffo-photos, thread-photos, fabric-photos, profile-photos, kit-photos)
+- [x] Complete folder structure scaffolded
+- [x] Anthropic client (src/lib/anthropic.ts) — uses @anthropic-ai/sdk, model claude-sonnet-4-5
+- [x] Image compression utility (src/lib/image.ts)
+- [x] Duplicate detection utility (src/lib/duplicate-detection.ts)
+- [x] Auth middleware (src/middleware.ts)
+- [x] Root page.tsx redirect logic (authed → /dashboard, unauthed → /welcome)
 
-### Phase 1 — Auth + Onboarding
-- [ ] Auth page with Sign In / Sign Up tabs
-- [ ] SignUpForm (name, email, password with show/hide)
-- [ ] SignInForm (email, password with show/hide, forgot password link)
-- [ ] ResetPasswordForm
-- [ ] Onboarding wizard (3 steps)
-- [ ] Step 1: display name
-- [ ] Step 2: profile photo (camera + upload, skippable)
-- [ ] Step 3: dogs (emoji picker, pill chips, skippable, animated)
-- [ ] Profile saved to Supabase profiles table
-- [ ] Onboarding complete flag — skip onboarding if already done
-- [ ] Session persistence tested on iPhone Safari + Kindle
+### Phase 1 — Auth + Onboarding — ✅ DONE
+- [x] Welcome/splash screen (src/app/welcome/page.tsx) — animated entry point, added this session
+- [x] Auth page with Sign In / Sign Up tabs (src/app/auth/page.tsx)
+- [x] SignUpForm — name, email, password with show/hide (src/components/auth/SignUpForm.tsx)
+- [x] SignInForm — email, password with show/hide, forgot password link (src/components/auth/SignInForm.tsx)
+- [x] ResetPasswordForm — email submit + success confirmation (src/components/auth/ResetPasswordForm.tsx)
+- [x] OnboardingWizard with progress bar + step dots (src/components/onboarding/OnboardingWizard.tsx)
+- [x] Step 1: display name (src/components/onboarding/Step1Name.tsx)
+- [x] Step 2: profile photo — camera + library + skip (src/components/onboarding/Step2Photo.tsx)
+- [x] Step 3: pets — emoji picker, animated pill chips, skip (src/components/onboarding/Step3Dogs.tsx)
+- [x] Profile saved to Supabase profiles table after each step
+- [x] Onboarding complete flag — skips onboarding if already done
+- [x] useAuth hook (src/hooks/useAuth.ts)
+- [x] Input component fixed with React.forwardRef (required for react-hook-form)
+- [ ] Session persistence tested on iPhone Safari + Kindle — PENDING (test when deployed)
+
+### Phase 2 — Layout + Navigation — 🔜 NEXT
+- [ ] PageWrapper component (src/components/layout/PageWrapper.tsx)
+- [ ] TopBar component with back button (src/components/layout/TopBar.tsx)
+- [ ] BottomNav — 5 tabs, fixed, safe-area-inset-bottom aware (src/components/layout/BottomNav.tsx)
+- [ ] SideNav for iPad >= 768px (src/components/layout/SideNav.tsx)
+- [ ] Responsive breakpoint switching (bottom nav ↔ side nav)
+- [ ] Dashboard placeholder wired up with layout
 
 ### Phase 2 — Layout + Navigation
 - [ ] Root layout with safe area insets
