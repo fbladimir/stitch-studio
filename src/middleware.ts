@@ -31,7 +31,7 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  const publicPaths = ["/welcome", "/auth", "/auth/reset-password", "/intro"];
+  const publicPaths = ["/welcome", "/auth", "/auth/reset-password", "/intro", "/offline"];
   const isPublic = publicPaths.some((p) => pathname.startsWith(p));
 
   if (!user && !isPublic) {
@@ -51,6 +51,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|icons|manifest.json|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    "/((?!_next/static|_next/image|favicon.ico|icons|manifest.json|sw\\.js|workbox-.*|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
