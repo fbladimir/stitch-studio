@@ -7,7 +7,7 @@ import { getKits } from "@/lib/supabase/queries";
 import { PageWrapper } from "@/components/layout/PageWrapper";
 import { TopBar } from "@/components/layout/TopBar";
 import { KitCard } from "@/components/kits/KitCard";
-import type { Pattern, KitStatus } from "@/types";
+import type { Pattern } from "@/types";
 
 type FilterTab = "all" | "unopened" | "started" | "finished";
 
@@ -82,6 +82,25 @@ export default function KitsPage() {
     <>
       <TopBar title="My Kits" />
       <PageWrapper className="pb-8">
+        {/* Collection switcher — Patterns / Kits */}
+        <div
+          className="flex rounded-2xl p-1 gap-1 mb-5"
+          style={{ backgroundColor: "#EDE5DC" }}
+        >
+          <Link
+            href="/patterns"
+            className="flex-1 flex items-center justify-center gap-1.5 h-10 rounded-xl font-nunito font-bold text-[13px] text-[#B6A090] active:scale-[0.97] transition-transform"
+          >
+            <span>📖</span> Patterns
+          </Link>
+          <div
+            className="flex-1 flex items-center justify-center gap-1.5 h-10 rounded-xl bg-white font-nunito font-bold text-[13px] text-[#3A2418] shadow-sm"
+            style={{ boxShadow: "0 1px 4px rgba(58,36,24,0.10)" }}
+          >
+            <span>🧺</span> Kits
+          </div>
+        </div>
+
         {/* Search */}
         <div className="mb-4 relative">
           <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#B6A090] text-lg select-none pointer-events-none">

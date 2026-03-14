@@ -72,6 +72,24 @@ export default function PatternsPage() {
     <>
       <TopBar title="My Patterns" />
       <PageWrapper className="pb-8">
+        {/* Collection switcher — Patterns / Kits */}
+        <div
+          className="flex rounded-2xl p-1 gap-1 mb-5"
+          style={{ backgroundColor: "#EDE5DC" }}
+        >
+          <div className="flex-1 flex items-center justify-center gap-1.5 h-10 rounded-xl bg-white font-nunito font-bold text-[13px] text-[#3A2418] shadow-sm"
+            style={{ boxShadow: "0 1px 4px rgba(58,36,24,0.10)" }}
+          >
+            <span>📖</span> Patterns
+          </div>
+          <Link
+            href="/kits"
+            className="flex-1 flex items-center justify-center gap-1.5 h-10 rounded-xl font-nunito font-bold text-[13px] text-[#B6A090] active:scale-[0.97] transition-transform"
+          >
+            <span>🧺</span> Kits
+          </Link>
+        </div>
+
         {/* Search */}
         <div className="mb-4 relative">
           <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#B6A090] text-lg select-none pointer-events-none">

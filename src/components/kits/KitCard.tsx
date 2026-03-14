@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import type { Pattern, KitStatus } from "@/types";
+import type { Pattern } from "@/types";
 
 interface KitCardProps {
   kit: Pattern;

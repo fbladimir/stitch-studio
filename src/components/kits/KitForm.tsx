@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import type { Pattern, PatternType, KitStatus } from "@/types";
+import type { Pattern, KitStatus } from "@/types";
 import { createClient } from "@/lib/supabase/client";
 import { createKit, updateKit, uploadKitPhoto } from "@/lib/supabase/queries";
 import { compressImage } from "@/lib/image";
@@ -90,7 +90,6 @@ export function KitForm({ mode, initialData }: KitFormProps) {
   });
 
   const selectedType = watch("type");
-  const contentsOther = watch("contents_other");
 
   // ── Photo ───────────────────────────────────────────────────
 

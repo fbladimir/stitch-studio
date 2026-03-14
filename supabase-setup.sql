@@ -203,11 +203,27 @@ CREATE POLICY "Users access own shopping_list" ON shopping_list
 
 
 -- ============================================================
--- SECTION 4: STORAGE PUBLIC READ POLICIES
--- Fixes broken photo display (Phase 4 Known Issue).
--- Photos in these buckets will now load in <img> tags.
--- Also adds upload policies so authenticated users can write.
+-- SECTION 4: STORAGE — MAKE BUCKETS PUBLIC + POLICIES
+-- CRITICAL: getPublicUrl() only returns accessible URLs when
+-- the bucket itself has public=true set at the bucket level.
+-- RLS policies alone are not enough. Run both parts below.
 -- ============================================================
+
+-- Part A: Set all photo buckets to public (THIS IS THE KEY FIX)
+-- This is what makes getPublicUrl() actually return accessible URLs.
+UPDATE storage.buckets
+SET public = true
+WHERE id IN (
+  'pattern-covers',
+  'fo-photos',
+  'ffo-photos',
+  'profile-photos',
+  'fabric-photos',
+  'thread-photos',
+  'kit-photos'
+);
+
+-- Part B: RLS policies — public read + auth upload/update/delete
 
 -- pattern-covers
 DROP POLICY IF EXISTS "Public read pattern-covers" ON storage.objects;
