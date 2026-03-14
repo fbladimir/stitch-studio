@@ -1,6 +1,6 @@
 # CLAUDE.md — Stitch Studio
 # Cross Stitch Companion App for Mom
-# Last Updated: 2026-03-14 (Session 6)
+# Last Updated: 2026-03-14 (Session 7)
 
 ---
 
@@ -363,6 +363,7 @@ The core "magic" workflow that ties everything together:
 POST /api/ai/scan-cover       → Claude Vision, returns pattern fields JSON
 POST /api/ai/scan-colorkey    → Claude Vision, returns threads array JSON
 POST /api/ai/scan-stash       → Claude Vision, returns threads array JSON
+POST /api/ai/scan-fabric      → Claude Vision, returns fabric fields JSON
 POST /api/ai/advisor          → Claude chat, streaming SSE response
 POST /api/ai/kitting-suggest  → Claude chat, returns substitution suggestions JSON
 ```
@@ -625,18 +626,22 @@ stitch-studio/
     │   ├── fabrics/
     │   │   └── page.tsx
     │   │
+    │   ├── kitting/
+    │   │   └── page.tsx               ← kitting check flow (select pattern → compare → result)
+    │   │
     │   ├── store-mode/
     │   │   └── page.tsx               ← in-store shopping assistant
     │   │
     │   ├── ai/
-    │   │   └── page.tsx               ← AI advisor chat + scan tools
+    │   │   └── page.tsx               ← AI advisor chat + scan tools (3 tabs: Advisor/Scan/Stash)
     │   │
     │   └── api/
     │       ├── ai/
     │       │   ├── scan-cover/route.ts
     │       │   ├── scan-colorkey/route.ts
     │       │   ├── scan-stash/route.ts
-    │       │   ├── advisor/route.ts      ← streaming SSE
+    │       │   ├── scan-fabric/route.ts   ← Claude Vision, fabric identification
+    │       │   ├── advisor/route.ts       ← streaming SSE
     │       │   └── kitting-suggest/route.ts
     │       └── places/
     │           └── nearby/route.ts       ← Google Maps Places proxy
@@ -836,7 +841,7 @@ NEVER force camera-only. NEVER force upload-only.
 ## ✅ PROGRESS LOG
 
 ### HANDOFF NOTE
-> Session 6 complete. **Phase 7 (Thread Inventory) and Phase 8 (Fabric Inventory) are both fully built and deployed.** Thread inventory: list with 🧵/🪢 Threads/Fabrics switcher, search, dynamic manufacturer filter tabs (only shows tabs for manufacturers you actually own), ThreadCard (color swatch + number + quantity badge), ThreadForm (dropdown, +/- quantity buttons, thread type pills), thread detail page with live quantity editing, patterns cross-reference list, and delete. Fabric inventory: same Threads/Fabrics switcher, search, fabric type filter tabs (All/Aida/Linen/Evenweave/Other), FabricCard (photo thumbnail, type + count badges), FabricForm (photo upload camera+library, manufacturer dropdown, color/size fields, type pills, count pills 14–36ct), fabric detail with full photo display, inline edit, and delete. Both modules committed and pushed (Vercel deployed). **Next session: Phase 9 — AI Features** (PhotoScanner shared component, /api/ai/scan-cover, /api/ai/scan-colorkey, /api/ai/scan-stash, /api/ai/advisor streaming SSE, /api/ai/kitting-suggest, AI integrated into PatternForm and thread list, Kitting Check flow, AI Advisor chat page). Profile page + Phase 15 (streaks, XP, achievements) remains planned for after all core modules are complete.
+> Session 7 complete. **Phase 9 (AI Features) is fully built and deployed.** All 6 AI API routes are live: scan-cover, scan-colorkey, scan-stash, scan-fabric (added this session beyond original plan), advisor (streaming SSE), and kitting-suggest. AI auto-fill is integrated into PatternForm (cover photo → pre-fills all fields), ThreadList (color key photo → bulk-import threads with preview), and FabricForm (fabric photo → fills manufacturer, type, count, color, size). AI Advisor chat page has 3 tabs (Advisor streaming chat with quick question chips + bouncing dot typing indicator, Color Key scanner, Stash Import scanner) using a fixed full-viewport iMessage-style layout. Kitting Check flow at `/kitting` lets you select a pattern, compares threads/fabric against inventory, shows have/missing with progress bar, and offers AI-powered thread substitution suggestions via bottom sheet. Dashboard stats cards are now tappable Links (Patterns → /patterns, In Progress → /patterns?filter=wip, Finished → /patterns?filter=finished, Threads → /threads). Dashboard "Kitting Check" quick action now links to `/kitting`. **Next session: Phase 10 — Store Mode** (full-screen in-store shopping assistant with chart scanner, thread/fabric quick check, shopping list, nearby stores). Profile page + Phase 15 (streaks, XP, achievements) remains planned for after all core modules are complete.
 
 ---
 
@@ -1052,21 +1057,35 @@ Photos load correctly in `<img>` tags via `getPublicUrl()`. Full SQL is in `supa
 - [x] fabrics/[id] detail page — full photo display, inline edit mode, delete with confirmation — src/app/(app)/fabrics/[id]/page.tsx
 - [x] Fabric inventory CRUD queries + uploadFabricPhoto (fabric-photos bucket) — src/lib/supabase/queries.ts
 
-### Phase 9 — AI Features
-- [ ] PhotoScanner shared component (camera + upload, preview, compress, confirm)
-- [ ] /api/ai/scan-cover route
-- [ ] /api/ai/scan-colorkey route
-- [ ] /api/ai/scan-stash route
-- [ ] /api/ai/advisor route (streaming SSE)
-- [ ] /api/ai/kitting-suggest route
-- [ ] AI scan integrated into PatternForm (cover page)
-- [ ] AI scan integrated into pattern thread list (color key)
-- [ ] Bulk stash import via AI scan
-- [ ] AI Advisor chat page (AdvisorChat component, streaming)
-- [ ] Kitting Check flow (select pattern → compare → shopping list)
-- [ ] KittingResult component
-- [ ] SubstitutionHelper component
-- [ ] Quick-question chips in Advisor
+### Phase 9 — AI Features — ✅ DONE
+- [x] PhotoScanner shared component (camera + upload, preview, compress, "Scan with AI" button) — src/components/ai/PhotoScanner.tsx
+- [x] /api/ai/scan-cover route — Claude Vision extracts pattern name, designer, company, sizes, thread brand, fabric, chart type
+- [x] /api/ai/scan-colorkey route — Claude Vision extracts full thread list (manufacturer, color #, name, strands, stitch type, skeins)
+- [x] /api/ai/scan-stash route — Claude Vision reads thread organizers/labels for bulk inventory import
+- [x] /api/ai/scan-fabric route — Claude Vision identifies fabric manufacturer, type (aida/linen/evenweave), count, color, size (added beyond original plan)
+- [x] /api/ai/advisor route (streaming SSE) — warm cross stitch advisor persona, ReadableStream with SSE events
+- [x] /api/ai/kitting-suggest route — suggests thread substitutes from user's stash with reasoning
+- [x] AI scan integrated into PatternForm — "Auto-fill with AI" button appears after cover photo selection (create mode), uses setValue to fill all form fields
+- [x] AI scan integrated into pattern ThreadList — "Scan Color Key" camera/library buttons, preview of found threads, "Add all N threads" bulk import
+- [x] AI scan integrated into FabricForm — "Auto-fill with AI" button after fabric photo, fills manufacturer dropdown, color, size, type pills, count pills
+- [x] Bulk stash import via AI scan — AI tab > Stash Import tab, photograph thread collection → preview → "Add all to my stash" button
+- [x] AI Advisor chat page with 3 tabs (Advisor/Scan/Stash Import) — src/app/(app)/ai/page.tsx
+- [x] AdvisorChat component — streaming chat UI with advisor avatar, bouncing dot typing indicator, auto-growing textarea, iMessage-style full-viewport fixed layout — src/components/ai/AdvisorChat.tsx
+- [x] Quick-question chips in Advisor (6 common questions: fabric count, washing, backstitching, framing, AIDA vs linen, strands)
+- [x] Kitting Check flow — src/app/(app)/kitting/page.tsx — select pattern → compare threads/fabric vs inventory → show results with progress bar
+- [x] KittingResult component — have/missing thread display, progress bar, "Mark as Kitted" button, "Substitute?" links — src/components/ai/KittingResult.tsx
+- [x] SubstitutionHelper component — bottom sheet modal, calls /api/ai/kitting-suggest, shows up to 3 substitutes from stash with reasons + general advice — src/components/ai/SubstitutionHelper.tsx
+- [x] Dashboard stats cards now tappable Links (Patterns → /patterns, In Progress → /patterns?filter=wip, Finished → /patterns?filter=finished, Threads → /threads)
+- [x] Dashboard "Kitting Check" quick action now links to /kitting
+- [x] Patterns page reads ?filter= query param to set initial filter tab (wrapped in Suspense boundary)
+- [x] slideUp CSS animation added to globals.css for bottom sheet modals
+- [x] Advisor API route includes credit balance error handling (shows clear message instead of generic error)
+
+**Session 7 extras:**
+- AI chat uses fixed full-viewport layout (fixed inset-0, flex column) — no nested scroll conflicts
+- overscroll-contain on messages area prevents scroll bleed to parent
+- Input bar properly positioned above bottom nav with safe area insets
+- Error handling in advisor route surfaces credit balance issues clearly to user
 
 ### Phase 10 — Store Mode (In-Store Shopping Assistant)
 - [ ] Store Mode full-screen shell
