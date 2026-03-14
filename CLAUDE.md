@@ -825,12 +825,18 @@ NEVER force camera-only. NEVER force upload-only.
 12. **Warmth is a feature.** Every empty state, every confirmation, every loading message
     should feel personal and crafting-themed — not generic app copy.
 
+13. **Supabase Storage buckets must be public** for photos to display in `<img>` tags.
+    `getPublicUrl()` only works when the bucket is public. All photo buckets (pattern-covers,
+    fo-photos, ffo-photos, profile-photos, fabric-photos, thread-photos, kit-photos) need
+    public read policies. See Phase 4 KNOWN ISSUE for the SQL. This is safe for a personal
+    app — URLs are UUID-namespaced and not guessable. Revisit with signed URLs in Phase 11 if needed.
+
 ---
 
 ## ✅ PROGRESS LOG
 
 ### HANDOFF NOTE
-> Session 2 complete. Phases 2 + 3 fully done and deployed to Vercel (https://stitch-studio-three.vercel.app). Phase 2: layout shell — BottomNav, SideNav, TopBar, PageWrapper, (app) route group with all authenticated pages inside it (nav bug fixed). Phase 3: full dashboard — DailyGreeting once-per-day overlay with animated dogs (8 dogs, staggered popIn → float/wiggle), time-aware greeting messages, stats grid, quick actions, recent patterns, WIP nudge, skeleton loading. New additions this session: Mom's feedback incorporated — (1) AI cover page scan already spec'd in Phase 9 and confirmed critical; (2) "visual database" confirmed as the app's core purpose — the Patterns/Threads/Fabrics pages ARE her visual collection; (3) Cross-stitch app import added as Phase 14 (R-XP, PatternKeeper, Saga — file-based CSV import wizard, thread import first, pattern import second); (4) Core Value Proposition section added to CLAUDE.md design principles. Daily greeting localStorage key: "ss_greeted". Next session starts Phase 4: Patterns Module. Phase 2 (Layout + Navigation) is fully DONE. Route group `(app)` created at `src/app/(app)/` — all authenticated pages live here and automatically get the nav shell. Old `src/app/dashboard/` removed; dashboard now at `src/app/(app)/dashboard/page.tsx`. Nav components: BottomNav (5 tabs, fixed, safe-area-inset-bottom), SideNav (tablet ≥ 768px, left rail 220px wide), TopBar (sticky, back button, right slot), PageWrapper (handles bottom/side nav padding + safe area). Nav items defined in `src/components/layout/nav-items.ts` and shared by both nav components — adding/changing tabs only requires editing that one file. All 5 tabs: Home → /dashboard, Patterns → /patterns, Stash → /threads, Shop → /store-mode, AI → /ai. Build passes clean. Tutorial onboarding spec added to CLAUDE.md as Phase 13 (post-launch). Next session starts Phase 3: Home Dashboard — greeting, stats row, quick actions grid, recent patterns, WIP nudge card.
+> Session 3 complete. Phase 4 (Patterns Module) is fully built and TypeScript-clean. All patterns CRUD, status toggles, WIP tracker, WIP journal, per-pattern thread list, FO/FFO photo uploads, duplicate detection, and delete with confirmation are working. Two bugs were fixed post-build: (1) toggle knob visual — switched from translate-x to left/right absolute positioning for cleaner active/inactive state; (2) broken cover photo — root cause is Supabase storage buckets are private; `getPublicUrl()` URLs don't work as `<img>` src without bucket being public. Added `onError` fallback to image tags as a code-level grace, but the REAL fix requires making the storage buckets public in Supabase dashboard (see KEY NOTES #13 below). Custom SVG app icon added at `public/icons/icon.svg` — embroidery hoop design in rose/terracotta with cross-stitch X marks in sage and gold. Added as SVG favicon in layout.tsx. PNG icons for PWA manifest are still placeholder — full icon set to be done in Phase 11. AI question confirmed: Phase 9 cover-page scanner will photograph the pattern cover → Claude fills in name, designer, sizes, thread brand, everything → Mom confirms → saves. Zero manual typing. Next session starts Phase 5: Kits Module.
 
 ---
 
@@ -920,23 +926,41 @@ NEVER force camera-only. NEVER force upload-only.
 9. **Skeleton loading** — on slower connections, skeleton shimmer cards should appear while data loads before content pops in.
 10. **No layout flash** — bottom nav should remain visible throughout.
 
-### Phase 4 — Patterns Module — 🔜 NEXT
-- [ ] Patterns list page (search + filter tabs: All/WIP/Kitted/Finished)
-- [ ] PatternCard component (thumbnail, name, designer, status badge)
-- [ ] Pattern add form (all fields per spec)
-- [ ] Pattern edit form
-- [ ] Pattern detail page
-- [ ] Magazine conditional fields
-- [ ] Per-pattern thread list (add/edit/remove threads)
-- [ ] StatusToggles (Kitted / WIP / Finished)
-- [ ] WipTracker (%, stitches, dates, days counter, progress bar)
-- [ ] WipJournal (timestamped notes)
-- [ ] FO photo upload (camera + gallery)
-- [ ] FFO photo upload (camera + gallery)
-- [ ] Duplicate detection on add (DuplicateWarning modal)
-- [ ] Delete pattern with confirmation
+### Phase 4 — Patterns Module — ✅ DONE
+- [x] Patterns list page (search + filter tabs: All/WIP/Kitted/Finished) — src/app/(app)/patterns/page.tsx
+- [x] PatternCard component (thumbnail, name, designer, status badge) — src/components/patterns/PatternCard.tsx
+- [x] Pattern add form (all fields per spec) — src/components/patterns/PatternForm.tsx
+- [x] Pattern edit form — same PatternForm with mode="edit"
+- [x] Pattern detail page — src/components/patterns/PatternDetail.tsx
+- [x] Magazine conditional fields — shown/hidden based on chart_type watch
+- [x] Per-pattern thread list (add/edit/remove threads) — src/components/patterns/ThreadList.tsx
+- [x] StatusToggles (Kitted / WIP / Finished) — src/components/patterns/StatusToggles.tsx
+- [x] WipTracker (%, stitches, dates, days counter, progress bar) — src/components/patterns/WipTracker.tsx
+- [x] WipJournal (timestamped notes) — src/components/patterns/WipJournal.tsx
+- [x] FO photo upload (camera + gallery) — in PatternDetail, uses uploadFoPhoto() from queries.ts
+- [x] FFO photo upload (camera + gallery) — in PatternDetail, uses uploadFoPhoto(type="ffo")
+- [x] Duplicate detection on add (DuplicateWarning modal) — src/components/patterns/DuplicateWarning.tsx
+- [x] Delete pattern with confirmation — in PatternDetail, routes back to /patterns after delete
+- [x] All DB queries — src/lib/supabase/queries.ts (full CRUD + storage upload helpers)
+- [x] Cover photo upload (camera + library, compress, upload to pattern-covers bucket)
 
-### Phase 5 — Kits Module
+**⚠️ KNOWN ISSUE — Supabase Storage Buckets:**
+The `pattern-covers`, `fo-photos`, `ffo-photos`, and other photo buckets are private.
+`getPublicUrl()` returns a URL that does NOT work as an `<img>` src on private buckets.
+To fix: go to Supabase dashboard → Storage → each bucket → make it Public (toggle).
+OR run this SQL in Supabase SQL editor:
+```sql
+CREATE POLICY "Public read pattern-covers" ON storage.objects FOR SELECT USING (bucket_id = 'pattern-covers');
+CREATE POLICY "Public read fo-photos" ON storage.objects FOR SELECT USING (bucket_id = 'fo-photos');
+CREATE POLICY "Public read ffo-photos" ON storage.objects FOR SELECT USING (bucket_id = 'ffo-photos');
+CREATE POLICY "Public read profile-photos" ON storage.objects FOR SELECT USING (bucket_id = 'profile-photos');
+CREATE POLICY "Public read fabric-photos" ON storage.objects FOR SELECT USING (bucket_id = 'fabric-photos');
+CREATE POLICY "Public read thread-photos" ON storage.objects FOR SELECT USING (bucket_id = 'thread-photos');
+CREATE POLICY "Public read kit-photos" ON storage.objects FOR SELECT USING (bucket_id = 'kit-photos');
+```
+Images currently have an `onError` handler that hides the broken icon gracefully until this is fixed.
+
+### Phase 5 — Kits Module — 🔜 NEXT
 - [ ] Kits list page
 - [ ] Kit add/edit form
 - [ ] Kit status tracking (Unopened/Started/Finished)
