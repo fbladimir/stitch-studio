@@ -31,16 +31,16 @@ export async function middleware(request: NextRequest) {
 
   const { pathname } = request.nextUrl;
 
-  const publicPaths = ["/auth", "/auth/reset-password"];
+  const publicPaths = ["/welcome", "/auth", "/auth/reset-password"];
   const isPublic = publicPaths.some((p) => pathname.startsWith(p));
 
   if (!user && !isPublic) {
     const url = request.nextUrl.clone();
-    url.pathname = "/auth";
+    url.pathname = "/welcome";
     return NextResponse.redirect(url);
   }
 
-  if (user && pathname === "/auth") {
+  if (user && (pathname === "/auth" || pathname === "/welcome")) {
     const url = request.nextUrl.clone();
     url.pathname = "/dashboard";
     return NextResponse.redirect(url);
