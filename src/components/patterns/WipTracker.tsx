@@ -16,7 +16,27 @@ export function WipTracker({ pattern, onUpdate }: WipTrackerProps) {
   const [stitches, setStitches] = useState(pattern.wip_stitches);
   const [saving, setSaving] = useState(false);
   const [dirty, setDirty] = useState(false);
+  const [editingStartDate, setEditingStartDate] = useState(false);
+  const [startDateValue, setStartDateValue] = useState("");
   const { recordActivity } = useEngagement();
+
+  async function saveStartDate() {
+    if (!startDateValue) {
+      setEditingStartDate(false);
+      return;
+    }
+    const newDate = new Date(startDateValue + "T00:00:00").toISOString();
+    if (newDate === pattern.start_date) {
+      setEditingStartDate(false);
+      return;
+    }
+    const { data } = await updatePattern(pattern.id, { start_date: newDate });
+    if (data) {
+      onUpdate(data);
+      toast.success("Start date updated!");
+    }
+    setEditingStartDate(false);
+  }
 
   const hasChanges =
     pct !== pattern.wip_pct || stitches !== pattern.wip_stitches;
@@ -92,7 +112,26 @@ export function WipTracker({ pattern, onUpdate }: WipTrackerProps) {
         {pattern.start_date && (
           <div>
             <p className="font-semibold text-[#3A2418]">Started</p>
-            <p>{formatDate(pattern.start_date)}</p>
+            {editingStartDate ? (
+              <input
+                type="date"
+                value={startDateValue}
+                onChange={(e) => setStartDateValue(e.target.value)}
+                onBlur={saveStartDate}
+                autoFocus
+                className="w-[130px] h-7 px-1.5 rounded-lg border border-[#E4D6C8] font-nunito text-[12px] text-[#3A2418] bg-white focus:outline-none focus:border-[#B36050]"
+              />
+            ) : (
+              <button
+                onClick={() => {
+                  setStartDateValue(pattern.start_date!.split("T")[0]);
+                  setEditingStartDate(true);
+                }}
+                className="underline decoration-dotted underline-offset-2 active:text-[#B36050]"
+              >
+                {formatDate(pattern.start_date)}
+              </button>
+            )}
           </div>
         )}
         {pattern.last_progress_date && (

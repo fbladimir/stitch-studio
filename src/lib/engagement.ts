@@ -308,6 +308,9 @@ const ALL_CHALLENGES: ChallengeDef[] = [
   { id: "journal_habit", name: "Journal Habit", icon: "📓", description: "Write 3 journal entries", goal: 3, actionType: "write_journal" },
   { id: "deep_dive", name: "The Deep Dive", icon: "🔍", description: "Scan a color key and add all threads", goal: 1, actionType: "scan_colorkey" },
   { id: "spring_clean", name: "Collection Spring Clean", icon: "🧹", description: "Review and update 5 existing patterns", goal: 5, actionType: "update_pattern" },
+  { id: "pet_cuddle", name: "Fur Baby Breaks", icon: "🐾", description: "Log progress 3 times — and give your pets a hug each time!", goal: 3, actionType: "log_progress" },
+  { id: "pet_stitch_buddy", name: "Stitch Buddy", icon: "🐶", description: "Stitch with your fur baby nearby! Log progress 7 days this month", goal: 7, actionType: "log_progress" },
+  { id: "treat_yourself", name: "Treat Yourself", icon: "🦴", description: "Finish a project — you and your pets deserve a treat!", goal: 1, actionType: "finish_pattern" },
 ];
 
 /**

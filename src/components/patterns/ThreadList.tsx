@@ -150,7 +150,21 @@ export function ThreadList({ patternId }: ThreadListProps) {
       }
 
       const data = await res.json();
-      setAiResults(data.threads || []);
+      const raw: AIScanThreadResult[] = data.threads || [];
+
+      // Deduplicate: keep one entry per manufacturer+color_number combo.
+      // If the same thread appears for different stitch types (full, backstitch, french knot),
+      // keep only the first occurrence to avoid duplicates.
+      const seen = new Set<string>();
+      const deduped = raw.filter((t) => {
+        const key = `${(t.manufacturer || "").toLowerCase()}-${(t.color_number || "").toLowerCase()}`;
+        if (!key || key === "-") return true; // keep threads without identifiers
+        if (seen.has(key)) return false;
+        seen.add(key);
+        return true;
+      });
+
+      setAiResults(deduped);
     } catch (err) {
       setAiError(err instanceof Error ? err.message : "Failed to scan. Please try again.");
     } finally {
