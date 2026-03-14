@@ -1,6 +1,6 @@
 # CLAUDE.md — Stitch Studio
 # Cross Stitch Companion App for Mom
-# Last Updated: 2026-03-13 (Session 1 end)
+# Last Updated: 2026-03-13 (Session 2)
 
 ---
 
@@ -45,6 +45,17 @@ manual upfront data entry by using AI (Claude API) to read photos of patterns an
 meets crafting companion. Feels like it was made just for her. She is 60+ but tech-savvy —
 she uses apps daily. Do NOT dumb it down. DO make it intuitive, beautiful, and frictionless.
 Zero tolerance for clunky flows or confusing labels.
+
+**Core Value Proposition (confirmed by Mom):**
+- The app IS her visual database. She wants to SEE her entire collection — every pattern with
+  its cover photo, every thread in her stash, every fabric — browsable, searchable, filterable.
+  Think of it like a beautiful personal library she can flip through. When she says "database"
+  she means: "I want to see all my stuff organized in one beautiful place I can actually browse."
+- AI cover page scanning is critical to her workflow. She does NOT want to type in pattern names,
+  designer names, sizes manually. She photographs the cover → app fills everything in → she confirms.
+  This is the #1 friction reducer for building her collection. (Planned: Phase 9)
+- She currently uses R-XP for cross stitch and wants to bring that data in without re-entry.
+  Other users in the community use PatternKeeper and Saga. Import support planned in Phase 14.
 
 **Device Priority (in order):**
 1. iPhone (primary — Safari, PWA installable)
@@ -819,7 +830,7 @@ NEVER force camera-only. NEVER force upload-only.
 ## ✅ PROGRESS LOG
 
 ### HANDOFF NOTE
-> Session 1 complete. Phase 0 and Phase 1 are fully DONE. App is deployed and live at https://stitch-studio-three.vercel.app — connected to GitHub (auto-deploys on push to main). Supabase is live at kendddbcwrfdtqpjoscy.supabase.co with Site URL and redirect URLs set to the Vercel domain. IMPORTANT: Supabase email confirmation MUST stay OFF (Authentication → Providers → Email → "Confirm email" = off) — turning it on breaks sign-in. A temporary sign out button exists on the dashboard for testing. A welcome/splash screen (src/app/welcome/page.tsx) is the unauthenticated entry point — middleware redirects to /welcome, not /auth. Next session starts with Phase 2: Layout + Navigation — build BottomNav, TopBar, SideNav, PageWrapper with safe area insets, then wire the dashboard into the layout shell. Do NOT rebuild anything from Phase 0 or Phase 1.
+> Session 2 complete. Phases 2 + 3 fully done and deployed to Vercel (https://stitch-studio-three.vercel.app). Phase 2: layout shell — BottomNav, SideNav, TopBar, PageWrapper, (app) route group with all authenticated pages inside it (nav bug fixed). Phase 3: full dashboard — DailyGreeting once-per-day overlay with animated dogs (8 dogs, staggered popIn → float/wiggle), time-aware greeting messages, stats grid, quick actions, recent patterns, WIP nudge, skeleton loading. New additions this session: Mom's feedback incorporated — (1) AI cover page scan already spec'd in Phase 9 and confirmed critical; (2) "visual database" confirmed as the app's core purpose — the Patterns/Threads/Fabrics pages ARE her visual collection; (3) Cross-stitch app import added as Phase 14 (R-XP, PatternKeeper, Saga — file-based CSV import wizard, thread import first, pattern import second); (4) Core Value Proposition section added to CLAUDE.md design principles. Daily greeting localStorage key: "ss_greeted". Next session starts Phase 4: Patterns Module. Phase 2 (Layout + Navigation) is fully DONE. Route group `(app)` created at `src/app/(app)/` — all authenticated pages live here and automatically get the nav shell. Old `src/app/dashboard/` removed; dashboard now at `src/app/(app)/dashboard/page.tsx`. Nav components: BottomNav (5 tabs, fixed, safe-area-inset-bottom), SideNav (tablet ≥ 768px, left rail 220px wide), TopBar (sticky, back button, right slot), PageWrapper (handles bottom/side nav padding + safe area). Nav items defined in `src/components/layout/nav-items.ts` and shared by both nav components — adding/changing tabs only requires editing that one file. All 5 tabs: Home → /dashboard, Patterns → /patterns, Stash → /threads, Shop → /store-mode, AI → /ai. Build passes clean. Tutorial onboarding spec added to CLAUDE.md as Phase 13 (post-launch). Next session starts Phase 3: Home Dashboard — greeting, stats row, quick actions grid, recent patterns, WIP nudge card.
 
 ---
 
@@ -865,23 +876,51 @@ NEVER force camera-only. NEVER force upload-only.
 - [x] Deployed to Vercel — https://stitch-studio-three.vercel.app
 - [x] Supabase Site URL + redirect URLs configured for Vercel domain
 
-### Phase 2 — Layout + Navigation — 🔜 NEXT
-- [ ] PageWrapper component (src/components/layout/PageWrapper.tsx)
-- [ ] TopBar component with back button (src/components/layout/TopBar.tsx)
-- [ ] BottomNav — 5 tabs, fixed, safe-area-inset-bottom aware (src/components/layout/BottomNav.tsx)
-- [ ] SideNav for iPad >= 768px (src/components/layout/SideNav.tsx)
-- [ ] Responsive breakpoint switching (bottom nav ↔ side nav)
-- [ ] Dashboard wired into layout shell (replace temp placeholder)
+### Phase 2 — Layout + Navigation — ✅ DONE
+- [x] PageWrapper component (src/components/layout/PageWrapper.tsx)
+- [x] TopBar component with back button (src/components/layout/TopBar.tsx)
+- [x] BottomNav — 5 tabs, fixed, safe-area-inset-bottom aware (src/components/layout/BottomNav.tsx)
+- [x] SideNav for iPad >= 768px (src/components/layout/SideNav.tsx)
+- [x] Shared nav-items.ts — single source of truth for all 5 nav tabs (src/components/layout/nav-items.ts)
+- [x] (app) route group with layout shell (src/app/(app)/layout.tsx)
+- [x] All app pages moved into (app) group: dashboard, patterns, threads, store-mode, ai
+- [x] Responsive breakpoint switching (bottom nav ↔ side nav at md/768px)
+- [x] Dashboard wired into layout shell (src/app/(app)/dashboard/page.tsx)
 
-### Phase 3 — Home Dashboard
-- [ ] Greeting with display name + dogs
-- [ ] Stats cards (patterns total, WIPs, finished, thread count)
-- [ ] Quick Actions grid (4 actions)
-- [ ] Recent patterns list (last 3 with thumbnails)
-- [ ] WIP reminder nudge card
-- [ ] "I'm Shopping!" button prominent and accessible
+**✅ HOW TO TEST PHASE 2 — CONFIRMED WORKING WHEN:**
+1. **Bottom nav persists on every page** — tap each of the 5 tabs (Home, Patterns, Stash, Shop, AI) and confirm the nav bar stays visible on all of them. No disappearing nav.
+2. **Active tab highlights correctly** — the tab for the current page shows in rose/terracotta; all others are muted gray.
+3. **Safe area inset (iPhone)** — on iPhone with home bar, the bottom nav sits above the home indicator with visible breathing room. No content hidden behind the nav.
+4. **iPad/tablet nav** — on a screen ≥ 768px wide (or Safari responsive mode), the bottom nav should be GONE and a left side nav should appear with the Stitch Studio logo and all 5 tabs.
+5. **Back button** — on Patterns, Stash, Shop, AI pages, tap the arrow in the TopBar and confirm it returns to the previous screen.
+6. **Content not hidden** — scroll to the bottom of any page and confirm the last content item is not cut off behind the nav bar.
 
-### Phase 4 — Patterns Module
+### Phase 3 — Home Dashboard — ✅ DONE
+- [x] DailyGreeting overlay (src/components/dashboard/DailyGreeting.tsx)
+      — once-per-day full-screen welcome, time-aware greeting, animated dogs (popIn → float/wiggle staggered by index), "Let's stitch!" CTA, tap-anywhere-to-skip
+- [x] CSS keyframe animations added to globals.css: float, wiggle, popIn, fadeSlideUp, shimmer/.skeleton
+- [x] Greeting header with display name + all dog names (first 5 inline, +N more) + tail wags line
+- [x] Stats 2×2 grid: Patterns, In Progress, Finished, Threads — live data from Supabase
+- [x] Quick Actions 2×2 grid: Scan New Pattern, Kitting Check, Log Progress, I'm Shopping!
+- [x] Recent patterns list (last 3 by updated_at) with thumbnail, name, designer, status badge
+- [x] Empty state for recent patterns (no patterns yet copy)
+- [x] WIP nudge card: shows if any WIP hasn't been updated in 7+ days (or never)
+- [x] Skeleton loading states for all data-dependent sections
+- [x] Sign out button retained for testing
+
+**✅ HOW TO TEST PHASE 3 — CONFIRMED WORKING WHEN:**
+1. **Daily greeting overlay** — on first visit of the day, a full-screen warm gradient overlay appears with your name and animated dogs. Each dog pops in one-by-one with a springy animation, then bounces (float) or wiggles (wiggle) continuously. "Let's stitch!" button or tap anywhere dismisses it.
+2. **Greeting is once-per-day** — dismiss it, refresh or navigate away and back to /dashboard — it should NOT appear again the same day. (localStorage key: `ss_greeted`)
+3. **Dogs animate differently** — even-index dogs float up/down, odd-index dogs wiggle/rotate. With 8 dogs you should see a mix of both.
+4. **Dashboard greeting header** — shows time-appropriate greeting ("Good morning/afternoon/evening, [Name]!") plus dog names + "send tail wags 🐾"
+5. **Stats cards** — show live counts. With no data, all should show 0. Add a pattern and the count updates on next load.
+6. **Quick actions** — all 4 tap correctly and navigate to the right pages.
+7. **WIP nudge** — if a pattern is marked WIP with no progress update in 7+ days (or no progress date set), the orange nudge card appears.
+8. **Recent patterns** — shows last 3 patterns by updated_at. With no patterns, shows the empty state card.
+9. **Skeleton loading** — on slower connections, skeleton shimmer cards should appear while data loads before content pops in.
+10. **No layout flash** — bottom nav should remain visible throughout.
+
+### Phase 4 — Patterns Module — 🔜 NEXT
 - [ ] Patterns list page (search + filter tabs: All/WIP/Kitted/Finished)
 - [ ] PatternCard component (thumbnail, name, designer, status badge)
 - [ ] Pattern add form (all fields per spec)
@@ -959,6 +998,123 @@ NEVER force camera-only. NEVER force upload-only.
 - [ ] Safe area insets verified on all iPhones
 - [ ] iPad two-column layout verified
 - [ ] Performance audit (Lighthouse)
+
+### Phase 14 — Cross-Stitch App Import (R-XP, PatternKeeper, Saga)
+
+**Background:** Mom uses R-XP (and others in the cross stitch community use PatternKeeper and Saga).
+She wants to bring her existing data INTO Stitch Studio without re-entering everything manually.
+None of these apps have public APIs, so true live sync is not feasible. Instead, we build a
+**file-based import wizard** that reads exported data from each app.
+
+**What each app can export:**
+- **PatternKeeper (iOS):** Exports thread lists as CSV. Columns: Manufacturer, Color #, Color Name,
+  Quantity. This maps directly to our `thread_inventory` table.
+- **R-XP (Windows):** Can export pattern data and thread lists as CSV or its own `.xpat` format.
+  We target CSV export (easiest common format).
+- **Saga:** Newer web-based app — check for CSV/JSON export option at build time.
+
+**Implementation approach:**
+
+1. **Import Entry Point:** Settings page → "Import from another app" section
+   Three buttons: "Import from PatternKeeper" | "Import from R-XP" | "Import from Saga"
+
+2. **Import Wizard (3 steps):**
+   - Step 1: "Export from [App Name]" — show illustrated instructions on how to export from
+     that specific app, with screenshots if possible
+   - Step 2: Upload the exported file (CSV or supported format)
+   - Step 3: Preview table — show what will be imported, let her review/deselect rows,
+     then confirm. Show: "X threads will be added to your stash"
+
+3. **Duplicate handling during import:**
+   - Check each thread against existing inventory by manufacturer + color number
+   - If already exists: show as "Already in stash (skip)" — do not create duplicate
+   - If new: mark as "Will add"
+   - She can override (add anyway) per item
+
+4. **Pattern import (more complex — Phase 14b):**
+   - CSV with pattern name, designer, size, status — maps to `patterns` table
+   - This is harder since pattern data is less standardized across apps
+   - Consider PatternKeeper-specific CSV column mapping
+   - Build thread import first (Phase 14a), pattern import second (Phase 14b)
+
+5. **Export from Stitch Studio too:**
+   - Let her export her thread inventory and pattern list as CSV
+   - Good for backup and for switching apps in future
+   - Helps if she wants to share her stash data with a friend
+
+**Components needed:**
+- `src/app/(app)/settings/page.tsx` — settings page (also needed for Phase 13 tutorial restart)
+- `src/components/import/ImportWizard.tsx`
+- `src/components/import/ImportPreviewTable.tsx`
+- `src/components/import/AppInstructions.tsx` — per-app export instructions
+
+**Build this after Phase 12 (Polish). Thread import first, pattern import second.**
+**Priority:** PatternKeeper CSV import first — most users, most straightforward format.
+
+---
+
+### Phase 13 — App Tutorial Onboarding (Post-Launch, After All Features Done)
+
+**Purpose:** After the full app is built, give Mom a guided tour so she knows how to use every
+feature without needing to ask Frank. This is a first-run overlay tutorial — not a re-run of
+the account onboarding (name/photo/pets). It activates automatically the first time she lands
+on the dashboard after completing account onboarding, and can be re-triggered from Settings.
+
+**Schema change required — add to profiles table:**
+```sql
+ALTER TABLE profiles ADD COLUMN tutorial_complete BOOLEAN DEFAULT FALSE;
+ALTER TABLE profiles ADD COLUMN tutorial_skipped_at TIMESTAMPTZ;
+```
+
+**Implementation Overview:**
+
+1. **TutorialOverlay component** (`src/components/tutorial/TutorialOverlay.tsx`)
+   - Full-screen dimmed backdrop with a spotlight cutout on the highlighted element
+   - Tooltip/callout card with: step number, title, short description, Next/Skip buttons
+   - Smooth animated transitions between steps (slide or fade)
+   - Always shows "Skip tour" in the corner — never trap the user
+   - Progress dots at the bottom showing total steps
+
+2. **Step targeting via `data-tutorial-id` attributes**
+   - Each targetable element gets `data-tutorial-id="some-id"` added to its JSX
+   - TutorialOverlay queries the DOM for the element, reads its `getBoundingClientRect()`,
+     and positions the spotlight + tooltip accordingly
+   - On step change, re-queries DOM (handles layout shift)
+
+3. **Tour steps (in order):**
+   - `greeting` — Dashboard greeting card: "This is your home base. Your name, your stats, everything at a glance."
+   - `quick-actions` — Quick Actions grid: "Four shortcuts to your most-used features. Scan a pattern, check your stash, log progress, or shop."
+   - `recent-patterns` — Recent patterns list: "Your recently touched patterns always appear here."
+   - `nav-patterns` — Bottom nav Patterns tab: "Tap here to browse your full pattern collection."
+   - `nav-stash` — Bottom nav Stash tab: "Your thread and fabric inventory lives here."
+   - `nav-shop` — Bottom nav Shop tab: "Tap this when you're at a craft store — it checks your stash and finds nearby shops."
+   - `nav-ai` — Bottom nav AI tab: "Your AI stitching advisor. Ask anything, scan a color key, or get thread substitutions."
+   - `wip-reminder` — WIP nudge card (shown only if a WIP exists): "We'll remind you when a project has been waiting. Tap to log your progress."
+   - Final step: "You're all set! Happy stitching ✿" — full-width card, no spotlight, with "Let's go!" button
+
+4. **State management:**
+   - `useTutorial` hook (`src/hooks/useTutorial.ts`): checks `tutorial_complete` on profile
+   - If `false` and not skipped this session: show tutorial after 800ms delay on first dashboard load
+   - On "Skip tour" or completing all steps: call Supabase to set `tutorial_complete = true`
+   - Zustand: store `isTutorialActive` flag to pause other interactions while tour is running
+
+5. **Re-trigger from Settings:**
+   - Settings page will have "Restart app tour" button
+   - Resets `tutorial_complete = false` in Supabase and re-launches TutorialOverlay
+
+6. **Kindle Fire / iPad notes:**
+   - On iPad (≥ 768px): spotlight/tooltip positioned relative to SideNav items, not BottomNav
+   - On Kindle: ensure spotlight rect calculation accounts for scroll position
+   - Tooltip always stays within viewport — flip to opposite side if near edge
+
+7. **Copy tone:** Warm, personal, brief. Write as if a friend is showing her around.
+   Example: "See those four buttons? Those are your magic shortcuts." NOT "Navigate to the
+   Quick Actions panel to access primary features."
+
+**Build this phase LAST — after Phase 12 (all features complete). Do not build this during
+feature development as nav and component structure must be stable first.**
+
+---
 
 ### Phase 12 — Polish + Launch
 - [ ] Toast notifications (success, error, info)

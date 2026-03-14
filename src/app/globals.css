@@ -10,6 +10,44 @@
   }
 }
 
+/* ── Stitch Studio Keyframe Animations ─────────────────────── */
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-10px); }
+}
+
+@keyframes wiggle {
+  0%, 100% { transform: rotate(0deg) scale(1); }
+  20%      { transform: rotate(-16deg) scale(1.12); }
+  40%      { transform: rotate(16deg) scale(1.12); }
+  60%      { transform: rotate(-8deg) scale(1.06); }
+  80%      { transform: rotate(8deg) scale(1.06); }
+}
+
+@keyframes popIn {
+  0%   { transform: scale(0) rotate(-12deg); opacity: 0; }
+  65%  { transform: scale(1.22) rotate(6deg); opacity: 1; }
+  100% { transform: scale(1) rotate(0deg);   opacity: 1; }
+}
+
+@keyframes fadeSlideUp {
+  0%   { opacity: 0; transform: translateY(18px); }
+  100% { opacity: 1; transform: translateY(0);    }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -400px 0; }
+  100% { background-position: 400px 0; }
+}
+
+.skeleton {
+  background: linear-gradient(90deg, #F0E8E0 25%, #FAF6F0 50%, #F0E8E0 75%);
+  background-size: 800px 100%;
+  animation: shimmer 1.4s ease-in-out infinite;
+  border-radius: 12px;
+}
+
 @layer base {
   :root {
     /* Stitch Studio Design System */
