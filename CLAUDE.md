@@ -835,7 +835,7 @@ NEVER force camera-only. NEVER force upload-only.
 ## ✅ PROGRESS LOG
 
 ### HANDOFF NOTE
-> Session 4 start. All Supabase SQL has been fully run and confirmed: all 7 core tables, RLS policies, auto-create profile trigger, storage public read + upload/update/delete policies for all 7 buckets, Phase 13 tutorial columns, and Phase 15 engagement tables. The storage known issue from Phase 4 is now RESOLVED — all photo buckets have public read policies applied. A full reference SQL file exists at `supabase-setup.sql` in the project root (safe to re-run at any time). Starting Phase 5: Kits Module.
+> Session 4 complete. Two things done this session: (1) Created `supabase-setup.sql` in the project root — a complete, safe-to-rerun SQL file covering all 7 tables, RLS policies, auto-create profile trigger, storage public read + auth upload/update/delete policies for all 7 buckets, Phase 13 tutorial columns, and Phase 15 engagement tables. Ran in Supabase and confirmed successful — no errors. Storage photo display is now FIXED. (2) Phase 5 (Kits Module) is fully built and TypeScript-clean. Full CRUD, iOS-style segmented status control (Unopened/Started/Finished), pill-style contents checklist, kit photo upload, WIP tracker + journal reused from patterns, FO/FFO photos on finish, skeleton loading, and delete with confirmation. Committed and pushed — Vercel auto-deployed. Next session starts Phase 6: Embroidery Module.
 
 ---
 
@@ -947,14 +947,47 @@ NEVER force camera-only. NEVER force upload-only.
 All 7 storage buckets now have public read policies + authenticated upload/update/delete policies applied.
 Photos load correctly in `<img>` tags via `getPublicUrl()`. Full SQL is in `supabase-setup.sql`.
 
-### Phase 5 — Kits Module — 🔜 NEXT
-- [ ] Kits list page
-- [ ] Kit add/edit form
-- [ ] Kit status tracking (Unopened/Started/Finished)
-- [ ] WIP tracking for kits (same as patterns)
-- [ ] Kit photo upload
+### Phase 5 — Kits Module — ✅ DONE
+- [x] Kits list page (search + filter tabs: All/Unopened/Started/Finished) — src/app/(app)/kits/page.tsx
+- [x] KitCard component (thumbnail, name, brand, type, status badge) — src/components/kits/KitCard.tsx
+- [x] Kit add form (all fields per spec) — src/components/kits/KitForm.tsx
+- [x] Kit edit form — same KitForm with mode="edit"
+- [x] Kit detail page — src/components/kits/KitDetail.tsx
+- [x] Kit type pill selector (Cross Stitch / Embroidery) — iOS segmented control style, in KitForm
+- [x] Kit contents pill checkboxes (Fabric / Threads / Needle / Pattern / Other) — big tap targets
+- [x] KitStatusControl — iOS segmented control (📦 Unopened / 🪡 Started / ✅ Finished) — src/components/kits/KitStatusControl.tsx
+- [x] WIP tracking (% slider, stitches, dates) — reuses WipTracker from patterns (same DB table)
+- [x] WIP journal — reuses WipJournal from patterns
+- [x] Kit photo upload (camera + library, compress, upload to kit-photos bucket)
+- [x] FO photo upload when Finished (camera + gallery)
+- [x] FFO photo upload when Finished (camera + gallery)
+- [x] Finished stats card (start date, completion date, days to complete)
+- [x] Delete kit with confirmation
+- [x] Skeleton loading on detail + edit pages
+- [x] Kit queries added to src/lib/supabase/queries.ts (getKits, getKit, createKit, updateKit, deleteKit, uploadKitPhoto)
+- [x] supabase-setup.sql created in project root — complete safe-to-rerun SQL for entire DB + storage
 
-### Phase 6 — Embroidery Module
+**✅ HOW TO TEST PHASE 5 — CONFIRMED WORKING WHEN:**
+1. **List page** — navigate to the Stitch Studio Kits tab (or tap Home → not visible yet, navigate directly to `/kits`). Should show search bar, 4 filter tabs (All/Unopened/Started/Finished), empty state with 🧺 icon.
+2. **Add a kit** — tap the + FAB. Form shows: kit photo (camera + library), kit name (required), brand, pill type selector (Cross Stitch / Embroidery — iOS segmented feel), pill content checkboxes (tap Fabric, Threads, Needle, Pattern — each gets a rose ✓ when active), notes, "Add to my collection 🧺" button.
+3. **Kit type selector** — tapping Cross Stitch vs Embroidery highlights the active pill with a white background and shadow (iOS-native feel). Tap both and confirm the active state changes.
+4. **Contents pills** — tap each pill (Fabric, Threads, Needle, Pattern). Each should highlight rose with a checkmark when active. Tap again to deselect.
+5. **Kit photo** — tap "Take Photo" or "Choose from Library". Photo compresses and shows preview with an × to remove it.
+6. **Save** — submit the form. Should redirect to the kit detail page showing your new kit.
+7. **Detail page** — shows kit photo, name, brand, type. Below: iOS segmented status control (📦 Unopened | 🪡 Started | ✅ Finished) with warm bg pill selector.
+8. **Status: Unopened** — tapping Unopened: contextual description "This kit is still sealed…" shows in a muted box below the control.
+9. **Status: Started** — tap Started: description changes to gold/warm, start_date auto-set. Progress Tracker section appears below (% slider, stitches input, save button). Progress Journal section also appears.
+10. **Progress tracker** — drag the % slider. The progress bar and number update in real time. Tap "Save progress" — should save to DB.
+11. **Journal entry** — type a note and tap "Add note". Entry appears with timestamp and % badge.
+12. **Status: Finished** — tap Finished: completion_date auto-set, days_to_complete calculated, progress goes to 100%. Green "Finished! 🎉" stats card appears. FO + FFO photo upload blocks appear below.
+13. **FO/FFO photos** — tap camera or library in each block. Photo uploads and displays.
+14. **Kit details card** — shows brand, type, and content pills (e.g., 🧵 Threads, 🪡 Needle) for what was included.
+15. **Edit kit** — tap ✏️ Edit. Form pre-fills all fields. Change something and save — redirects back to detail with updated values.
+16. **Delete** — scroll to bottom, tap "Delete this kit" → confirmation expands inline → "Yes, delete it" → routes back to /kits list.
+17. **Filter tabs** — with kits in different statuses, confirm each tab filters correctly (Unopened shows only unopened kits, etc.).
+18. **Search** — type a kit name or brand and confirm list filters live.
+
+### Phase 6 — Embroidery Module — 🔜 NEXT
 - [ ] Embroidery list page
 - [ ] Embroidery add/edit form
 - [ ] Status tracking
