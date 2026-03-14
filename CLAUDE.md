@@ -1,6 +1,6 @@
 # CLAUDE.md — Stitch Studio
 # Cross Stitch Companion App for Mom
-# Last Updated: 2026-03-14 (Session 9)
+# Last Updated: 2026-03-14 (Session 10)
 
 ---
 
@@ -542,6 +542,44 @@ CREATE TABLE shopping_list (
 );
 ```
 
+**Phase 15 additions to profiles table:**
+```sql
+ALTER TABLE profiles ADD COLUMN current_streak INTEGER DEFAULT 0;
+ALTER TABLE profiles ADD COLUMN longest_streak INTEGER DEFAULT 0;
+ALTER TABLE profiles ADD COLUMN last_activity_date DATE;
+ALTER TABLE profiles ADD COLUMN total_xp INTEGER DEFAULT 0;
+ALTER TABLE profiles ADD COLUMN level INTEGER DEFAULT 1;
+ALTER TABLE profiles ADD COLUMN streak_freeze_used_this_week BOOLEAN DEFAULT FALSE;
+ALTER TABLE profiles ADD COLUMN freeze_week_start DATE;
+ALTER TABLE profiles ADD COLUMN tutorial_complete BOOLEAN DEFAULT FALSE;
+ALTER TABLE profiles ADD COLUMN tutorial_skipped_at TIMESTAMPTZ;
+```
+
+**Phase 15 new tables:**
+```sql
+-- Achievements earned
+CREATE TABLE achievements (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  achievement_id TEXT NOT NULL,
+  earned_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(user_id, achievement_id)
+);
+
+-- Monthly challenge progress
+CREATE TABLE challenge_progress (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  challenge_id TEXT NOT NULL,
+  month TEXT NOT NULL,  -- '2026-03'
+  progress INTEGER DEFAULT 0,
+  goal INTEGER NOT NULL,
+  completed BOOLEAN DEFAULT FALSE,
+  completed_at TIMESTAMPTZ,
+  UNIQUE(user_id, challenge_id, month)
+);
+```
+
 **Row Level Security — enable on ALL tables:**
 ```sql
 ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
@@ -551,6 +589,8 @@ ALTER TABLE thread_inventory ENABLE ROW LEVEL SECURITY;
 ALTER TABLE fabric_inventory ENABLE ROW LEVEL SECURITY;
 ALTER TABLE wip_journal ENABLE ROW LEVEL SECURITY;
 ALTER TABLE shopping_list ENABLE ROW LEVEL SECURITY;
+ALTER TABLE achievements ENABLE ROW LEVEL SECURITY;
+ALTER TABLE challenge_progress ENABLE ROW LEVEL SECURITY;
 
 -- Example policy (repeat for each table):
 CREATE POLICY "Users access own data" ON patterns
@@ -632,6 +672,9 @@ stitch-studio/
     │   ├── store-mode/
     │   │   └── page.tsx               ← in-store shopping assistant
     │   │
+    │   ├── profile/
+    │   │   └── page.tsx               ← profile page (avatar, level, XP, streaks, achievements, sign out)
+    │   │
     │   ├── ai/
     │   │   └── page.tsx               ← AI advisor chat + scan tools (3 tabs: Advisor/Scan/Stash)
     │   │
@@ -692,6 +735,17 @@ stitch-studio/
     │   │   ├── KittingResult.tsx        ← have / need / shopping list display
     │   │   └── SubstitutionHelper.tsx
     │   │
+    │   ├── engagement/
+    │   │   ├── CelebrationOverlay.tsx   ← full-screen confetti + dog parade + celebration copy
+    │   │   ├── StreakCard.tsx           ← dashboard 🔥 streak display, tap for detail
+    │   │   ├── StreakDetail.tsx         ← bottom sheet: current/longest, week dots, milestones
+    │   │   ├── AchievementBadge.tsx     ← single badge (earned/locked states)
+    │   │   ├── AchievementShelf.tsx     ← full grid of all 22 badges by category
+    │   │   ├── ChallengeCard.tsx        ← single challenge with progress bar
+    │   │   ├── ChallengeSection.tsx     ← dashboard section showing 3 active challenges
+    │   │   ├── LevelBadge.tsx           ← level pill with star + title (sm/md/lg)
+    │   │   └── XpBar.tsx               ← progress bar toward next level
+    │   │
     │   └── store-mode/
     │       ├── StoreModeShell.tsx       ← full-screen takeover UI
     │       ├── ChartScanner.tsx         ← scan chart in store
@@ -706,12 +760,14 @@ stitch-studio/
     │   │   ├── server.ts               ← server-side Supabase client
     │   │   └── queries.ts              ← all DB query functions
     │   ├── anthropic.ts                ← Anthropic client + helpers
+    │   ├── engagement.ts               ← XP, streak, achievements, challenges, levels
     │   ├── image.ts                    ← client-side compress before upload
     │   ├── duplicate-detection.ts      ← fuzzy match logic for chart duplicates
     │   └── utils.ts
     │
     ├── hooks/
     │   ├── useAuth.ts
+    │   ├── useEngagement.ts            ← streak, XP, achievements, challenges, recordActivity()
     │   ├── usePatterns.ts
     │   ├── useThreads.ts
     │   ├── useFabrics.ts
@@ -841,7 +897,7 @@ NEVER force camera-only. NEVER force upload-only.
 ## ✅ PROGRESS LOG
 
 ### HANDOFF NOTE
-> Session 9 complete. **Phases 9, 10, and 11 are all fully built and deployed.** This was a massive session covering three full phases. Phase 9 (AI Features): 6 API routes (scan-cover, scan-colorkey, scan-stash, scan-fabric, advisor SSE, kitting-suggest), AI auto-fill in PatternForm/ThreadList/FabricForm, AI Advisor chat (iMessage-style layout, streaming, quick chips), Kitting Check at `/kitting` with substitution suggestions, clickable dashboard stats. Phase 10 (Store Mode): full-screen takeover with "Exit Store Mode" terracotta bar, 5 tabs (Scan/Threads/Fabric/List/Nearby), chart scanner with duplicate detection, quick thread/fabric checks, auto-generated shopping list, Google Maps Places API for nearby stores. Phase 11 (PWA): switched to @ducanh2912/next-pwa (App Router compatible), service worker + offline fallback page, iOS "Add to Home Screen" 3-step install banner (shows once on iOS Safari), middleware updated for sw.js + /offline paths. **Next session: Phase 15 — Engagement & Delight System (Duolingo-inspired)** — streaks, achievements/badges, celebrations/confetti, monthly challenges, level/XP system, collection insights, dog integration. This requires schema changes (ALTER profiles + new achievements/challenge_progress tables). After Phase 15: Phase 13 (App Tutorial with Roku guide) updated to include all Phase 15 features. Phase 14 (cross-stitch app import) deferred to later. **Recommendation: Start Phase 15 in a NEW chat** due to its large scope (schema migration, engagement logic library, 12+ new components, profile page, celebration overlays, streak system).
+> Session 10 complete. **Phase 15 (Engagement & Delight System) is fully built and deployed.** Schema migration ran successfully in Supabase (9 new columns on profiles + achievements + challenge_progress tables with RLS). Core engagement library (`src/lib/engagement.ts`) handles XP values, 6-level system, streak calculation with weekly freeze, 22 achievements across 5 categories, and 9 rotating monthly challenges. The `useEngagement` hook provides a `recordActivity()` function that updates streak/XP/level/achievements/challenges in one call. 12 new components in `src/components/engagement/`: CelebrationOverlay (full-screen confetti + dog parade), StreakCard + StreakDetail (flame + bottom sheet), AchievementBadge + AchievementShelf (earned/locked grid), ChallengeCard + ChallengeSection (progress bars), LevelBadge + XpBar. Profile page built at `/profile` with avatar, dogs, level, XP bar, streak, achievement shelf, sign out. Dashboard updated with profile avatar link (top-right), level badge, streak card, and monthly challenges. Engagement wired into StatusToggles (kitted/finished → XP + finish celebration), WipTracker (progress → XP), WipJournal (journal → XP). CelebrationOverlay mounted globally in app layout. **Not yet built from Phase 15 spec:** Weekly/Monthly digest cards (15f), Yearly Wrapped (15f), dog-powered notification nudges (15g). These can be Phase 15b. **Next session:** Phase 12 (Polish + Launch) or Phase 13 (App Tutorial with Roku guide). Phase 14 (cross-stitch app import) still deferred.
 
 ---
 
@@ -1258,16 +1314,15 @@ feature development as nav and component structure must be stable first.**
 
 ---
 
-### Profile Page — planned for Phase 15 build
-
-The user's profile photo from onboarding is not currently displayed anywhere in the app. The profile page will be built as part of Phase 15 (engagement system) and will include:
-- Profile photo (from onboarding)
-- Display name + dog list
-- Current streak + longest streak
-- Level badge + XP progress bar
-- Achievement shelf (earned badges)
-- "Restart app tour" button (triggers Roku intro again)
-- Sign out button (permanent home for it, removed from dashboard)
+### Profile Page — ✅ DONE (Session 10)
+- [x] Profile photo display (from onboarding) — large avatar circle at top
+- [x] Display name + dog list (emoji · name format)
+- [x] Current streak + longest streak (via StreakCard component)
+- [x] Level badge + XP progress bar (LevelBadge + XpBar components)
+- [x] Achievement shelf — full grid of all 22 badges, earned/locked states, tap for detail modal
+- [ ] "Restart app tour" button — deferred to Phase 13 (tutorial system not yet built)
+- [x] Sign out button (permanent home, removed from dashboard)
+- [x] Back to Dashboard link
 
 **Route:** `src/app/(app)/profile/page.tsx`
 
@@ -1643,6 +1698,69 @@ src/hooks/useEngagement.ts   ← loads streak, achievements, challenges for curr
 11. Yearly Wrapped (can be deferred to Phase 15b)
 
 **Build Phase 15 AFTER Phase 12 (core app complete). Community (Phase 16) after Phase 15.**
+
+---
+
+### Phase 15 — Engagement & Delight System — ✅ DONE (Session 10)
+
+**Schema migration:** `supabase-phase15-migration.sql` (ran successfully)
+- [x] 9 columns added to profiles (current_streak, longest_streak, last_activity_date, total_xp, level, streak_freeze_used_this_week, freeze_week_start, tutorial_complete, tutorial_skipped_at)
+- [x] achievements table (user_id, achievement_id, earned_at, UNIQUE constraint) + RLS
+- [x] challenge_progress table (user_id, challenge_id, month, progress, goal, completed) + RLS
+- [x] Performance indexes on achievements(user_id) and challenge_progress(user_id, month)
+
+**Core logic:** `src/lib/engagement.ts`
+- [x] XP values for 12 action types (add_pattern=10, mark_finished=50, log_wip_progress=10, write_journal=8, etc.)
+- [x] 6-level system: Apprentice (0 XP) → Journeyman (200) → Skilled (600) → Expert (1500) → Master (3500) → Grand Master (7000)
+- [x] Streak calculation with weekly freeze grace period (auto-activates once per week on missed day)
+- [x] 7 streak milestones (3, 7, 14, 30, 50, 100, 365 days) with celebration messages
+- [x] 22 achievements across 5 categories (collection, finishing, stash, streak, special)
+- [x] 9 rotating monthly challenges (3 per month, deterministic by month string hash)
+- [x] Celebration data builders (finish, badge, level-up, first-pattern, streak-milestone)
+
+**Hook:** `src/hooks/useEngagement.ts`
+- [x] `recordActivity()` — updates streak, XP, level, checks achievements, increments challenge progress
+- [x] Auto-initializes monthly challenges on first load
+- [x] Queues celebrations to Zustand store
+
+**Zustand store updates:** `src/store/appStore.ts`
+- [x] celebrationQueue: CelebrationData[] with push/pushMany/pop/clear actions
+
+**12 new components:** `src/components/engagement/`
+- [x] CelebrationOverlay — full-screen z-200, confetti particles (rose/sage/gold), dog parade, auto-dismiss for non-finish (4s)
+- [x] StreakCard — 🔥 flame with pulse animation, streak count, message, tap to open detail
+- [x] StreakDetail — bottom sheet with current/longest, week activity dots (M-S), next milestone
+- [x] AchievementBadge — earned (full color + date) / locked (grayed + grayscale) states
+- [x] AchievementShelf — grid by category, tap for detail modal (earned date or earn instructions)
+- [x] ChallengeCard — progress bar, days remaining, completed state (sage green)
+- [x] ChallengeSection — dashboard section showing 3 active challenges
+- [x] LevelBadge — colored pill with star + title, 3 sizes (sm/md/lg)
+- [x] XpBar — progress bar to next level with XP counts
+
+**Profile page:** `src/app/(app)/profile/page.tsx`
+- [x] Avatar, display name, dogs, level badge (lg), XP bar, streak card, full achievement shelf, sign out
+
+**Dashboard integration:** `src/app/(app)/dashboard/page.tsx`
+- [x] Profile avatar link (top-right of greeting header)
+- [x] Level badge below greeting
+- [x] Streak card below stats row
+- [x] Monthly challenges section below Quick Actions
+- [x] Challenge data loaded alongside existing dashboard queries
+
+**Wired into actions:**
+- [x] StatusToggles — kitted → `recordActivity("mark_kitted")`; finished → celebration overlay + `recordActivity("mark_finished")`
+- [x] WipTracker — save progress → `recordActivity("log_wip_progress")`
+- [x] WipJournal — add note → `recordActivity("write_journal")`
+
+**App layout:** CelebrationOverlay mounted globally in `src/app/(app)/layout.tsx`
+
+**CSS animations added:** confettiFall, pulse, badgePop, flamePulse, streakGlow
+
+**Not yet built (Phase 15b — deferred):**
+- [ ] WeeklyDigest.tsx — Monday "your week in stitches" card
+- [ ] MonthlyWrap.tsx — month summary card
+- [ ] YearlyWrap.tsx — Stitch Wrapped annual slideshow
+- [ ] Dog-powered notification nudges (15g) — streak-at-risk, WIP neglected messaging
 
 ---
 
