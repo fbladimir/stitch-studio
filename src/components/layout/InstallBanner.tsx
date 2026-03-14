@@ -1,16 +1,22 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useAppStore } from "@/store/appStore";
 
 /**
  * iOS "Add to Home Screen" instruction banner.
  * Shows once per device (localStorage), only on iOS Safari when NOT already installed as PWA.
  * Dismissible — won't show again after user closes it.
+ * Waits until tutorial is finished so it doesn't overlap onboarding flows.
  */
 export function InstallBanner() {
   const [show, setShow] = useState(false);
+  const isTutorialActive = useAppStore((s) => s.isTutorialActive);
 
   useEffect(() => {
+    // Don't show while tutorial is running
+    if (isTutorialActive) return;
+
     // Only show on iOS Safari, not already in standalone mode
     const isIOS =
       /iPad|iPhone|iPod/.test(navigator.userAgent) ||
@@ -25,14 +31,15 @@ export function InstallBanner() {
       const timer = setTimeout(() => setShow(true), 2000);
       return () => clearTimeout(timer);
     }
-  }, []);
+  }, [isTutorialActive]);
 
   function dismiss() {
     setShow(false);
     localStorage.setItem("ss_install_dismissed", "true");
   }
 
-  if (!show) return null;
+  // Hide while tutorial is active (even if already shown)
+  if (!show || isTutorialActive) return null;
 
   return (
     <div className="fixed bottom-[calc(env(safe-area-inset-bottom)+64px)] left-4 right-4 z-[60] animate-slideUp md:hidden">
