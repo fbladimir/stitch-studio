@@ -8,7 +8,7 @@ interface LevelBadgeProps {
 }
 
 const LEVEL_COLORS: Record<number, string> = {
-  1: "bg-[#F5EEE8] text-[#896E66] border-[#E4D6C8]",
+  1: "bg-[#F5EEE8] text-[#6B544D] border-[#E4D6C8]",
   2: "bg-[#FBF5E8] text-[#AE7C2A] border-[#E8D5A0]",
   3: "bg-[#EBF2EC] text-[#5F7A63] border-[#C0D4C2]",
   4: "bg-[#FDF4F1] text-[#B36050] border-[#F0C8BB]",

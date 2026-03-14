@@ -296,7 +296,7 @@ export function PatternForm({ mode, initialData }: PatternFormProps) {
           ) : (
             <div className="w-full aspect-[4/3] rounded-2xl border-2 border-dashed border-[#E4D6C8] bg-[#FAF6F0] flex flex-col items-center justify-center mb-3 gap-2">
               <span className="text-4xl opacity-30">📷</span>
-              <p className="font-nunito text-[12px] text-[#B6A090]">No photo yet</p>
+              <p className="font-nunito text-[12px] text-[#9A8578]">No photo yet</p>
             </div>
           )}
 
@@ -541,7 +541,7 @@ export function PatternForm({ mode, initialData }: PatternFormProps) {
         <button
           type="button"
           onClick={() => router.back()}
-          className="w-full h-11 rounded-full border border-[#E4D6C8] text-[#896E66] font-nunito font-semibold text-[14px] active:scale-[0.98]"
+          className="w-full h-11 rounded-full border border-[#E4D6C8] text-[#6B544D] font-nunito font-semibold text-[14px] active:scale-[0.98]"
         >
           Cancel
         </button>

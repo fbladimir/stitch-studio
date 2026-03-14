@@ -31,7 +31,7 @@ export function AchievementShelf({ earned }: AchievementShelfProps) {
         <p className="font-playfair text-2xl font-bold text-[#3A2418]">
           {earned.length}/{ACHIEVEMENTS.length}
         </p>
-        <p className="font-nunito text-[12px] text-[#896E66] font-semibold uppercase tracking-wide">
+        <p className="font-nunito text-[12px] text-[#6B544D] font-semibold uppercase tracking-wide">
           Badges Earned
         </p>
       </div>
@@ -63,6 +63,8 @@ export function AchievementShelf({ earned }: AchievementShelfProps) {
       {selectedDef && (
         <div
           className="fixed inset-0 z-[150] flex items-center justify-center p-6"
+          role="dialog"
+          aria-modal="true"
           onClick={() => setSelectedBadge(null)}
         >
           <div className="absolute inset-0 bg-black/30" />
@@ -75,7 +77,7 @@ export function AchievementShelf({ earned }: AchievementShelfProps) {
             <h3 className="font-playfair text-xl font-bold text-[#3A2418]">
               {selectedDef.name}
             </h3>
-            <p className="font-nunito text-[13px] text-[#896E66] mt-1">
+            <p className="font-nunito text-[13px] text-[#6B544D] mt-1">
               {selectedDef.description}
             </p>
             {selectedEarned ? (

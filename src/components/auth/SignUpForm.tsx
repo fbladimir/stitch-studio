@@ -43,7 +43,7 @@ export function SignUpForm() {
           id="name"
           placeholder="e.g. Margaret"
           autoComplete="name"
-          className="h-14 text-base rounded-xl border-[#E4D6C8] bg-white focus-visible:ring-[#B36050] placeholder:text-[#C4A898]"
+          className="h-14 text-base rounded-xl border-[#E4D6C8] bg-white focus-visible:ring-[#B36050] placeholder:text-[#9A8578]"
           {...register("name")}
         />
         {errors.name && (
@@ -61,7 +61,7 @@ export function SignUpForm() {
           type="email"
           placeholder="you@example.com"
           autoComplete="email"
-          className="h-14 text-base rounded-xl border-[#E4D6C8] bg-white focus-visible:ring-[#B36050] placeholder:text-[#C4A898]"
+          className="h-14 text-base rounded-xl border-[#E4D6C8] bg-white focus-visible:ring-[#B36050] placeholder:text-[#9A8578]"
           {...register("email")}
         />
         {errors.email && (
@@ -80,13 +80,13 @@ export function SignUpForm() {
             type={showPassword ? "text" : "password"}
             placeholder="At least 8 characters"
             autoComplete="new-password"
-            className="h-14 text-base rounded-xl border-[#E4D6C8] bg-white focus-visible:ring-[#B36050] placeholder:text-[#C4A898] pr-12"
+            className="h-14 text-base rounded-xl border-[#E4D6C8] bg-white focus-visible:ring-[#B36050] placeholder:text-[#9A8578] pr-12"
             {...register("password")}
           />
           <button
             type="button"
             onClick={() => setShowPassword(!showPassword)}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-[#896E66] hover:text-[#3A2418] transition-colors"
+            className="absolute right-4 top-1/2 -translate-y-1/2 text-[#6B544D] hover:text-[#3A2418] transition-colors"
             aria-label={showPassword ? "Hide password" : "Show password"}
           >
             {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}

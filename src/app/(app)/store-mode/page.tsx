@@ -143,7 +143,7 @@ export default function StoreModePage() {
         {loading ? (
           <div className="flex flex-col items-center justify-center h-full gap-3">
             <div className="w-8 h-8 border-3 border-[#E4D6C8] border-t-[#B36050] rounded-full animate-spin" />
-            <p className="font-nunito text-[13px] text-[#896E66]">Loading your stash...</p>
+            <p className="font-nunito text-[13px] text-[#6B544D]">Loading your stash...</p>
           </div>
         ) : (
           <>
@@ -257,7 +257,7 @@ function ChartScanner({ userId, patterns }: { userId: string; patterns: Pattern[
         <p className="font-playfair font-bold text-[20px] text-[#3A2418]">
           Scan a Chart
         </p>
-        <p className="font-nunito text-[13px] text-[#896E66] mt-1">
+        <p className="font-nunito text-[13px] text-[#6B544D] mt-1">
           Photograph a pattern on the shelf to check if you own it
         </p>
       </div>
@@ -287,7 +287,7 @@ function ChartScanner({ userId, patterns }: { userId: string; patterns: Pattern[
           <p className="font-nunito font-bold text-[16px] text-[#3A2418]">
             Checking your collection...
           </p>
-          <p className="font-nunito text-[13px] text-[#896E66]">
+          <p className="font-nunito text-[13px] text-[#6B544D]">
             Reading the chart cover
           </p>
         </div>
@@ -299,7 +299,7 @@ function ChartScanner({ userId, patterns }: { userId: string; patterns: Pattern[
           <p className="font-nunito text-[14px] text-[#B03020]">{error}</p>
           <button
             onClick={reset}
-            className="mt-3 font-nunito text-[13px] text-[#896E66] underline"
+            className="mt-3 font-nunito text-[13px] text-[#6B544D] underline"
           >
             Try again
           </button>
@@ -317,7 +317,7 @@ function ChartScanner({ userId, patterns }: { userId: string; patterns: Pattern[
             {result.pattern.name}
           </p>
           {result.pattern.designer && (
-            <p className="font-nunito text-[13px] text-[#896E66]">
+            <p className="font-nunito text-[13px] text-[#6B544D]">
               by {result.pattern.designer}
             </p>
           )}
@@ -325,7 +325,7 @@ function ChartScanner({ userId, patterns }: { userId: string; patterns: Pattern[
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={result.pattern.cover_photo_url}
-              alt=""
+              alt={result.pattern.name}
               className="w-32 h-32 rounded-xl object-cover border border-[#E4D6C8]"
               loading="lazy"
             />
@@ -358,7 +358,7 @@ function ChartScanner({ userId, patterns }: { userId: string; patterns: Pattern[
             </Link>
             <button
               onClick={reset}
-              className="flex-1 h-12 rounded-full border border-[#E4D6C8] text-[#896E66] font-nunito font-semibold text-[14px] active:scale-[0.98]"
+              className="flex-1 h-12 rounded-full border border-[#E4D6C8] text-[#6B544D] font-nunito font-semibold text-[14px] active:scale-[0.98]"
             >
               Scan Another
             </button>
@@ -381,7 +381,7 @@ function ChartScanner({ userId, patterns }: { userId: string; patterns: Pattern[
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={result.pattern.cover_photo_url}
-                alt=""
+                alt={result.pattern.name}
                 className="w-14 h-14 rounded-lg object-cover flex-shrink-0"
                 loading="lazy"
               />
@@ -391,7 +391,7 @@ function ChartScanner({ userId, patterns }: { userId: string; patterns: Pattern[
                 {result.pattern.name}
               </p>
               {result.pattern.designer && (
-                <p className="font-nunito text-[12px] text-[#896E66]">
+                <p className="font-nunito text-[12px] text-[#6B544D]">
                   {result.pattern.designer}
                 </p>
               )}
@@ -409,7 +409,7 @@ function ChartScanner({ userId, patterns }: { userId: string; patterns: Pattern[
             </Link>
             <button
               onClick={reset}
-              className="flex-1 h-12 rounded-full border border-[#E4D6C8] text-[#896E66] font-nunito font-semibold text-[14px] active:scale-[0.98]"
+              className="flex-1 h-12 rounded-full border border-[#E4D6C8] text-[#6B544D] font-nunito font-semibold text-[14px] active:scale-[0.98]"
             >
               Scan Another
             </button>
@@ -429,12 +429,12 @@ function ChartScanner({ userId, patterns }: { userId: string; patterns: Pattern[
               {result.scanData.name}
             </p>
             {result.scanData.designer && (
-              <p className="font-nunito text-[13px] text-[#896E66] mt-0.5">
+              <p className="font-nunito text-[13px] text-[#6B544D] mt-0.5">
                 by {result.scanData.designer}
               </p>
             )}
             {result.scanData.company && (
-              <p className="font-nunito text-[12px] text-[#896E66]">
+              <p className="font-nunito text-[12px] text-[#6B544D]">
                 {result.scanData.company}
               </p>
             )}
@@ -448,7 +448,7 @@ function ChartScanner({ userId, patterns }: { userId: string; patterns: Pattern[
             </Link>
             <button
               onClick={reset}
-              className="flex-1 h-12 rounded-full border border-[#E4D6C8] text-[#896E66] font-nunito font-semibold text-[14px] active:scale-[0.98]"
+              className="flex-1 h-12 rounded-full border border-[#E4D6C8] text-[#6B544D] font-nunito font-semibold text-[14px] active:scale-[0.98]"
             >
               Skip
             </button>
@@ -499,7 +499,7 @@ function QuickThreadCheck({ threads }: { threads: ThreadInventoryItem[] }) {
         <p className="font-playfair font-bold text-[20px] text-[#3A2418]">
           Quick Thread Check
         </p>
-        <p className="font-nunito text-[13px] text-[#896E66] mt-1">
+        <p className="font-nunito text-[13px] text-[#6B544D] mt-1">
           Type a thread number or name to check your stash
         </p>
       </div>
@@ -511,7 +511,7 @@ function QuickThreadCheck({ threads }: { threads: ThreadInventoryItem[] }) {
         placeholder="e.g. 304 or Christmas Red"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        className="w-full h-14 px-5 rounded-2xl border-2 border-[#3A2418] bg-white font-nunito text-[18px] text-[#3A2418] focus:outline-none focus:border-[#B36050] placeholder:text-[#C4AFA6] text-center"
+        className="w-full h-14 px-5 rounded-2xl border-2 border-[#3A2418] bg-white font-nunito text-[18px] text-[#3A2418] focus:outline-none focus:border-[#B36050] placeholder:text-[#9A8578] text-center"
         autoComplete="off"
       />
 
@@ -536,14 +536,14 @@ function QuickThreadCheck({ threads }: { threads: ThreadInventoryItem[] }) {
                   {t.manufacturer} {t.color_number}
                 </p>
                 {t.color_name && (
-                  <p className="font-nunito text-[13px] text-[#896E66]">{t.color_name}</p>
+                  <p className="font-nunito text-[13px] text-[#6B544D]">{t.color_name}</p>
                 )}
               </div>
               <div className="text-right flex-shrink-0">
                 <p className="font-playfair font-bold text-[22px] text-[#5F7A63]">
                   {t.quantity}
                 </p>
-                <p className="font-nunito text-[10px] text-[#896E66] uppercase">
+                <p className="font-nunito text-[10px] text-[#6B544D] uppercase">
                   skein{t.quantity !== 1 ? "s" : ""}
                 </p>
               </div>
@@ -559,7 +559,7 @@ function QuickThreadCheck({ threads }: { threads: ThreadInventoryItem[] }) {
           <p className="font-nunito font-bold text-[16px] text-[#B03020] mt-2">
             Not in your stash
           </p>
-          <p className="font-nunito text-[13px] text-[#896E66] mt-1">
+          <p className="font-nunito text-[13px] text-[#6B544D] mt-1">
             No threads matching &ldquo;{query}&rdquo; found in your inventory
           </p>
         </div>
@@ -568,7 +568,7 @@ function QuickThreadCheck({ threads }: { threads: ThreadInventoryItem[] }) {
       {/* Stash summary */}
       {!q && (
         <div className="bg-white border border-[#E4D6C8] rounded-2xl px-4 py-4 text-center">
-          <p className="font-nunito text-[14px] text-[#896E66]">
+          <p className="font-nunito text-[14px] text-[#6B544D]">
             You have <span className="font-bold text-[#3A2418]">{threads.length}</span> thread{threads.length !== 1 ? "s" : ""} in your stash
           </p>
         </div>
@@ -607,14 +607,14 @@ function QuickFabricCheck({ fabrics }: { fabrics: FabricInventoryItem[] }) {
         <p className="font-playfair font-bold text-[20px] text-[#3A2418]">
           Quick Fabric Check
         </p>
-        <p className="font-nunito text-[13px] text-[#896E66] mt-1">
+        <p className="font-nunito text-[13px] text-[#6B544D] mt-1">
           Filter by type and count to see what you have
         </p>
       </div>
 
       {/* Type filter */}
       <div>
-        <p className="font-nunito font-bold text-[12px] text-[#896E66] uppercase tracking-wide mb-2">
+        <p className="font-nunito font-bold text-[12px] text-[#6B544D] uppercase tracking-wide mb-2">
           Fabric Type
         </p>
         <div className="flex gap-2 flex-wrap">
@@ -625,7 +625,7 @@ function QuickFabricCheck({ fabrics }: { fabrics: FabricInventoryItem[] }) {
               className={`h-10 px-4 rounded-full font-nunito font-semibold text-[13px] border transition-colors ${
                 filterType === id
                   ? "bg-[#3A2418] border-[#3A2418] text-white"
-                  : "bg-white border-[#E4D6C8] text-[#896E66]"
+                  : "bg-white border-[#E4D6C8] text-[#6B544D]"
               }`}
             >
               {label}
@@ -636,7 +636,7 @@ function QuickFabricCheck({ fabrics }: { fabrics: FabricInventoryItem[] }) {
 
       {/* Count filter */}
       <div>
-        <p className="font-nunito font-bold text-[12px] text-[#896E66] uppercase tracking-wide mb-2">
+        <p className="font-nunito font-bold text-[12px] text-[#6B544D] uppercase tracking-wide mb-2">
           Count
         </p>
         <div className="flex gap-2 flex-wrap">
@@ -647,7 +647,7 @@ function QuickFabricCheck({ fabrics }: { fabrics: FabricInventoryItem[] }) {
               className={`h-10 px-4 rounded-full font-nunito font-semibold text-[13px] border transition-colors ${
                 filterCount === c
                   ? "bg-[#3A2418] border-[#3A2418] text-white"
-                  : "bg-white border-[#E4D6C8] text-[#896E66]"
+                  : "bg-white border-[#E4D6C8] text-[#6B544D]"
               }`}
             >
               {c === "all" ? "All" : `${c}ct`}
@@ -671,7 +671,7 @@ function QuickFabricCheck({ fabrics }: { fabrics: FabricInventoryItem[] }) {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
                   src={f.photo_url}
-                  alt=""
+                  alt={f.color_name || "Fabric"}
                   className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
                   loading="lazy"
                 />
@@ -686,17 +686,17 @@ function QuickFabricCheck({ fabrics }: { fabrics: FabricInventoryItem[] }) {
                 </p>
                 <div className="flex gap-1.5 mt-1 flex-wrap">
                   {f.fabric_type && (
-                    <span className="px-2 py-0.5 rounded-full bg-white text-[10px] font-nunito font-bold text-[#896E66] capitalize">
+                    <span className="px-2 py-0.5 rounded-full bg-white text-[10px] font-nunito font-bold text-[#6B544D] capitalize">
                       {f.fabric_type}
                     </span>
                   )}
                   {f.count && (
-                    <span className="px-2 py-0.5 rounded-full bg-white text-[10px] font-nunito font-bold text-[#896E66]">
+                    <span className="px-2 py-0.5 rounded-full bg-white text-[10px] font-nunito font-bold text-[#6B544D]">
                       {f.count}ct
                     </span>
                   )}
                   {f.size && (
-                    <span className="px-2 py-0.5 rounded-full bg-white text-[10px] font-nunito font-bold text-[#896E66]">
+                    <span className="px-2 py-0.5 rounded-full bg-white text-[10px] font-nunito font-bold text-[#6B544D]">
                       {f.size}
                     </span>
                   )}
@@ -711,7 +711,7 @@ function QuickFabricCheck({ fabrics }: { fabrics: FabricInventoryItem[] }) {
           <p className="font-nunito font-bold text-[15px] text-[#B03020] mt-2">
             No matching fabric
           </p>
-          <p className="font-nunito text-[13px] text-[#896E66] mt-1">
+          <p className="font-nunito text-[13px] text-[#6B544D] mt-1">
             {fabrics.length === 0
               ? "You haven't added any fabric to your stash yet"
               : "No fabric matches your current filters"}
@@ -800,7 +800,7 @@ function ShoppingList({
     return (
       <div className="flex flex-col items-center justify-center py-16 gap-3">
         <div className="w-8 h-8 border-3 border-[#E4D6C8] border-t-[#B36050] rounded-full animate-spin" />
-        <p className="font-nunito text-[13px] text-[#896E66]">Building your shopping list...</p>
+        <p className="font-nunito text-[13px] text-[#6B544D]">Building your shopping list...</p>
       </div>
     );
   }
@@ -818,7 +818,7 @@ function ShoppingList({
         <p className="font-playfair font-bold text-[20px] text-[#3A2418]">
           Shopping List
         </p>
-        <p className="font-nunito text-[13px] text-[#896E66] mt-1">
+        <p className="font-nunito text-[13px] text-[#6B544D] mt-1">
           Threads you need across all your patterns
         </p>
       </div>
@@ -829,7 +829,7 @@ function ShoppingList({
           <p className="font-nunito font-bold text-[16px] text-[#5F7A63]">
             Nothing to buy!
           </p>
-          <p className="font-nunito text-[13px] text-[#896E66]">
+          <p className="font-nunito text-[13px] text-[#6B544D]">
             You have all the threads you need, or no patterns have thread lists yet.
           </p>
         </div>
@@ -853,7 +853,7 @@ function ShoppingList({
                     className="bg-white border border-[#E4D6C8] rounded-xl px-4 py-2.5 flex items-center gap-3"
                   >
                     <div className="w-8 h-8 rounded-lg bg-[#FAF6F0] flex items-center justify-center flex-shrink-0">
-                      <span className="font-nunito font-bold text-[10px] text-[#896E66]">
+                      <span className="font-nunito font-bold text-[10px] text-[#6B544D]">
                         {item.manufacturer.slice(0, 2)}
                       </span>
                     </div>
@@ -862,12 +862,12 @@ function ShoppingList({
                         {item.color_number}
                       </p>
                       {item.color_name && (
-                        <p className="font-nunito text-[11px] text-[#896E66] truncate">
+                        <p className="font-nunito text-[11px] text-[#6B544D] truncate">
                           {item.color_name}
                         </p>
                       )}
                     </div>
-                    <p className="font-nunito text-[10px] text-[#B6A090] flex-shrink-0">
+                    <p className="font-nunito text-[10px] text-[#9A8578] flex-shrink-0">
                       for {item.patternName.length > 15 ? item.patternName.slice(0, 15) + "…" : item.patternName}
                     </p>
                   </div>
@@ -943,7 +943,7 @@ function NearbyStores() {
         <p className="font-playfair font-bold text-[20px] text-[#3A2418]">
           Nearby Craft Stores
         </p>
-        <p className="font-nunito text-[13px] text-[#896E66] mt-1">
+        <p className="font-nunito text-[13px] text-[#6B544D] mt-1">
           Find craft and needlework shops near you
         </p>
       </div>
@@ -955,7 +955,7 @@ function NearbyStores() {
           <p className="font-nunito text-[14px] text-[#3A2418]">
             We need your location to find nearby stores
           </p>
-          <p className="font-nunito text-[12px] text-[#896E66]">
+          <p className="font-nunito text-[12px] text-[#6B544D]">
             Your location is only used for this search and is never saved
           </p>
           <button
@@ -984,7 +984,7 @@ function NearbyStores() {
           <p className="font-nunito font-bold text-[15px] text-[#AE7C2A]">
             Location access denied
           </p>
-          <p className="font-nunito text-[13px] text-[#896E66]">
+          <p className="font-nunito text-[13px] text-[#6B544D]">
             To find nearby stores, please enable location access in your browser or device settings, then try again.
           </p>
           <button
@@ -1002,7 +1002,7 @@ function NearbyStores() {
           <p className="font-nunito text-[14px] text-[#B03020]">{errorMsg}</p>
           <button
             onClick={() => setStatus("idle")}
-            className="mt-2 font-nunito text-[13px] text-[#896E66] underline"
+            className="mt-2 font-nunito text-[13px] text-[#6B544D] underline"
           >
             Try again
           </button>
@@ -1017,7 +1017,7 @@ function NearbyStores() {
               <p className="font-nunito font-bold text-[15px] text-[#AE7C2A]">
                 No craft stores found nearby
               </p>
-              <p className="font-nunito text-[13px] text-[#896E66] mt-1">
+              <p className="font-nunito text-[13px] text-[#6B544D] mt-1">
                 Try searching from a different location
               </p>
             </div>
@@ -1036,11 +1036,11 @@ function NearbyStores() {
                     <p className="font-nunito font-bold text-[14px] text-[#3A2418] truncate">
                       {store.name}
                     </p>
-                    <p className="font-nunito text-[12px] text-[#896E66] truncate">
+                    <p className="font-nunito text-[12px] text-[#6B544D] truncate">
                       {store.address}
                     </p>
                     <div className="flex items-center gap-2 mt-0.5">
-                      <span className="font-nunito text-[11px] text-[#896E66]">
+                      <span className="font-nunito text-[11px] text-[#6B544D]">
                         {store.distance}
                       </span>
                       {store.open_now !== undefined && (
@@ -1060,7 +1060,7 @@ function NearbyStores() {
 
           <button
             onClick={requestLocation}
-            className="w-full h-11 rounded-full border border-[#E4D6C8] text-[#896E66] font-nunito font-semibold text-[13px] active:scale-[0.98]"
+            className="w-full h-11 rounded-full border border-[#E4D6C8] text-[#6B544D] font-nunito font-semibold text-[13px] active:scale-[0.98]"
           >
             Refresh Results
           </button>

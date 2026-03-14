@@ -101,14 +101,15 @@ export function PhotoScanner({ mode, onScanComplete, onClose, className = "" }: 
           <p className="font-playfair font-bold text-[16px] text-[#3A2418]">
             {labels.title}
           </p>
-          <p className="font-nunito text-[12px] text-[#896E66] mt-1">
+          <p className="font-nunito text-[12px] text-[#6B544D] mt-1">
             {labels.description}
           </p>
         </div>
         {onClose && (
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-[#FAF6F0] border border-[#E4D6C8] flex items-center justify-center text-[#896E66] text-sm active:scale-95"
+            className="w-8 h-8 rounded-full bg-[#FAF6F0] border border-[#E4D6C8] flex items-center justify-center text-[#6B544D] text-sm active:scale-95"
+            aria-label="Remove photo"
           >
             ×
           </button>
@@ -148,7 +149,7 @@ export function PhotoScanner({ mode, onScanComplete, onClose, className = "" }: 
               </button>
               <button
                 onClick={clearPhoto}
-                className="h-12 px-5 rounded-full border border-[#E4D6C8] text-[#896E66] font-nunito font-semibold text-[13px] active:scale-[0.98]"
+                className="h-12 px-5 rounded-full border border-[#E4D6C8] text-[#6B544D] font-nunito font-semibold text-[13px] active:scale-[0.98]"
               >
                 Retake
               </button>
@@ -160,7 +161,7 @@ export function PhotoScanner({ mode, onScanComplete, onClose, className = "" }: 
           <span className="text-5xl opacity-30">
             {mode === "cover" ? "📷" : mode === "colorkey" ? "🧵" : "📦"}
           </span>
-          <p className="font-nunito text-[12px] text-[#B6A090]">
+          <p className="font-nunito text-[12px] text-[#9A8578]">
             Take a photo or choose from your library
           </p>
           <div className="flex gap-2">

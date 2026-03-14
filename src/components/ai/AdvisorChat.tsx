@@ -170,7 +170,7 @@ export function AdvisorChat() {
               <p className="font-playfair font-bold text-[18px] text-[#3A2418]">
                 Your Stitch Advisor
               </p>
-              <p className="font-nunito text-[13px] text-[#896E66] mt-1 max-w-[280px] mx-auto">
+              <p className="font-nunito text-[13px] text-[#6B544D] mt-1 max-w-[280px] mx-auto">
                 Ask me anything about cross stitch, threads, fabric, techniques, or finishing!
               </p>
             </div>
@@ -245,7 +245,7 @@ export function AdvisorChat() {
           onKeyDown={handleKeyDown}
           placeholder="Ask about stitching..."
           rows={1}
-          className="flex-1 resize-none rounded-2xl border border-[#E4D6C8] bg-[#FAF6F0] px-4 py-2.5 font-nunito text-[14px] text-[#3A2418] placeholder:text-[#B6A090] focus:outline-none focus:border-[#B36050] focus:ring-1 focus:ring-[#B36050]/20 transition-colors"
+          className="flex-1 resize-none rounded-2xl border border-[#E4D6C8] bg-[#FAF6F0] px-4 py-2.5 font-nunito text-[14px] text-[#3A2418] placeholder:text-[#9A8578] focus:outline-none focus:border-[#B36050] focus:ring-1 focus:ring-[#B36050]/20 transition-colors"
           style={{ height: 44, maxHeight: 112 }}
         />
         <button

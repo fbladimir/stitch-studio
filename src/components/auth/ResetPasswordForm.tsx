@@ -45,7 +45,7 @@ export function ResetPasswordForm({ onBack }: ResetPasswordFormProps) {
         <h3 className="font-playfair text-xl font-semibold text-[#3A2418]">
           Check your email
         </h3>
-        <p className="text-[#896E66] leading-relaxed">
+        <p className="text-[#6B544D] leading-relaxed">
           We sent a reset link to{" "}
           <span className="font-semibold text-[#3A2418]">{getValues("email")}</span>.
           Click the link in the email to set a new password.{" "}
@@ -66,12 +66,12 @@ export function ResetPasswordForm({ onBack }: ResetPasswordFormProps) {
         <button
           type="button"
           onClick={onBack}
-          className="flex items-center gap-1 text-sm text-[#896E66] hover:text-[#3A2418] transition-colors mb-4"
+          className="flex items-center gap-1 text-sm text-[#6B544D] hover:text-[#3A2418] transition-colors mb-4"
         >
           <ArrowLeft size={16} />
           Back to sign in
         </button>
-        <p className="text-[#896E66] text-sm leading-relaxed">
+        <p className="text-[#6B544D] text-sm leading-relaxed">
           Enter your email and we&apos;ll send you a link to reset your password.
         </p>
       </div>
@@ -85,7 +85,7 @@ export function ResetPasswordForm({ onBack }: ResetPasswordFormProps) {
           type="email"
           placeholder="you@example.com"
           autoComplete="email"
-          className="h-14 text-base rounded-xl border-[#E4D6C8] bg-white focus-visible:ring-[#B36050] placeholder:text-[#C4A898]"
+          className="h-14 text-base rounded-xl border-[#E4D6C8] bg-white focus-visible:ring-[#B36050] placeholder:text-[#9A8578]"
           {...register("email")}
         />
         {errors.email && (

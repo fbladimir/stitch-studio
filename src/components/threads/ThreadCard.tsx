@@ -44,7 +44,7 @@ export function ThreadCard({ thread }: ThreadCardProps) {
         <p className="font-nunito font-bold text-[14px] text-[#3A2418] truncate leading-tight">
           {thread.color_name ?? thread.color_number ?? "Unnamed thread"}
         </p>
-        <p className="font-nunito text-[12px] text-[#896E66] mt-0.5 truncate">
+        <p className="font-nunito text-[12px] text-[#6B544D] mt-0.5 truncate">
           {[thread.manufacturer, typeLabel].filter(Boolean).join(" · ")}
         </p>
       </div>

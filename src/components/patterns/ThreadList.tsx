@@ -229,7 +229,7 @@ export function ThreadList({ patternId }: ThreadListProps) {
                 <div className="bg-[#FAF6F0] border border-[#E4D6C8] rounded-xl px-3 py-2.5 flex items-center gap-3">
                   {/* Color swatch placeholder */}
                   <div className="w-8 h-8 rounded-lg bg-[#E4D6C8] flex-shrink-0 flex items-center justify-center">
-                    <span className="text-[10px] font-bold font-nunito text-[#896E66]">
+                    <span className="text-[10px] font-bold font-nunito text-[#6B544D]">
                       {thread.manufacturer?.slice(0, 1)}
                     </span>
                   </div>
@@ -239,7 +239,7 @@ export function ThreadList({ patternId }: ThreadListProps) {
                       {thread.manufacturer} {thread.color_number}
                       {thread.color_name ? ` · ${thread.color_name}` : ""}
                     </p>
-                    <p className="font-nunito text-[11px] text-[#896E66]">
+                    <p className="font-nunito text-[11px] text-[#6B544D]">
                       {[
                         thread.strands ? `${thread.strands} strands` : null,
                         thread.stitch_type
@@ -257,7 +257,7 @@ export function ThreadList({ patternId }: ThreadListProps) {
                   <div className="flex items-center gap-1 flex-shrink-0">
                     <button
                       onClick={() => openEdit(thread)}
-                      className="w-9 h-9 rounded-xl bg-white border border-[#E4D6C8] flex items-center justify-center text-[#896E66] active:scale-95"
+                      className="w-9 h-9 rounded-xl bg-white border border-[#E4D6C8] flex items-center justify-center text-[#6B544D] active:scale-95"
                     >
                       ✏️
                     </button>
@@ -292,7 +292,7 @@ export function ThreadList({ patternId }: ThreadListProps) {
       {threads.length === 0 && !showAdd && (
         <div className="bg-[#FAF6F0] border border-dashed border-[#E4D6C8] rounded-2xl px-4 py-6 text-center">
           <p className="text-2xl mb-2">🧵</p>
-          <p className="font-nunito text-[13px] text-[#896E66]">
+          <p className="font-nunito text-[13px] text-[#6B544D]">
             No threads added yet
           </p>
         </div>
@@ -307,7 +307,7 @@ export function ThreadList({ patternId }: ThreadListProps) {
             </p>
             <button
               onClick={() => setAiResults(null)}
-              className="text-[11px] font-nunito text-[#896E66] underline"
+              className="text-[11px] font-nunito text-[#6B544D] underline"
             >
               Dismiss
             </button>
@@ -320,7 +320,7 @@ export function ThreadList({ patternId }: ThreadListProps) {
                 className="bg-white/70 rounded-lg px-3 py-2 flex items-center gap-2"
               >
                 <div className="w-6 h-6 rounded bg-[#E4D6C8] flex-shrink-0 flex items-center justify-center">
-                  <span className="text-[9px] font-bold font-nunito text-[#896E66]">
+                  <span className="text-[9px] font-bold font-nunito text-[#6B544D]">
                     {t.manufacturer?.slice(0, 1)}
                   </span>
                 </div>
@@ -532,7 +532,7 @@ function ThreadForm({
         </button>
         <button
           onClick={onCancel}
-          className="flex-1 h-10 rounded-full border border-[#E4D6C8] text-[#896E66] font-nunito font-semibold text-[13px] active:scale-[0.98]"
+          className="flex-1 h-10 rounded-full border border-[#E4D6C8] text-[#6B544D] font-nunito font-semibold text-[13px] active:scale-[0.98]"
         >
           Cancel
         </button>

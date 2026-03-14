@@ -65,7 +65,7 @@ export function SubstitutionHelper({
   }, [missingThread, availableThreads]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-end justify-center" role="dialog" aria-modal="true" onClick={onClose}>
       <div className="absolute inset-0 bg-black/40" data-sheet-backdrop />
       <div
         ref={sheetRef}
@@ -87,14 +87,15 @@ export function SubstitutionHelper({
             <p className="font-playfair font-bold text-[16px] text-[#3A2418]">
               Thread Substitution
             </p>
-            <p className="font-nunito text-[12px] text-[#896E66] mt-0.5">
+            <p className="font-nunito text-[12px] text-[#6B544D] mt-0.5">
               Finding alternatives for {missingThread.manufacturer} {missingThread.color_number}
               {missingThread.color_name ? ` (${missingThread.color_name})` : ""}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="w-8 h-8 rounded-full bg-[#FAF6F0] border border-[#E4D6C8] flex items-center justify-center text-[#896E66] text-sm active:scale-95"
+            className="w-8 h-8 rounded-full bg-[#FAF6F0] border border-[#E4D6C8] flex items-center justify-center text-[#6B544D] text-sm active:scale-95"
+            aria-label="Close"
           >
             ×
           </button>
@@ -104,7 +105,7 @@ export function SubstitutionHelper({
         {loading && (
           <div className="flex flex-col items-center gap-3 py-8">
             <div className="w-8 h-8 border-3 border-[#E4D6C8] border-t-[#B36050] rounded-full animate-spin" />
-            <p className="font-nunito text-[13px] text-[#896E66]">
+            <p className="font-nunito text-[13px] text-[#6B544D]">
               Checking your stash for substitutes...
             </p>
           </div>
@@ -151,7 +152,7 @@ export function SubstitutionHelper({
             {/* General advice */}
             {generalAdvice && (
               <div className="bg-[#FAF6F0] border border-[#E4D6C8] rounded-xl px-4 py-3">
-                <p className="font-nunito text-[11px] text-[#896E66] uppercase tracking-wide mb-1 font-bold">
+                <p className="font-nunito text-[11px] text-[#6B544D] uppercase tracking-wide mb-1 font-bold">
                   Advisor tip
                 </p>
                 <p className="font-nunito text-[13px] text-[#3A2418] leading-relaxed">
@@ -165,7 +166,7 @@ export function SubstitutionHelper({
         {/* Close button */}
         <button
           onClick={onClose}
-          className="w-full h-11 rounded-full border border-[#E4D6C8] text-[#896E66] font-nunito font-semibold text-[14px] active:scale-[0.98]"
+          className="w-full h-11 rounded-full border border-[#E4D6C8] text-[#6B544D] font-nunito font-semibold text-[14px] active:scale-[0.98]"
         >
           Close
         </button>

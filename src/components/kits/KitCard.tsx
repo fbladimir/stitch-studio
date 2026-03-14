@@ -18,7 +18,7 @@ function kitStatusBadge(kit: Pattern): { text: string; classes: string } {
       classes: "bg-[#FBF5E8] text-[#AE7C2A]",
     };
   }
-  return { text: "Unopened 📦", classes: "bg-[#F5EEE8] text-[#896E66]" };
+  return { text: "Unopened 📦", classes: "bg-[#F5EEE8] text-[#6B544D]" };
 }
 
 function kitTypeLabel(type: string) {
@@ -58,7 +58,7 @@ export function KitCard({ kit }: KitCardProps) {
         <p className="font-nunito font-bold text-[14px] text-[#3A2418] truncate leading-tight">
           {kit.name}
         </p>
-        <p className="font-nunito text-[12px] text-[#896E66] mt-0.5 truncate">
+        <p className="font-nunito text-[12px] text-[#6B544D] mt-0.5 truncate">
           {[kit.company, kitTypeLabel(kit.type)].filter(Boolean).join(" · ")}
         </p>
         <span

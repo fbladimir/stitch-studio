@@ -91,7 +91,7 @@ export function PatternDetail({ initialPattern }: PatternDetailProps) {
         ) : (
           <div className="w-full h-full flex flex-col items-center justify-center gap-2">
             <span className="text-6xl opacity-20">📖</span>
-            <p className="font-nunito text-[12px] text-[#B6A090]">No cover photo yet</p>
+            <p className="font-nunito text-[12px] text-[#9A8578]">No cover photo yet</p>
           </div>
         )}
       </div>
@@ -103,14 +103,14 @@ export function PatternDetail({ initialPattern }: PatternDetailProps) {
             {pattern.name}
           </h1>
           {(pattern.designer || pattern.company) && (
-            <p className="font-nunito text-[14px] text-[#896E66] mt-1">
+            <p className="font-nunito text-[14px] text-[#6B544D] mt-1">
               {[pattern.designer, pattern.company].filter(Boolean).join(" · ")}
             </p>
           )}
         </div>
         <Link
           href={`/patterns/${pattern.id}/edit`}
-          className="flex-shrink-0 h-10 px-4 rounded-full border border-[#E4D6C8] bg-white font-nunito font-semibold text-[13px] text-[#896E66] flex items-center gap-1.5 active:scale-95"
+          className="flex-shrink-0 h-10 px-4 rounded-full border border-[#E4D6C8] bg-white font-nunito font-semibold text-[13px] text-[#6B544D] flex items-center gap-1.5 active:scale-95"
         >
           ✏️ Edit
         </Link>
@@ -209,7 +209,7 @@ export function PatternDetail({ initialPattern }: PatternDetailProps) {
             !pattern.rec_thread_brand &&
             !pattern.rec_fabric &&
             !pattern.chart_type && (
-              <p className="font-nunito text-[13px] text-[#B6A090]">
+              <p className="font-nunito text-[13px] text-[#9A8578]">
                 No details recorded yet.{" "}
                 <Link href={`/patterns/${pattern.id}/edit`} className="text-[#B36050] font-semibold">
                   Add them now →
@@ -318,7 +318,7 @@ export function PatternDetail({ initialPattern }: PatternDetailProps) {
         {!showDeleteConfirm ? (
           <button
             onClick={() => setShowDeleteConfirm(true)}
-            className="w-full h-11 rounded-full border border-[#E4D6C8] text-[#896E66] font-nunito font-semibold text-[13px] active:scale-[0.98]"
+            className="w-full h-11 rounded-full border border-[#E4D6C8] text-[#6B544D] font-nunito font-semibold text-[13px] active:scale-[0.98]"
           >
             Delete this pattern
           </button>
@@ -327,7 +327,7 @@ export function PatternDetail({ initialPattern }: PatternDetailProps) {
             <p className="font-nunito font-bold text-[14px] text-[#B03020] mb-1">
               Delete &ldquo;{pattern.name}&rdquo;?
             </p>
-            <p className="font-nunito text-[12px] text-[#896E66] mb-4">
+            <p className="font-nunito text-[12px] text-[#6B544D] mb-4">
               This will permanently remove the pattern and all its threads. This cannot be undone.
             </p>
             <div className="flex gap-2">
@@ -340,7 +340,7 @@ export function PatternDetail({ initialPattern }: PatternDetailProps) {
               </button>
               <button
                 onClick={() => setShowDeleteConfirm(false)}
-                className="flex-1 h-11 rounded-full border border-[#E4D6C8] text-[#896E66] font-nunito font-semibold text-[13px] active:scale-[0.98]"
+                className="flex-1 h-11 rounded-full border border-[#E4D6C8] text-[#6B544D] font-nunito font-semibold text-[13px] active:scale-[0.98]"
               >
                 Keep it
               </button>
@@ -357,7 +357,7 @@ export function PatternDetail({ initialPattern }: PatternDetailProps) {
 function DetailRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-baseline gap-2">
-      <span className="font-nunito text-[12px] font-semibold text-[#896E66] w-36 flex-shrink-0">
+      <span className="font-nunito text-[12px] font-semibold text-[#6B544D] w-36 flex-shrink-0">
         {label}
       </span>
       <span className="font-nunito text-[14px] text-[#3A2418] flex-1">{value}</span>
@@ -390,7 +390,7 @@ function PhotoUploadBlock({
           {uploading ? (
             <div className="flex flex-col items-center gap-2">
               <div className="w-8 h-8 border-2 border-[#B36050] border-t-transparent rounded-full animate-spin" />
-              <p className="font-nunito text-[12px] text-[#896E66]">Uploading…</p>
+              <p className="font-nunito text-[12px] text-[#6B544D]">Uploading…</p>
             </div>
           ) : (
             <span className="text-4xl opacity-20">🖼️</span>
@@ -399,7 +399,7 @@ function PhotoUploadBlock({
       )}
       <div className="px-4 py-3">
         <p className="font-nunito font-bold text-[13px] text-[#3A2418]">{label}</p>
-        <p className="font-nunito text-[11px] text-[#896E66] mb-3">{subLabel}</p>
+        <p className="font-nunito text-[11px] text-[#6B544D] mb-3">{subLabel}</p>
         <div className="flex gap-2">
           <button
             onClick={onCamera}

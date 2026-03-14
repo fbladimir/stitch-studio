@@ -18,7 +18,7 @@ function statusBadge(e: Pattern): { text: string; classes: string } {
       classes: "bg-[#FBF5E8] text-[#AE7C2A]",
     };
   }
-  return { text: "Not Started", classes: "bg-[#F5EEE8] text-[#896E66]" };
+  return { text: "Not Started", classes: "bg-[#F5EEE8] text-[#6B544D]" };
 }
 
 export function EmbroideryCard({ embroidery }: EmbroideryCardProps) {
@@ -57,7 +57,7 @@ export function EmbroideryCard({ embroidery }: EmbroideryCardProps) {
           {embroidery.name}
         </p>
         {subtitle && (
-          <p className="font-nunito text-[12px] text-[#896E66] mt-0.5 truncate">
+          <p className="font-nunito text-[12px] text-[#6B544D] mt-0.5 truncate">
             {subtitle}
           </p>
         )}

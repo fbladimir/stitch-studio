@@ -53,7 +53,7 @@ function DogParade({ dogs }: { dogs: Dog[] }) {
             }}
           >
             <span className="text-3xl leading-none">{dog.emoji}</span>
-            <span className="text-[10px] font-bold font-nunito text-[#896E66] truncate max-w-[48px]">
+            <span className="text-[10px] font-bold font-nunito text-[#6B544D] truncate max-w-[48px]">
               {dog.name}
             </span>
           </div>
@@ -116,6 +116,8 @@ export function CelebrationOverlay() {
   return (
     <div
       className="fixed inset-0 z-[200] flex items-center justify-center p-5 transition-opacity duration-300"
+      role="dialog"
+      aria-modal="true"
       style={{
         opacity: animateIn ? 1 : 0,
         background: "linear-gradient(155deg, #FDF4F1 0%, #FAF6F0 45%, #EBF2EC 100%)",
@@ -155,7 +157,7 @@ export function CelebrationOverlay() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={celebration.coverPhotoUrl}
-              alt={celebration.patternName ?? ""}
+              alt={celebration.patternName ?? "Finished pattern"}
               className="w-full h-full object-cover"
             />
           </div>
@@ -184,7 +186,7 @@ export function CelebrationOverlay() {
         {/* Dog line */}
         {celebration.dogLine && (
           <p
-            className="font-nunito text-[13px] text-[#896E66] italic"
+            className="font-nunito text-[13px] text-[#6B544D] italic"
             style={{ animation: "fadeSlideUp 0.5s ease-out 0.3s both" }}
           >
             🐾 {celebration.dogLine}
@@ -200,7 +202,7 @@ export function CelebrationOverlay() {
             {celebration.stats.map((s) => (
               <div key={s.label} className="text-center">
                 <p className="font-playfair text-xl font-bold text-[#B36050]">{s.value}</p>
-                <p className="font-nunito text-[10px] text-[#896E66] uppercase tracking-wide font-semibold">
+                <p className="font-nunito text-[10px] text-[#6B544D] uppercase tracking-wide font-semibold">
                   {s.label}
                 </p>
               </div>

@@ -20,7 +20,7 @@ export default function GlobalError({
         <h1 className="font-playfair text-[28px] font-bold text-[#3A2418] mb-2">
           Something went wrong
         </h1>
-        <p className="font-nunito text-[15px] text-[#896E66] mb-8 leading-relaxed">
+        <p className="font-nunito text-[15px] text-[#6B544D] mb-8 leading-relaxed">
           Don&apos;t worry, your data is safe. Let&apos;s try that again.
         </p>
         <button

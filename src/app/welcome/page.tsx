@@ -108,7 +108,7 @@ export default function WelcomePage() {
               transition: "opacity 0.6s ease 0.2s, transform 0.6s ease 0.2s",
             }}
           >
-            <p className="text-[#896E66] text-lg text-center leading-relaxed max-w-xs">
+            <p className="text-[#6B544D] text-lg text-center leading-relaxed max-w-xs">
               Your complete cross stitch companion — patterns, threads, and kits all in one place.
             </p>
           </div>
@@ -125,7 +125,7 @@ export default function WelcomePage() {
             {["📸 AI Pattern Scanning", "🧵 Thread Inventory", "🛍️ In-Store Mode"].map((pill) => (
               <span
                 key={pill}
-                className="px-3 py-1.5 rounded-full bg-white border border-[#E4D6C8] text-xs font-semibold text-[#896E66] shadow-sm"
+                className="px-3 py-1.5 rounded-full bg-white border border-[#E4D6C8] text-xs font-semibold text-[#6B544D] shadow-sm"
               >
                 {pill}
               </span>

@@ -40,7 +40,7 @@ export default function AIPage() {
               className={`flex-1 py-2.5 rounded-lg font-nunito font-semibold text-[13px] transition-all ${
                 tab === key
                   ? "bg-[#B36050] text-white shadow-sm"
-                  : "text-[#896E66]"
+                  : "text-[#6B544D]"
               }`}
             >
               {label}
@@ -116,7 +116,7 @@ function ScanResultPreview({
         </p>
         <button
           onClick={onClear}
-          className="mt-3 font-nunito text-[12px] text-[#896E66] underline"
+          className="mt-3 font-nunito text-[12px] text-[#6B544D] underline"
         >
           Try again
         </button>
@@ -139,7 +139,7 @@ function ScanResultPreview({
         {result.threads.map((t, i) => (
           <div key={i} className="bg-white/70 rounded-lg px-3 py-2 flex items-center gap-2">
             <div className="w-7 h-7 rounded bg-[#E4D6C8] flex-shrink-0 flex items-center justify-center">
-              <span className="text-[9px] font-bold font-nunito text-[#896E66]">
+              <span className="text-[9px] font-bold font-nunito text-[#6B544D]">
                 {t.manufacturer?.slice(0, 2)}
               </span>
             </div>
@@ -148,23 +148,23 @@ function ScanResultPreview({
                 {t.manufacturer} {t.color_number}
               </p>
               {t.color_name && (
-                <p className="font-nunito text-[11px] text-[#896E66] truncate">{t.color_name}</p>
+                <p className="font-nunito text-[11px] text-[#6B544D] truncate">{t.color_name}</p>
               )}
             </div>
-            <span className="font-nunito text-[11px] text-[#896E66]">
+            <span className="font-nunito text-[11px] text-[#6B544D]">
               {t.skeins_needed || 1} sk
             </span>
           </div>
         ))}
       </div>
 
-      <p className="font-nunito text-[12px] text-[#896E66] text-center">
+      <p className="font-nunito text-[12px] text-[#6B544D] text-center">
         To add these to a pattern, open the pattern and use &ldquo;Scan Color Key&rdquo; from the thread list.
       </p>
 
       <button
         onClick={onClear}
-        className="w-full h-10 rounded-full border border-[#E4D6C8] text-[#896E66] font-nunito font-semibold text-[13px] active:scale-[0.98]"
+        className="w-full h-10 rounded-full border border-[#E4D6C8] text-[#6B544D] font-nunito font-semibold text-[13px] active:scale-[0.98]"
       >
         Clear results
       </button>
@@ -220,7 +220,7 @@ function StashResultPreview({
         <p className="font-nunito text-[13px] text-[#B03020]">
           No threads found in this image. Try a clearer photo of your thread labels or organizer.
         </p>
-        <button onClick={onClear} className="mt-3 font-nunito text-[12px] text-[#896E66] underline">
+        <button onClick={onClear} className="mt-3 font-nunito text-[12px] text-[#6B544D] underline">
           Try again
         </button>
       </div>
@@ -234,7 +234,7 @@ function StashResultPreview({
         <p className="font-nunito font-bold text-[14px] text-[#5F7A63]">
           {result.threads.length} thread{result.threads.length !== 1 ? "s" : ""} added to your stash!
         </p>
-        <button onClick={onClear} className="mt-2 font-nunito text-[12px] text-[#896E66] underline">
+        <button onClick={onClear} className="mt-2 font-nunito text-[12px] text-[#6B544D] underline">
           Scan more
         </button>
       </div>
@@ -256,7 +256,7 @@ function StashResultPreview({
         {result.threads.map((t, i) => (
           <div key={i} className="bg-white/70 rounded-lg px-3 py-2 flex items-center gap-2">
             <div className="w-7 h-7 rounded bg-[#E4D6C8] flex-shrink-0 flex items-center justify-center">
-              <span className="text-[9px] font-bold font-nunito text-[#896E66]">
+              <span className="text-[9px] font-bold font-nunito text-[#6B544D]">
                 {t.manufacturer?.slice(0, 2)}
               </span>
             </div>
@@ -264,7 +264,7 @@ function StashResultPreview({
               {t.manufacturer} {t.color_number}
               {t.color_name ? ` · ${t.color_name}` : ""}
             </p>
-            <span className="font-nunito text-[11px] text-[#896E66] font-semibold">
+            <span className="font-nunito text-[11px] text-[#6B544D] font-semibold">
               ×{t.quantity || 1}
             </span>
           </div>
@@ -288,7 +288,7 @@ function StashResultPreview({
 
       <button
         onClick={onClear}
-        className="w-full h-10 rounded-full border border-[#E4D6C8] text-[#896E66] font-nunito font-semibold text-[13px] active:scale-[0.98]"
+        className="w-full h-10 rounded-full border border-[#E4D6C8] text-[#6B544D] font-nunito font-semibold text-[13px] active:scale-[0.98]"
       >
         Cancel
       </button>

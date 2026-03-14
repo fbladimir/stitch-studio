@@ -68,7 +68,7 @@ export function KittingResult({
       <div className="bg-white border border-[#E4D6C8] rounded-2xl p-4">
         <div className="flex items-center justify-between mb-2">
           <p className="font-nunito font-bold text-[13px] text-[#3A2418]">Thread Coverage</p>
-          <p className="font-nunito text-[12px] text-[#896E66]">
+          <p className="font-nunito text-[12px] text-[#6B544D]">
             {result.threads_have.length}/{totalThreads}
           </p>
         </div>
@@ -121,7 +121,7 @@ export function KittingResult({
             <p className="font-nunito font-bold text-[13px] text-[#B03020]">
               ❌ Missing ({result.threads_missing.length})
             </p>
-            <span className="text-[#896E66] text-sm">{expandMissing ? "▲" : "▼"}</span>
+            <span className="text-[#6B544D] text-sm">{expandMissing ? "▲" : "▼"}</span>
           </button>
 
           {expandMissing && (

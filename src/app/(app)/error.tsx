@@ -20,7 +20,7 @@ export default function AppError({
         <h1 className="font-playfair text-[24px] font-bold text-[#3A2418] mb-2">
           Oops — a dropped stitch!
         </h1>
-        <p className="font-nunito text-[14px] text-[#896E66] mb-6 leading-relaxed">
+        <p className="font-nunito text-[14px] text-[#6B544D] mb-6 leading-relaxed">
           Something unexpected happened. Your data is safe — let&apos;s try again.
         </p>
         <button

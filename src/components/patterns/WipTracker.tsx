@@ -108,7 +108,7 @@ export function WipTracker({ pattern, onUpdate }: WipTrackerProps) {
       </div>
 
       {/* Dates */}
-      <div className="flex gap-4 text-[12px] font-nunito text-[#896E66]">
+      <div className="flex gap-4 text-[12px] font-nunito text-[#6B544D]">
         {pattern.start_date && (
           <div>
             <p className="font-semibold text-[#3A2418]">Started</p>

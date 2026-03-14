@@ -7,7 +7,7 @@ export default function OfflinePage() {
       <h1 className="font-playfair text-[24px] font-bold text-[#3A2418] mb-2">
         You&apos;re offline
       </h1>
-      <p className="font-nunito text-[15px] text-[#896E66] max-w-[300px] leading-relaxed">
+      <p className="font-nunito text-[15px] text-[#6B544D] max-w-[300px] leading-relaxed">
         It looks like you&apos;ve lost your connection. Don&apos;t worry — your stitching data is safe!
         Reconnect to the internet and try again.
       </p>

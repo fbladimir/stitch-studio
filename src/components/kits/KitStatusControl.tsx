@@ -57,7 +57,7 @@ export function KitStatusControl({ kit, onUpdate }: KitStatusControlProps) {
   }
 
   const colorActive: Record<KitStatus, string> = {
-    unopened: "text-[#896E66]",
+    unopened: "text-[#6B544D]",
     started: "text-[#AE7C2A]",
     finished: "text-[#5F7A63]",
   };
@@ -90,7 +90,7 @@ export function KitStatusControl({ kit, onUpdate }: KitStatusControlProps) {
               <span className="text-xl leading-none">{seg.emoji}</span>
               <span
                 className={`font-nunito font-bold text-[11px] leading-tight ${
-                  isActive ? colorActive[seg.value] : "text-[#B6A090]"
+                  isActive ? colorActive[seg.value] : "text-[#9A8578]"
                 }`}
               >
                 {seg.label}
@@ -111,7 +111,7 @@ export function KitStatusControl({ kit, onUpdate }: KitStatusControlProps) {
         }`}
       >
         {current === "unopened" && (
-          <p className="font-nunito text-[13px] text-[#896E66]">
+          <p className="font-nunito text-[13px] text-[#6B544D]">
             This kit is still sealed and waiting for the perfect moment. 📦
           </p>
         )}

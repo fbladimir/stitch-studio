@@ -100,7 +100,7 @@ export function ThreadForm({ mode, initial, onSubmit, submitting }: ThreadFormPr
             {...register("color_number")}
             type="text"
             placeholder="e.g. 3865"
-            className="w-full h-11 px-3.5 rounded-2xl border border-[#E4D6C8] bg-white font-nunito text-[14px] text-[#3A2418] focus:outline-none focus:border-[#B36050] placeholder:text-[#C4AFA6]"
+            className="w-full h-11 px-3.5 rounded-2xl border border-[#E4D6C8] bg-white font-nunito text-[14px] text-[#3A2418] focus:outline-none focus:border-[#B36050] placeholder:text-[#9A8578]"
           />
         </div>
         <div className="flex-1">
@@ -111,7 +111,7 @@ export function ThreadForm({ mode, initial, onSubmit, submitting }: ThreadFormPr
             {...register("color_name")}
             type="text"
             placeholder="e.g. White Bright"
-            className="w-full h-11 px-3.5 rounded-2xl border border-[#E4D6C8] bg-white font-nunito text-[14px] text-[#3A2418] focus:outline-none focus:border-[#B36050] placeholder:text-[#C4AFA6]"
+            className="w-full h-11 px-3.5 rounded-2xl border border-[#E4D6C8] bg-white font-nunito text-[14px] text-[#3A2418] focus:outline-none focus:border-[#B36050] placeholder:text-[#9A8578]"
           />
         </div>
       </div>
@@ -158,7 +158,7 @@ export function ThreadForm({ mode, initial, onSubmit, submitting }: ThreadFormPr
                 className={`h-9 px-4 rounded-full font-nunito font-semibold text-[13px] border transition-colors ${
                   active
                     ? "bg-[#B36050] border-[#B36050] text-white"
-                    : "bg-white border-[#E4D6C8] text-[#896E66]"
+                    : "bg-white border-[#E4D6C8] text-[#6B544D]"
                 }`}
               >
                 {t.label}
@@ -177,7 +177,7 @@ export function ThreadForm({ mode, initial, onSubmit, submitting }: ThreadFormPr
           {...register("notes")}
           rows={3}
           placeholder="Any notes about this thread…"
-          className="w-full px-3.5 py-3 rounded-2xl border border-[#E4D6C8] bg-white font-nunito text-[14px] text-[#3A2418] focus:outline-none focus:border-[#B36050] placeholder:text-[#C4AFA6] resize-none"
+          className="w-full px-3.5 py-3 rounded-2xl border border-[#E4D6C8] bg-white font-nunito text-[14px] text-[#3A2418] focus:outline-none focus:border-[#B36050] placeholder:text-[#9A8578] resize-none"
         />
       </div>
 

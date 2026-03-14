@@ -8,7 +8,7 @@ export default function NotFound() {
         <h1 className="font-playfair text-[28px] font-bold text-[#3A2418] mb-2">
           Lost stitch!
         </h1>
-        <p className="font-nunito text-[15px] text-[#896E66] mb-8 leading-relaxed">
+        <p className="font-nunito text-[15px] text-[#6B544D] mb-8 leading-relaxed">
           We couldn&apos;t find the page you&apos;re looking for. It may have been
           moved or doesn&apos;t exist.
         </p>

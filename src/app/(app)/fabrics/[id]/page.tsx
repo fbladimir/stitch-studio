@@ -95,7 +95,7 @@ export default function FabricDetailPage() {
         <TopBar title="Fabric" showBack backHref="/fabrics" />
         <PageWrapper>
           <div className="text-center py-16">
-            <p className="font-nunito text-[#896E66]">Fabric not found.</p>
+            <p className="font-nunito text-[#6B544D]">Fabric not found.</p>
           </div>
         </PageWrapper>
       </>
@@ -121,7 +121,7 @@ export default function FabricDetailPage() {
           ) : (
             <button
               onClick={() => setEditing(false)}
-              className="font-nunito font-semibold text-[14px] text-[#896E66]"
+              className="font-nunito font-semibold text-[14px] text-[#6B544D]"
             >
               Cancel
             </button>
@@ -160,7 +160,7 @@ export default function FabricDetailPage() {
                 {fabric.color_name ?? "Unnamed fabric"}
               </p>
               {fabric.manufacturer && (
-                <p className="font-nunito text-[13px] text-[#896E66] mt-1">
+                <p className="font-nunito text-[13px] text-[#6B544D] mt-1">
                   {fabric.manufacturer}
                 </p>
               )}
@@ -178,7 +178,7 @@ export default function FabricDetailPage() {
               </div>
 
               {fabric.notes && (
-                <p className="font-nunito text-[13px] text-[#896E66] mt-4 pt-4 border-t border-[#F0E6DC]">
+                <p className="font-nunito text-[13px] text-[#6B544D] mt-4 pt-4 border-t border-[#F0E6DC]">
                   {fabric.notes}
                 </p>
               )}
@@ -192,7 +192,7 @@ export default function FabricDetailPage() {
                 </span>
               )}
               {fabric.count && (
-                <span className="px-3 py-1 rounded-full font-nunito text-[12px] font-bold bg-[#F5EEE8] text-[#896E66] border border-[#E4D6C8]">
+                <span className="px-3 py-1 rounded-full font-nunito text-[12px] font-bold bg-[#F5EEE8] text-[#6B544D] border border-[#E4D6C8]">
                   {fabric.count} ct
                 </span>
               )}
@@ -203,7 +203,7 @@ export default function FabricDetailPage() {
               {!deleteConfirm ? (
                 <button
                   onClick={() => setDeleteConfirm(true)}
-                  className="w-full h-12 rounded-full border border-[#E4D6C8] font-nunito font-semibold text-[14px] text-[#896E66] bg-white active:scale-[0.98] transition-transform"
+                  className="w-full h-12 rounded-full border border-[#E4D6C8] font-nunito font-semibold text-[14px] text-[#6B544D] bg-white active:scale-[0.98] transition-transform"
                 >
                   Remove from stash
                 </button>
@@ -212,13 +212,13 @@ export default function FabricDetailPage() {
                   <p className="font-nunito font-bold text-[14px] text-[#3A2418]">
                     Remove this fabric?
                   </p>
-                  <p className="font-nunito text-[13px] text-[#896E66]">
+                  <p className="font-nunito text-[13px] text-[#6B544D]">
                     This will remove it from your stash permanently.
                   </p>
                   <div className="flex gap-3">
                     <button
                       onClick={() => setDeleteConfirm(false)}
-                      className="flex-1 h-11 rounded-full border border-[#E4D6C8] font-nunito font-semibold text-[14px] text-[#896E66] bg-white"
+                      className="flex-1 h-11 rounded-full border border-[#E4D6C8] font-nunito font-semibold text-[14px] text-[#6B544D] bg-white"
                     >
                       Keep it
                     </button>
@@ -243,7 +243,7 @@ export default function FabricDetailPage() {
 function Row({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-baseline justify-between gap-3">
-      <span className="font-nunito text-[12px] text-[#B6A090] flex-shrink-0">{label}</span>
+      <span className="font-nunito text-[12px] text-[#9A8578] flex-shrink-0">{label}</span>
       <span className="font-nunito font-semibold text-[13px] text-[#3A2418] text-right">{value}</span>
     </div>
   );

@@ -19,7 +19,7 @@ import type { ThreadInventoryItem, Pattern } from "@/types";
 function statusBadge(p: Pattern): { text: string; classes: string } {
   if (p.completion_date) return { text: "Finished ✓", classes: "bg-[#EBF2EC] text-[#5F7A63]" };
   if (p.wip) return { text: `WIP${p.wip_pct ? ` · ${p.wip_pct}%` : ""}`, classes: "bg-[#FBF5E8] text-[#AE7C2A]" };
-  return { text: "Not started", classes: "bg-[#F5EEE8] text-[#896E66]" };
+  return { text: "Not started", classes: "bg-[#F5EEE8] text-[#6B544D]" };
 }
 
 function Skeleton({ className }: { className?: string }) {
@@ -118,7 +118,7 @@ export default function ThreadDetailPage() {
         <TopBar title="Thread" showBack backHref="/threads" />
         <PageWrapper>
           <div className="text-center py-16">
-            <p className="font-nunito text-[#896E66]">Thread not found.</p>
+            <p className="font-nunito text-[#6B544D]">Thread not found.</p>
           </div>
         </PageWrapper>
       </>
@@ -147,7 +147,7 @@ export default function ThreadDetailPage() {
           ) : (
             <button
               onClick={() => setEditing(false)}
-              className="font-nunito font-semibold text-[14px] text-[#896E66]"
+              className="font-nunito font-semibold text-[14px] text-[#6B544D]"
             >
               Cancel
             </button>
@@ -184,12 +184,12 @@ export default function ThreadDetailPage() {
                   <p className="font-playfair font-bold text-[18px] text-[#3A2418] leading-tight">
                     {thread.color_name ?? thread.color_number ?? "Unnamed thread"}
                   </p>
-                  <p className="font-nunito text-[13px] text-[#896E66] mt-0.5">
+                  <p className="font-nunito text-[13px] text-[#6B544D] mt-0.5">
                     {thread.manufacturer}
                     {threadTypeLabel ? ` · ${threadTypeLabel}` : ""}
                   </p>
                   {thread.color_number && thread.color_name && (
-                    <p className="font-nunito text-[12px] text-[#B6A090] mt-0.5">
+                    <p className="font-nunito text-[12px] text-[#9A8578] mt-0.5">
                       #{thread.color_number}
                     </p>
                   )}
@@ -197,7 +197,7 @@ export default function ThreadDetailPage() {
               </div>
 
               {thread.notes && (
-                <p className="font-nunito text-[13px] text-[#896E66] mt-4 pt-4 border-t border-[#F0E6DC]">
+                <p className="font-nunito text-[13px] text-[#6B544D] mt-4 pt-4 border-t border-[#F0E6DC]">
                   {thread.notes}
                 </p>
               )}
@@ -229,7 +229,7 @@ export default function ThreadDetailPage() {
                 >
                   +
                 </button>
-                <span className="font-nunito text-[13px] text-[#896E66]">
+                <span className="font-nunito text-[13px] text-[#6B544D]">
                   {thread.quantity === 1 ? "skein" : "skeins"}
                 </span>
               </div>
@@ -247,7 +247,7 @@ export default function ThreadDetailPage() {
                 {patterns === null ? (
                   <Skeleton className="h-12" />
                 ) : patterns.length === 0 ? (
-                  <p className="font-nunito text-[13px] text-[#B6A090]">
+                  <p className="font-nunito text-[13px] text-[#9A8578]">
                     None of your patterns call for this thread yet.
                   </p>
                 ) : (
@@ -279,7 +279,7 @@ export default function ThreadDetailPage() {
                               {p.name}
                             </p>
                             {p.designer && (
-                              <p className="font-nunito text-[11px] text-[#896E66] truncate">
+                              <p className="font-nunito text-[11px] text-[#6B544D] truncate">
                                 {p.designer}
                               </p>
                             )}
@@ -302,7 +302,7 @@ export default function ThreadDetailPage() {
               {!deleteConfirm ? (
                 <button
                   onClick={() => setDeleteConfirm(true)}
-                  className="w-full h-12 rounded-full border border-[#E4D6C8] font-nunito font-semibold text-[14px] text-[#896E66] bg-white active:scale-[0.98] transition-transform"
+                  className="w-full h-12 rounded-full border border-[#E4D6C8] font-nunito font-semibold text-[14px] text-[#6B544D] bg-white active:scale-[0.98] transition-transform"
                 >
                   Remove from stash
                 </button>
@@ -311,13 +311,13 @@ export default function ThreadDetailPage() {
                   <p className="font-nunito font-bold text-[14px] text-[#3A2418]">
                     Remove this thread?
                   </p>
-                  <p className="font-nunito text-[13px] text-[#896E66]">
+                  <p className="font-nunito text-[13px] text-[#6B544D]">
                     This will remove it from your stash. This cannot be undone.
                   </p>
                   <div className="flex gap-3">
                     <button
                       onClick={() => setDeleteConfirm(false)}
-                      className="flex-1 h-11 rounded-full border border-[#E4D6C8] font-nunito font-semibold text-[14px] text-[#896E66] bg-white"
+                      className="flex-1 h-11 rounded-full border border-[#E4D6C8] font-nunito font-semibold text-[14px] text-[#6B544D] bg-white"
                     >
                       Keep it
                     </button>

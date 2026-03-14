@@ -35,7 +35,7 @@ export function TopBar({
         {showBack && (
           <button
             onClick={handleBack}
-            className="flex items-center justify-center min-w-[44px] min-h-[44px] -ml-2 rounded-full text-[#896E66] hover:text-[#B36050] hover:bg-[#FDF4F1] transition-colors"
+            className="flex items-center justify-center min-w-[44px] min-h-[44px] -ml-2 rounded-full text-[#6B544D] hover:text-[#B36050] hover:bg-[#FDF4F1] transition-colors"
             aria-label="Go back"
           >
             <ArrowLeft size={22} aria-hidden="true" />

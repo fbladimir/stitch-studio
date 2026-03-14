@@ -17,7 +17,7 @@ export function statusBadge(pattern: Pattern) {
   if (pattern.kitted) {
     return { text: "Kitted", classes: "bg-[#FDF4F1] text-[#B36050]" };
   }
-  return { text: "Not started", classes: "bg-[#F5EEE8] text-[#896E66]" };
+  return { text: "Not started", classes: "bg-[#F5EEE8] text-[#6B544D]" };
 }
 
 export function PatternCard({ pattern }: PatternCardProps) {
@@ -53,7 +53,7 @@ export function PatternCard({ pattern }: PatternCardProps) {
           {pattern.name}
         </p>
         {(pattern.designer || pattern.company) && (
-          <p className="font-nunito text-[12px] text-[#896E66] mt-0.5 truncate">
+          <p className="font-nunito text-[12px] text-[#6B544D] mt-0.5 truncate">
             {[pattern.designer, pattern.company].filter(Boolean).join(" · ")}
           </p>
         )}

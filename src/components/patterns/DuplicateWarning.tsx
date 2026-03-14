@@ -20,7 +20,7 @@ export function DuplicateWarning({
     useBottomSheetDrag({ onClose: onCancel });
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" onClick={onCancel}>
+    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center" role="dialog" aria-modal="true" onClick={onCancel}>
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/40" data-sheet-backdrop />
 
@@ -44,7 +44,7 @@ export function DuplicateWarning({
             Possible Duplicate
           </h2>
         </div>
-        <p className="font-nunito text-[13px] text-[#896E66] mb-5">
+        <p className="font-nunito text-[13px] text-[#6B544D] mb-5">
           {candidates.length === 1
             ? "This pattern looks like one you already have:"
             : `These ${candidates.length} patterns in your collection look similar:`}
@@ -75,7 +75,7 @@ export function DuplicateWarning({
                   {c.name}
                 </p>
                 {c.designer && (
-                  <p className="font-nunito text-[11px] text-[#896E66] truncate">
+                  <p className="font-nunito text-[11px] text-[#6B544D] truncate">
                     {c.designer}
                   </p>
                 )}
@@ -98,7 +98,7 @@ export function DuplicateWarning({
           </button>
           <button
             onClick={onCancel}
-            className="w-full h-12 rounded-full border border-[#E4D6C8] bg-white text-[#896E66] font-nunito font-semibold text-[14px] active:scale-[0.98] transition-transform"
+            className="w-full h-12 rounded-full border border-[#E4D6C8] bg-white text-[#6B544D] font-nunito font-semibold text-[14px] active:scale-[0.98] transition-transform"
           >
             Cancel — go back
           </button>

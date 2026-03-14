@@ -52,7 +52,7 @@ export function Step2Photo({ userId, displayName, onNext }: Step2PhotoProps) {
         <h1 className="font-playfair text-3xl font-bold text-[#3A2418]">
           Add a photo, {displayName}!
         </h1>
-        <p className="text-[#896E66] text-base leading-relaxed">
+        <p className="text-[#6B544D] text-base leading-relaxed">
           Totally optional — but it&apos;s a nice touch.
         </p>
       </div>
@@ -118,7 +118,7 @@ export function Step2Photo({ userId, displayName, onNext }: Step2PhotoProps) {
         <button
           type="button"
           onClick={() => onNext(null)}
-          className="w-full py-3 text-sm text-[#896E66] hover:text-[#3A2418] font-medium transition-colors"
+          className="w-full py-3 text-sm text-[#6B544D] hover:text-[#3A2418] font-medium transition-colors"
         >
           Skip for now →
         </button>

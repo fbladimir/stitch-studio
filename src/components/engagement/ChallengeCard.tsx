@@ -38,14 +38,14 @@ export function ChallengeCard({ challenge }: ChallengeCardProps) {
               </span>
             )}
           </div>
-          <p className="font-nunito text-[11px] text-[#896E66] mt-0.5">
+          <p className="font-nunito text-[11px] text-[#6B544D] mt-0.5">
             {def.description}
           </p>
 
           {/* Progress bar */}
           <div className="mt-2.5">
             <div className="flex justify-between items-center mb-1">
-              <span className="font-nunito text-[10px] font-bold text-[#896E66]">
+              <span className="font-nunito text-[10px] font-bold text-[#6B544D]">
                 {progress}/{challenge.goal}
               </span>
               {!isComplete && (

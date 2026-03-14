@@ -170,7 +170,7 @@ export function FabricForm({ mode, initial, onSubmit, submitting }: FabricFormPr
         ) : (
           <div className="w-full aspect-[4/3] rounded-2xl border-2 border-dashed border-[#E4D6C8] bg-[#FAF6F0] flex flex-col items-center justify-center mb-3 gap-2">
             <span className="text-5xl opacity-20">🪢</span>
-            <p className="font-nunito text-[12px] text-[#B6A090]">Photo of your fabric</p>
+            <p className="font-nunito text-[12px] text-[#9A8578]">Photo of your fabric</p>
           </div>
         )}
 
@@ -263,7 +263,7 @@ export function FabricForm({ mode, initial, onSubmit, submitting }: FabricFormPr
             {...register("color_name")}
             type="text"
             placeholder="e.g. Antique White, Raw Linen, Cream"
-            className="w-full h-11 px-3.5 rounded-2xl border border-[#E4D6C8] bg-white font-nunito text-[14px] text-[#3A2418] focus:outline-none focus:border-[#B36050] placeholder:text-[#C4AFA6]"
+            className="w-full h-11 px-3.5 rounded-2xl border border-[#E4D6C8] bg-white font-nunito text-[14px] text-[#3A2418] focus:outline-none focus:border-[#B36050] placeholder:text-[#9A8578]"
           />
         </div>
 
@@ -276,7 +276,7 @@ export function FabricForm({ mode, initial, onSubmit, submitting }: FabricFormPr
             {...register("size")}
             type="text"
             placeholder='e.g. 9x10 inches, 12x18 inches'
-            className="w-full h-11 px-3.5 rounded-2xl border border-[#E4D6C8] bg-white font-nunito text-[14px] text-[#3A2418] focus:outline-none focus:border-[#B36050] placeholder:text-[#C4AFA6]"
+            className="w-full h-11 px-3.5 rounded-2xl border border-[#E4D6C8] bg-white font-nunito text-[14px] text-[#3A2418] focus:outline-none focus:border-[#B36050] placeholder:text-[#9A8578]"
           />
         </div>
       </section>
@@ -300,7 +300,7 @@ export function FabricForm({ mode, initial, onSubmit, submitting }: FabricFormPr
                   className={`h-10 px-5 rounded-full font-nunito font-semibold text-[13px] border transition-colors ${
                     active
                       ? "bg-[#B36050] border-[#B36050] text-white"
-                      : "bg-white border-[#E4D6C8] text-[#896E66]"
+                      : "bg-white border-[#E4D6C8] text-[#6B544D]"
                   }`}
                 >
                   {t.label}
@@ -326,7 +326,7 @@ export function FabricForm({ mode, initial, onSubmit, submitting }: FabricFormPr
                   className={`h-10 px-4 rounded-full font-nunito font-semibold text-[13px] border transition-colors ${
                     active
                       ? "bg-[#B36050] border-[#B36050] text-white"
-                      : "bg-white border-[#E4D6C8] text-[#896E66]"
+                      : "bg-white border-[#E4D6C8] text-[#6B544D]"
                   }`}
                 >
                   {c} ct
@@ -346,7 +346,7 @@ export function FabricForm({ mode, initial, onSubmit, submitting }: FabricFormPr
           {...register("notes")}
           rows={3}
           placeholder="Where you got it, what you plan to use it for…"
-          className="w-full px-3.5 py-3 rounded-2xl border border-[#E4D6C8] bg-[#FAF6F0] font-nunito text-[14px] text-[#3A2418] focus:outline-none focus:border-[#B36050] placeholder:text-[#C4AFA6] resize-none"
+          className="w-full px-3.5 py-3 rounded-2xl border border-[#E4D6C8] bg-[#FAF6F0] font-nunito text-[14px] text-[#3A2418] focus:outline-none focus:border-[#B36050] placeholder:text-[#9A8578] resize-none"
         />
       </section>
 

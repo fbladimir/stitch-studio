@@ -91,7 +91,7 @@ export default function ThreadsPage() {
           </div>
           <Link
             href="/fabrics"
-            className="flex-1 flex items-center justify-center gap-1 h-10 rounded-xl font-nunito font-bold text-[12px] text-[#B6A090] active:scale-[0.97] transition-transform"
+            className="flex-1 flex items-center justify-center gap-1 h-10 rounded-xl font-nunito font-bold text-[12px] text-[#9A8578] active:scale-[0.97] transition-transform"
           >
             <span>🪢</span> Fabrics
           </Link>
@@ -99,7 +99,7 @@ export default function ThreadsPage() {
 
         {/* Search */}
         <div className="mb-4 relative">
-          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#B6A090] text-lg select-none pointer-events-none">
+          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#9A8578] text-lg select-none pointer-events-none">
             🔍
           </span>
           <input
@@ -107,12 +107,12 @@ export default function ThreadsPage() {
             placeholder="Search by number, name, or brand…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full h-11 pl-10 pr-4 rounded-2xl border border-[#E4D6C8] bg-white font-nunito text-[14px] text-[#3A2418] focus:outline-none focus:border-[#B36050] placeholder:text-[#C4AFA6]"
+            className="w-full h-11 pl-10 pr-4 rounded-2xl border border-[#E4D6C8] bg-white font-nunito text-[14px] text-[#3A2418] focus:outline-none focus:border-[#B36050] placeholder:text-[#9A8578]"
           />
           {search && (
             <button
               onClick={() => setSearch("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#B6A090] text-xl w-7 h-7 flex items-center justify-center"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9A8578] text-xl w-7 h-7 flex items-center justify-center"
             >
               ×
             </button>
@@ -128,7 +128,7 @@ export default function ThreadsPage() {
               className={`flex-shrink-0 h-9 px-4 rounded-full font-nunito font-semibold text-[13px] transition-colors ${
                 activeManufacturer === "all"
                   ? "bg-[#B36050] text-white"
-                  : "bg-white border border-[#E4D6C8] text-[#896E66]"
+                  : "bg-white border border-[#E4D6C8] text-[#6B544D]"
               }`}
             >
               All
@@ -143,7 +143,7 @@ export default function ThreadsPage() {
                 className={`flex-shrink-0 h-9 px-4 rounded-full font-nunito font-semibold text-[13px] transition-colors ${
                   activeManufacturer === m
                     ? "bg-[#B36050] text-white"
-                    : "bg-white border border-[#E4D6C8] text-[#896E66]"
+                    : "bg-white border border-[#E4D6C8] text-[#6B544D]"
                 }`}
               >
                 {m}
@@ -157,7 +157,7 @@ export default function ThreadsPage() {
 
         {/* Stats row when not loading */}
         {!loading && threads!.length > 0 && (
-          <p className="font-nunito text-[12px] text-[#B6A090] mb-3">
+          <p className="font-nunito text-[12px] text-[#9A8578] mb-3">
             {threads!.length} {threads!.length === 1 ? "thread" : "threads"} in your stash
             {activeManufacturer !== "all" && ` · ${filtered!.length} shown`}
           </p>
@@ -209,7 +209,7 @@ function EmptyState({
         <p className="font-nunito font-bold text-[15px] text-[#3A2418]">
           No threads match &ldquo;{search}&rdquo;
         </p>
-        <p className="font-nunito text-[13px] text-[#896E66]">
+        <p className="font-nunito text-[13px] text-[#6B544D]">
           Try a color number, name, or brand.
         </p>
       </div>
@@ -223,7 +223,7 @@ function EmptyState({
         <p className="font-nunito font-bold text-[15px] text-[#3A2418]">
           No {manufacturer} threads yet
         </p>
-        <p className="font-nunito text-[13px] text-[#896E66]">
+        <p className="font-nunito text-[13px] text-[#6B544D]">
           Tap + to add your first {manufacturer} thread.
         </p>
       </div>
@@ -236,7 +236,7 @@ function EmptyState({
       <p className="font-nunito font-bold text-[16px] text-[#3A2418]">
         Your stash is empty!
       </p>
-      <p className="font-nunito text-[13px] text-[#896E66] max-w-[260px]">
+      <p className="font-nunito text-[13px] text-[#6B544D] max-w-[260px]">
         Tap the + button to start adding your threads. Every skein tells a story ✿
       </p>
     </div>

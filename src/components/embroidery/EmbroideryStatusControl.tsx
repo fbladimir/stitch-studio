@@ -30,7 +30,7 @@ function getStatus(e: Pattern): EmbroideryStatus {
 const STATUS_DESCRIPTIONS: Record<EmbroideryStatus, { text: string; classes: string }> = {
   not_started: {
     text: "This design is waiting for its moment to shine.",
-    classes: "bg-[#FAF6F0] text-[#896E66] border-[#E4D6C8]",
+    classes: "bg-[#FAF6F0] text-[#6B544D] border-[#E4D6C8]",
   },
   wip: {
     text: "You're stitching — every thread brings it closer to life! 🌸",
@@ -110,7 +110,7 @@ export function EmbroideryStatusControl({
               className={`flex-1 flex items-center justify-center gap-1.5 h-11 rounded-xl font-nunito font-semibold text-[12px] transition-all duration-200 active:scale-[0.97] disabled:opacity-60 ${
                 isActive
                   ? "bg-white text-[#3A2418] shadow-sm"
-                  : "text-[#B6A090]"
+                  : "text-[#9A8578]"
               }`}
               style={{
                 boxShadow: isActive ? "0 1px 4px rgba(58,36,24,0.10)" : undefined,

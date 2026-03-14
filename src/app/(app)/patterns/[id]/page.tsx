@@ -52,7 +52,7 @@ export default function PatternDetailPage() {
             <p className="font-nunito font-bold text-[15px] text-[#3A2418]">
               Pattern not found
             </p>
-            <p className="font-nunito text-[13px] text-[#896E66]">
+            <p className="font-nunito text-[13px] text-[#6B544D]">
               It may have been deleted.
             </p>
           </div>

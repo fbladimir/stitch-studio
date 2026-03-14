@@ -37,7 +37,7 @@ export function SideNav() {
               className={`flex items-center gap-3 px-3 py-3 rounded-xl transition-colors min-h-[48px] ${
                 isActive
                   ? "bg-[#FDF4F1] text-[#B36050]"
-                  : "text-[#896E66] hover:bg-[#FAF6F0] hover:text-[#3A2418]"
+                  : "text-[#6B544D] hover:bg-[#FAF6F0] hover:text-[#3A2418]"
               }`}
             >
               <Icon

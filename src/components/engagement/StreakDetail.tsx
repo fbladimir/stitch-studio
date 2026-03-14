@@ -26,7 +26,7 @@ export function StreakDetail({
   const nextMilestone = STREAK_MILESTONES.find((m) => m.days > currentStreak);
 
   return (
-    <div className="fixed inset-0 z-[150] flex items-end justify-center" onClick={onClose}>
+    <div className="fixed inset-0 z-[150] flex items-end justify-center" role="dialog" aria-modal="true" onClick={onClose}>
       {/* Backdrop */}
       <div className="absolute inset-0 bg-black/30" data-sheet-backdrop />
 
@@ -52,7 +52,7 @@ export function StreakDetail({
           </span>
           <div className="text-center">
             <p className="font-playfair text-4xl font-bold text-[#AE7C2A]">{currentStreak}</p>
-            <p className="font-nunito text-[12px] text-[#896E66] font-semibold uppercase tracking-wide">
+            <p className="font-nunito text-[12px] text-[#6B544D] font-semibold uppercase tracking-wide">
               day streak
             </p>
           </div>
@@ -62,13 +62,13 @@ export function StreakDetail({
         <div className="flex gap-4 justify-center mb-6">
           <div className="text-center bg-white rounded-xl border border-[#E4D6C8] px-5 py-3">
             <p className="font-playfair text-xl font-bold text-[#B36050]">{currentStreak}</p>
-            <p className="font-nunito text-[10px] text-[#896E66] uppercase tracking-wide font-semibold">
+            <p className="font-nunito text-[10px] text-[#6B544D] uppercase tracking-wide font-semibold">
               Current
             </p>
           </div>
           <div className="text-center bg-white rounded-xl border border-[#E4D6C8] px-5 py-3">
             <p className="font-playfair text-xl font-bold text-[#5F7A63]">{longestStreak}</p>
-            <p className="font-nunito text-[10px] text-[#896E66] uppercase tracking-wide font-semibold">
+            <p className="font-nunito text-[10px] text-[#6B544D] uppercase tracking-wide font-semibold">
               Longest
             </p>
           </div>
@@ -91,7 +91,7 @@ export function StreakDetail({
                 >
                   {active ? "✓" : ""}
                 </div>
-                <span className="font-nunito text-[10px] text-[#896E66] font-semibold">
+                <span className="font-nunito text-[10px] text-[#6B544D] font-semibold">
                   {DAY_LABELS[i]}
                 </span>
               </div>
@@ -102,13 +102,13 @@ export function StreakDetail({
         {/* Next milestone */}
         {nextMilestone && (
           <div className="bg-[#FBF5E8] rounded-xl border border-[#E8D5A0] px-4 py-3 text-center">
-            <p className="font-nunito text-[12px] text-[#896E66]">
+            <p className="font-nunito text-[12px] text-[#6B544D]">
               Next milestone:{" "}
               <span className="font-bold text-[#AE7C2A]">
                 {nextMilestone.days} days
               </span>
             </p>
-            <p className="font-nunito text-[11px] text-[#896E66] mt-0.5">
+            <p className="font-nunito text-[11px] text-[#6B544D] mt-0.5">
               {nextMilestone.days - currentStreak} days to go!
             </p>
           </div>

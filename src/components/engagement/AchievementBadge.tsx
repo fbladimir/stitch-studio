@@ -51,7 +51,7 @@ export function AchievementBadge({
 
       {/* Earned date */}
       {earned && earnedAt && isMd && (
-        <p className="font-nunito text-[9px] text-[#896E66]">
+        <p className="font-nunito text-[9px] text-[#6B544D]">
           {new Date(earnedAt).toLocaleDateString("en-US", {
             month: "short",
             day: "numeric",

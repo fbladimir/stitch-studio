@@ -89,13 +89,13 @@ export default function KitsPage() {
         >
           <Link
             href="/patterns"
-            className="flex-1 flex items-center justify-center gap-1 h-10 rounded-xl font-nunito font-bold text-[12px] text-[#B6A090] active:scale-[0.97] transition-transform"
+            className="flex-1 flex items-center justify-center gap-1 h-10 rounded-xl font-nunito font-bold text-[12px] text-[#9A8578] active:scale-[0.97] transition-transform"
           >
             <span>📖</span> Patterns
           </Link>
           <Link
             href="/embroidery"
-            className="flex-1 flex items-center justify-center gap-1 h-10 rounded-xl font-nunito font-bold text-[12px] text-[#B6A090] active:scale-[0.97] transition-transform"
+            className="flex-1 flex items-center justify-center gap-1 h-10 rounded-xl font-nunito font-bold text-[12px] text-[#9A8578] active:scale-[0.97] transition-transform"
           >
             <span>🌸</span> Embroidery
           </Link>
@@ -109,7 +109,7 @@ export default function KitsPage() {
 
         {/* Search */}
         <div className="mb-4 relative">
-          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#B6A090] text-lg select-none pointer-events-none">
+          <span className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[#9A8578] text-lg select-none pointer-events-none">
             🔍
           </span>
           <input
@@ -117,12 +117,12 @@ export default function KitsPage() {
             placeholder="Search kits or brands…"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full h-11 pl-10 pr-4 rounded-2xl border border-[#E4D6C8] bg-white font-nunito text-[14px] text-[#3A2418] focus:outline-none focus:border-[#B36050] placeholder:text-[#C4AFA6]"
+            className="w-full h-11 pl-10 pr-4 rounded-2xl border border-[#E4D6C8] bg-white font-nunito text-[14px] text-[#3A2418] focus:outline-none focus:border-[#B36050] placeholder:text-[#9A8578]"
           />
           {search && (
             <button
               onClick={() => setSearch("")}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#B6A090] text-xl w-7 h-7 flex items-center justify-center"
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[#9A8578] text-xl w-7 h-7 flex items-center justify-center"
             >
               ×
             </button>
@@ -141,7 +141,7 @@ export default function KitsPage() {
                 className={`flex-shrink-0 h-9 px-4 rounded-full font-nunito font-semibold text-[13px] transition-colors ${
                   isActive
                     ? "bg-[#B36050] text-white"
-                    : "bg-white border border-[#E4D6C8] text-[#896E66]"
+                    : "bg-white border border-[#E4D6C8] text-[#6B544D]"
                 }`}
               >
                 {tab.label}
@@ -197,7 +197,7 @@ function EmptyState({ tab, search }: { tab: FilterTab; search: string }) {
         <p className="font-nunito font-bold text-[15px] text-[#3A2418]">
           No kits match &ldquo;{search}&rdquo;
         </p>
-        <p className="font-nunito text-[13px] text-[#896E66]">
+        <p className="font-nunito text-[13px] text-[#6B544D]">
           Try a different name or brand.
         </p>
       </div>
@@ -233,7 +233,7 @@ function EmptyState({ tab, search }: { tab: FilterTab; search: string }) {
     <div className="flex flex-col items-center text-center py-12 gap-3">
       <span className="text-5xl">{icon}</span>
       <p className="font-nunito font-bold text-[15px] text-[#3A2418]">{title}</p>
-      <p className="font-nunito text-[13px] text-[#896E66] max-w-[260px]">{body}</p>
+      <p className="font-nunito text-[13px] text-[#6B544D] max-w-[260px]">{body}</p>
     </div>
   );
 }

@@ -19,7 +19,7 @@ function fabricTypeBadge(type: FabricInventoryItem["fabric_type"]): {
     case "evenweave":
       return { label: "Evenweave", classes: "bg-[#FBF5E8] text-[#AE7C2A]" };
     default:
-      return { label: "Other", classes: "bg-[#F5EEE8] text-[#896E66]" };
+      return { label: "Other", classes: "bg-[#F5EEE8] text-[#6B544D]" };
   }
 }
 
@@ -56,7 +56,7 @@ export function FabricCard({ fabric }: FabricCardProps) {
         <p className="font-nunito font-bold text-[14px] text-[#3A2418] truncate leading-tight">
           {fabric.color_name ?? fabric.manufacturer ?? "Unnamed fabric"}
         </p>
-        <p className="font-nunito text-[12px] text-[#896E66] mt-0.5 truncate">
+        <p className="font-nunito text-[12px] text-[#6B544D] mt-0.5 truncate">
           {[fabric.manufacturer, fabric.size].filter(Boolean).join(" · ")}
         </p>
         <div className="flex items-center gap-1.5 mt-1.5 flex-wrap">
@@ -66,7 +66,7 @@ export function FabricCard({ fabric }: FabricCardProps) {
             {badge.label}
           </span>
           {countLabel && (
-            <span className="inline-block px-2.5 py-0.5 rounded-full font-nunito text-[10px] font-bold bg-[#F5EEE8] text-[#896E66]">
+            <span className="inline-block px-2.5 py-0.5 rounded-full font-nunito text-[10px] font-bold bg-[#F5EEE8] text-[#6B544D]">
               {countLabel}
             </span>
           )}

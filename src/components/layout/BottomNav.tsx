@@ -24,7 +24,7 @@ export function BottomNav() {
               href={href}
               data-tutorial-id={tutorialId}
               className={`flex flex-col items-center justify-center gap-0.5 flex-1 min-h-[56px] transition-colors ${
-                isActive ? "text-[#B36050]" : "text-[#896E66]"
+                isActive ? "text-[#B36050]" : "text-[#6B544D]"
               }`}
             >
               <Icon

@@ -66,7 +66,7 @@ export function WipJournal({ patternId, currentPct, currentStitches }: WipJourna
           onChange={(e) => setNote(e.target.value)}
           placeholder="How's it coming along? Any challenges? Thoughts on the colors…"
           rows={3}
-          className="w-full px-3 py-2.5 rounded-xl border border-[#E4D6C8] font-nunito text-[14px] text-[#3A2418] bg-[#FAF6F0] focus:outline-none focus:border-[#B36050] resize-none placeholder:text-[#C4AFA6]"
+          className="w-full px-3 py-2.5 rounded-xl border border-[#E4D6C8] font-nunito text-[14px] text-[#3A2418] bg-[#FAF6F0] focus:outline-none focus:border-[#B36050] resize-none placeholder:text-[#9A8578]"
         />
         <button
           onClick={submit}
@@ -86,7 +86,7 @@ export function WipJournal({ patternId, currentPct, currentStitches }: WipJourna
               className="bg-[#FAF6F0] border border-[#E4D6C8] rounded-2xl px-4 py-3"
             >
               <div className="flex items-center justify-between mb-1.5">
-                <span className="font-nunito text-[11px] text-[#896E66]">
+                <span className="font-nunito text-[11px] text-[#6B544D]">
                   {formatDateTime(entry.created_at)}
                 </span>
                 {entry.pct_at_time !== null && (
@@ -99,7 +99,7 @@ export function WipJournal({ patternId, currentPct, currentStitches }: WipJourna
                 {entry.note}
               </p>
               {entry.stitches_at_time !== null && entry.stitches_at_time > 0 && (
-                <p className="font-nunito text-[11px] text-[#896E66] mt-1">
+                <p className="font-nunito text-[11px] text-[#6B544D] mt-1">
                   {entry.stitches_at_time.toLocaleString()} stitches
                 </p>
               )}
@@ -109,7 +109,7 @@ export function WipJournal({ patternId, currentPct, currentStitches }: WipJourna
       )}
 
       {!loading && entries.length === 0 && (
-        <p className="font-nunito text-[13px] text-[#B6A090] text-center py-2">
+        <p className="font-nunito text-[13px] text-[#9A8578] text-center py-2">
           No notes yet — add your first progress update above!
         </p>
       )}

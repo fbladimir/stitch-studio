@@ -238,7 +238,7 @@ export function KitForm({ mode, initialData }: KitFormProps) {
         ) : (
           <div className="w-full aspect-[4/3] rounded-2xl border-2 border-dashed border-[#E4D6C8] bg-[#FAF6F0] flex flex-col items-center justify-center mb-3 gap-2">
             <span className="text-5xl opacity-20">🧺</span>
-            <p className="font-nunito text-[12px] text-[#B6A090]">
+            <p className="font-nunito text-[12px] text-[#9A8578]">
               Photo of the kit packaging
             </p>
           </div>
@@ -323,7 +323,7 @@ export function KitForm({ mode, initialData }: KitFormProps) {
                   className={`flex-1 flex items-center justify-center gap-2 h-11 rounded-xl font-nunito font-semibold text-[13px] transition-all duration-200 active:scale-[0.97] ${
                     isActive
                       ? "bg-white text-[#3A2418] shadow-sm"
-                      : "text-[#B6A090]"
+                      : "text-[#9A8578]"
                   }`}
                   style={{
                     boxShadow: isActive ? "0 1px 4px rgba(58,36,24,0.10)" : undefined,
@@ -344,7 +344,7 @@ export function KitForm({ mode, initialData }: KitFormProps) {
           <p className="font-playfair font-bold text-[16px] text-[#3A2418]">
             What&apos;s Included
           </p>
-          <p className="font-nunito text-[12px] text-[#B6A090] mt-0.5">
+          <p className="font-nunito text-[12px] text-[#9A8578] mt-0.5">
             Tap everything that came in the box
           </p>
         </div>
@@ -360,7 +360,7 @@ export function KitForm({ mode, initialData }: KitFormProps) {
                 className={`flex items-center gap-2 h-11 px-4 rounded-full border font-nunito font-semibold text-[13px] transition-all duration-150 active:scale-[0.96] ${
                   checked
                     ? "bg-[#FDF4F1] border-[#B36050] text-[#B36050]"
-                    : "bg-white border-[#E4D6C8] text-[#896E66]"
+                    : "bg-white border-[#E4D6C8] text-[#6B544D]"
                 }`}
               >
                 <span>{emoji}</span>
@@ -420,7 +420,7 @@ export function KitForm({ mode, initialData }: KitFormProps) {
       <button
         type="button"
         onClick={() => router.back()}
-        className="w-full h-12 rounded-full border border-[#E4D6C8] text-[#896E66] font-nunito font-semibold text-[14px] active:scale-[0.98]"
+        className="w-full h-12 rounded-full border border-[#E4D6C8] text-[#6B544D] font-nunito font-semibold text-[14px] active:scale-[0.98]"
       >
         Cancel
       </button>

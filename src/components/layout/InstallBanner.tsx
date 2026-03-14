@@ -47,7 +47,7 @@ export function InstallBanner() {
         {/* Close */}
         <button
           onClick={dismiss}
-          className="absolute top-3 right-3 w-8 h-8 rounded-full bg-[#FAF6F0] flex items-center justify-center text-[#896E66] text-sm active:scale-90"
+          className="absolute top-3 right-3 w-8 h-8 rounded-full bg-[#FAF6F0] flex items-center justify-center text-[#6B544D] text-sm active:scale-90"
         >
           ×
         </button>
@@ -60,7 +60,7 @@ export function InstallBanner() {
             <p className="font-nunito font-bold text-[14px] text-[#3A2418]">
               Add to Home Screen
             </p>
-            <p className="font-nunito text-[12px] text-[#896E66]">
+            <p className="font-nunito text-[12px] text-[#6B544D]">
               Get the full app experience!
             </p>
           </div>
@@ -95,7 +95,7 @@ export function InstallBanner() {
 
         <button
           onClick={dismiss}
-          className="w-full h-10 rounded-full border border-[#E4D6C8] text-[#896E66] font-nunito font-semibold text-[13px] active:scale-[0.98]"
+          className="w-full h-10 rounded-full border border-[#E4D6C8] text-[#6B544D] font-nunito font-semibold text-[13px] active:scale-[0.98]"
         >
           Maybe later
         </button>

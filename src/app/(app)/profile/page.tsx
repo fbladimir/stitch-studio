@@ -89,7 +89,7 @@ export default function ProfilePage() {
 
           {/* Dogs */}
           {dogs.length > 0 && (
-            <p className="font-nunito text-[13px] text-[#896E66] mt-1">
+            <p className="font-nunito text-[13px] text-[#6B544D] mt-1">
               {dogs.map((d) => `${d.emoji} ${d.name}`).join(" · ")}
             </p>
           )}

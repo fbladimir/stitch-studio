@@ -19,7 +19,7 @@ export function XpBar({ totalXp }: XpBarProps) {
           Level {level.level}
         </span>
         {!isMaxLevel && (
-          <span className="font-nunito text-[10px] text-[#896E66]">
+          <span className="font-nunito text-[10px] text-[#6B544D]">
             {current} / {needed} XP
           </span>
         )}

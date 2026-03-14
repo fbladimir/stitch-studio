@@ -40,7 +40,7 @@ function statusLabel(p: RecentPattern) {
   if (p.completion_date) return { text: "Finished ✓", classes: "bg-[#EBF2EC] text-[#5F7A63]" };
   if (p.wip) return { text: `WIP · ${p.wip_pct}%`, classes: "bg-[#FBF5E8] text-[#AE7C2A]" };
   if (p.kitted) return { text: "Kitted", classes: "bg-[#FDF4F1] text-[#B36050]" };
-  return { text: "Not started", classes: "bg-[#F5EEE8] text-[#896E66]" };
+  return { text: "Not started", classes: "bg-[#F5EEE8] text-[#6B544D]" };
 }
 
 function daysSince(date: string | null): number | null {
@@ -272,7 +272,7 @@ export default function DashboardPage() {
               </div>
 
               {allDogs.length > 0 && (
-                <p className="font-nunito text-[13px] text-[#896E66] mt-1.5">
+                <p className="font-nunito text-[13px] text-[#6B544D] mt-1.5">
                   {dogs.map((d) => `${d.emoji} ${d.name}`).join(" & ")}{" "}
                   send tail wags 🐾
                 </p>
@@ -302,7 +302,7 @@ export default function DashboardPage() {
                 { value: stats!.totalPatterns, label: "Patterns", icon: "📖", color: "text-[#B36050]", href: "/patterns" },
                 { value: stats!.wips, label: "In Progress", icon: "⏱️", color: "text-[#AE7C2A]", href: "/patterns?filter=wip" },
                 { value: stats!.finished, label: "Finished", icon: "✓", color: "text-[#5F7A63]", href: "/patterns?filter=finished" },
-                { value: stats!.threads, label: "Threads", icon: "🧵", color: "text-[#896E66]", href: "/threads" },
+                { value: stats!.threads, label: "Threads", icon: "🧵", color: "text-[#6B544D]", href: "/threads" },
               ].map(({ value, label, icon, color, href }) => (
                 <Link
                   key={label}
@@ -315,7 +315,7 @@ export default function DashboardPage() {
                     <p className={`font-playfair text-2xl font-bold leading-none ${color}`}>
                       {value}
                     </p>
-                    <p className="font-nunito text-[11px] text-[#896E66] font-semibold mt-0.5 uppercase tracking-wide">
+                    <p className="font-nunito text-[11px] text-[#6B544D] font-semibold mt-0.5 uppercase tracking-wide">
                       {label}
                     </p>
                   </div>
@@ -358,7 +358,7 @@ export default function DashboardPage() {
                   <p className="font-nunito font-bold text-[13px] text-[#3A2418] leading-tight">
                     {label}
                   </p>
-                  <p className="font-nunito text-[11px] text-[#896E66] mt-0.5">
+                  <p className="font-nunito text-[11px] text-[#6B544D] mt-0.5">
                     {desc}
                   </p>
                 </div>
@@ -385,7 +385,7 @@ export default function DashboardPage() {
                   <p className="font-nunito font-bold text-[13px] text-[#3A2418]">
                     &ldquo;{wipNudge.name}&rdquo; is waiting for you!
                   </p>
-                  <p className="font-nunito text-[12px] text-[#896E66] mt-0.5">
+                  <p className="font-nunito text-[12px] text-[#6B544D] mt-0.5">
                     {wipNudge.last_progress_date
                       ? `No update in ${daysSince(wipNudge.last_progress_date)} days — ready to keep going?`
                       : "You haven't logged any progress yet — ready to start?"}
@@ -423,7 +423,7 @@ export default function DashboardPage() {
               <p className="font-nunito font-bold text-[14px] text-[#3A2418]">
                 No patterns yet!
               </p>
-              <p className="font-nunito text-[12px] text-[#896E66] mt-1">
+              <p className="font-nunito text-[12px] text-[#6B544D] mt-1">
                 Tap &ldquo;Scan New Pattern&rdquo; above to add your first one.
               </p>
             </div>
@@ -458,7 +458,7 @@ export default function DashboardPage() {
                         {p.name}
                       </p>
                       {p.designer && (
-                        <p className="font-nunito text-[11px] text-[#896E66] mt-0.5 truncate">
+                        <p className="font-nunito text-[11px] text-[#6B544D] mt-0.5 truncate">
                           {p.designer}
                         </p>
                       )}

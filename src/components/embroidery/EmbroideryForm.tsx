@@ -251,7 +251,7 @@ export function EmbroideryForm({ mode, initialData }: EmbroideryFormProps) {
         ) : (
           <div className="w-full aspect-[4/3] rounded-2xl border-2 border-dashed border-[#E4D6C8] bg-[#FAF6F0] flex flex-col items-center justify-center mb-3 gap-2">
             <span className="text-5xl opacity-20">🌸</span>
-            <p className="font-nunito text-[12px] text-[#B6A090]">
+            <p className="font-nunito text-[12px] text-[#9A8578]">
               Photo of the pattern or design
             </p>
           </div>
@@ -335,7 +335,7 @@ export function EmbroideryForm({ mode, initialData }: EmbroideryFormProps) {
           <p className="font-playfair font-bold text-[16px] text-[#3A2418]">
             Stitch Types
           </p>
-          <p className="font-nunito text-[12px] text-[#B6A090] mt-0.5">
+          <p className="font-nunito text-[12px] text-[#9A8578] mt-0.5">
             Type a stitch and press Enter to add it
           </p>
         </div>
@@ -402,7 +402,7 @@ export function EmbroideryForm({ mode, initialData }: EmbroideryFormProps) {
                   className={`h-10 px-4 rounded-full border font-nunito font-semibold text-[13px] transition-all duration-150 active:scale-[0.96] ${
                     isActive
                       ? "bg-[#FDF4F1] border-[#B36050] text-[#B36050]"
-                      : "bg-white border-[#E4D6C8] text-[#896E66]"
+                      : "bg-white border-[#E4D6C8] text-[#6B544D]"
                   }`}
                 >
                   {t}
@@ -426,7 +426,7 @@ export function EmbroideryForm({ mode, initialData }: EmbroideryFormProps) {
                   className={`h-10 px-4 rounded-full border font-nunito font-semibold text-[13px] transition-all duration-150 active:scale-[0.96] ${
                     isActive
                       ? "bg-[#FDF4F1] border-[#B36050] text-[#B36050]"
-                      : "bg-white border-[#E4D6C8] text-[#896E66]"
+                      : "bg-white border-[#E4D6C8] text-[#6B544D]"
                   }`}
                 >
                   {f}
@@ -476,7 +476,7 @@ export function EmbroideryForm({ mode, initialData }: EmbroideryFormProps) {
       <button
         type="button"
         onClick={() => router.back()}
-        className="w-full h-12 rounded-full border border-[#E4D6C8] text-[#896E66] font-nunito font-semibold text-[14px] active:scale-[0.98]"
+        className="w-full h-12 rounded-full border border-[#E4D6C8] text-[#6B544D] font-nunito font-semibold text-[14px] active:scale-[0.98]"
       >
         Cancel
       </button>

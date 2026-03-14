@@ -157,7 +157,7 @@ export default function KittingPage() {
               <p className="font-playfair font-bold text-[18px] text-[#3A2418] mt-2">
                 Kitting Check
               </p>
-              <p className="font-nunito text-[13px] text-[#896E66] mt-1">
+              <p className="font-nunito text-[13px] text-[#6B544D] mt-1">
                 Select a pattern to check if you have all the threads and fabric
               </p>
             </div>
@@ -180,7 +180,7 @@ export default function KittingPage() {
               </div>
             ) : filtered.length === 0 ? (
               <div className="text-center py-8">
-                <p className="font-nunito text-[13px] text-[#896E66]">
+                <p className="font-nunito text-[13px] text-[#6B544D]">
                   {patterns.length === 0
                     ? "Add some patterns first, then come back to check your kitting!"
                     : "No patterns match your search"}
@@ -198,7 +198,7 @@ export default function KittingPage() {
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={p.cover_photo_url}
-                        alt=""
+                        alt={p.name}
                         className="w-12 h-12 rounded-lg object-cover flex-shrink-0"
                         loading="lazy"
                       />
@@ -212,7 +212,7 @@ export default function KittingPage() {
                         {p.name}
                       </p>
                       {p.designer && (
-                        <p className="font-nunito text-[12px] text-[#896E66] truncate">
+                        <p className="font-nunito text-[12px] text-[#6B544D] truncate">
                           {p.designer}
                         </p>
                       )}
@@ -236,7 +236,7 @@ export default function KittingPage() {
             <p className="font-nunito font-semibold text-[14px] text-[#3A2418]">
               Checking your stash...
             </p>
-            <p className="font-nunito text-[12px] text-[#896E66]">
+            <p className="font-nunito text-[12px] text-[#6B544D]">
               Comparing threads and fabric for &ldquo;{selectedPattern?.name}&rdquo;
             </p>
           </div>
@@ -262,7 +262,7 @@ export default function KittingPage() {
                 setKittingResult(null);
                 setSelectedPattern(null);
               }}
-              className="w-full h-11 rounded-full border border-[#E4D6C8] text-[#896E66] font-nunito font-semibold text-[14px] active:scale-[0.98]"
+              className="w-full h-11 rounded-full border border-[#E4D6C8] text-[#6B544D] font-nunito font-semibold text-[14px] active:scale-[0.98]"
             >
               Check another pattern
             </button>

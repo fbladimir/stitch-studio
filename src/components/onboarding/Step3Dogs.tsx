@@ -40,7 +40,7 @@ export function Step3Dogs({ onNext }: Step3DogsProps) {
         <h1 className="font-playfair text-3xl font-bold text-[#3A2418]">
           Got pets?
         </h1>
-        <p className="text-[#896E66] text-base leading-relaxed">
+        <p className="text-[#6B544D] text-base leading-relaxed">
           Tell us about your fur babies — they&apos;ll send you tail wags on the home screen!
         </p>
       </div>
@@ -113,7 +113,7 @@ export function Step3Dogs({ onNext }: Step3DogsProps) {
             <button
               type="button"
               onClick={() => setShowAdd(false)}
-              className="px-5 h-12 rounded-full border border-[#E4D6C8] text-[#896E66] text-sm font-medium hover:bg-white transition-colors"
+              className="px-5 h-12 rounded-full border border-[#E4D6C8] text-[#6B544D] text-sm font-medium hover:bg-white transition-colors"
             >
               Cancel
             </button>
@@ -123,7 +123,7 @@ export function Step3Dogs({ onNext }: Step3DogsProps) {
         <button
           type="button"
           onClick={() => setShowAdd(true)}
-          className="w-full h-14 flex items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-[#E4D6C8] text-[#896E66] hover:border-[#B36050] hover:text-[#B36050] hover:bg-[#FDF4F1] transition-all font-medium"
+          className="w-full h-14 flex items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-[#E4D6C8] text-[#6B544D] hover:border-[#B36050] hover:text-[#B36050] hover:bg-[#FDF4F1] transition-all font-medium"
         >
           <Plus size={20} />
           Add a pet

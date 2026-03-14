@@ -83,7 +83,7 @@ function DogCell({ dog, index }: { dog: Dog; index: number }) {
       }}
     >
       <span className="text-4xl leading-none">{dog.emoji}</span>
-      <span className="text-[11px] font-bold font-nunito text-[#896E66] text-center leading-tight max-w-[52px] truncate">
+      <span className="text-[11px] font-bold font-nunito text-[#6B544D] text-center leading-tight max-w-[52px] truncate">
         {dog.name}
       </span>
     </div>
@@ -200,7 +200,7 @@ export function DailyGreeting({ onDismiss, onSkipped }: DailyGreetingProps) {
           className="text-center"
           style={{ animation: "fadeSlideUp 0.55s ease-out 0.1s both" }}
         >
-          <p className="font-nunito text-sm font-semibold text-[#896E66] uppercase tracking-widest mb-1">
+          <p className="font-nunito text-sm font-semibold text-[#6B544D] uppercase tracking-widest mb-1">
             {greeting}
           </p>
           <h1 className="font-playfair text-4xl font-bold text-[#3A2418] leading-tight">
@@ -217,7 +217,7 @@ export function DailyGreeting({ onDismiss, onSkipped }: DailyGreetingProps) {
             className="w-full"
             style={{ animation: "fadeSlideUp 0.55s ease-out 0.22s both" }}
           >
-            <p className="text-center font-nunito text-[11px] font-bold text-[#B6A090] uppercase tracking-widest mb-4">
+            <p className="text-center font-nunito text-[11px] font-bold text-[#9A8578] uppercase tracking-widest mb-4">
               Your fur babies are cheering you on 🐾
             </p>
             <div className="flex flex-wrap justify-center gap-4">

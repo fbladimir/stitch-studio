@@ -306,7 +306,7 @@ export default function IntroPage() {
         </div>
         <button
           onClick={skip}
-          className="font-nunito text-[13px] font-semibold text-[#B6A090] active:opacity-60 transition-opacity px-2 py-1"
+          className="font-nunito text-[13px] font-semibold text-[#9A8578] active:opacity-60 transition-opacity px-2 py-1"
         >
           Skip
         </button>
@@ -352,7 +352,7 @@ export default function IntroPage() {
             <h1 className="font-playfair text-[26px] font-bold text-[#3A2418] leading-tight mb-3">
               {slide.title}
             </h1>
-            <p className="font-nunito text-[15px] text-[#896E66] leading-relaxed">
+            <p className="font-nunito text-[15px] text-[#6B544D] leading-relaxed">
               {slide.body}
             </p>
 

@@ -347,7 +347,7 @@ function TooltipContent({
           <p className="font-playfair text-[16px] font-bold text-[#3A2418] leading-tight">
             {currentStep.title}
           </p>
-          <p className="font-nunito text-[13px] text-[#896E66] mt-1 leading-relaxed">
+          <p className="font-nunito text-[13px] text-[#6B544D] mt-1 leading-relaxed">
             {currentStep.description}
           </p>
         </div>
@@ -378,7 +378,7 @@ function TooltipContent({
           {!isLastStep && (
             <button
               onClick={skipTutorial}
-              className="font-nunito text-[12px] font-semibold text-[#B6A090] px-3 py-2 active:opacity-60 transition-opacity"
+              className="font-nunito text-[12px] font-semibold text-[#9A8578] px-3 py-2 active:opacity-60 transition-opacity"
             >
               Skip
             </button>

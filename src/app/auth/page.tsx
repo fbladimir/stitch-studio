@@ -35,7 +35,7 @@ function AuthCard() {
               className={`flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 ${
                 view === "signin"
                   ? "bg-white text-[#3A2418] shadow-sm"
-                  : "text-[#896E66] hover:text-[#3A2418]"
+                  : "text-[#6B544D] hover:text-[#3A2418]"
               }`}
             >
               Sign in
@@ -45,7 +45,7 @@ function AuthCard() {
               className={`flex-1 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200 ${
                 view === "signup"
                   ? "bg-white text-[#3A2418] shadow-sm"
-                  : "text-[#896E66] hover:text-[#3A2418]"
+                  : "text-[#6B544D] hover:text-[#3A2418]"
               }`}
             >
               Create account
@@ -82,7 +82,7 @@ export default function AuthPage() {
             <h1 className="font-playfair text-4xl font-bold text-[#3A2418] tracking-tight">
               Stitch Studio
             </h1>
-            <p className="text-[#896E66] mt-2 text-base">
+            <p className="text-[#6B544D] mt-2 text-base">
               Your cross stitch companion
             </p>
           </div>

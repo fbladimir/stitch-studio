@@ -113,6 +113,8 @@ export function StatusToggles({ pattern, onUpdate }: StatusTogglesProps) {
       <button
         onClick={toggleKitted}
         disabled={saving !== null}
+        role="switch"
+        aria-checked={pattern.kitted}
         className={`flex items-center justify-between w-full px-4 py-3.5 rounded-2xl border transition-colors active:scale-[0.99] ${
           pattern.kitted
             ? "bg-[#FDF4F1] border-[#F0C8BB]"
@@ -125,7 +127,7 @@ export function StatusToggles({ pattern, onUpdate }: StatusTogglesProps) {
             <p className="font-nunito font-bold text-[14px] text-[#3A2418]">
               Kitted
             </p>
-            <p className="font-nunito text-[11px] text-[#896E66]">
+            <p className="font-nunito text-[11px] text-[#6B544D]">
               {pattern.kitted
                 ? "Supplies gathered ✓"
                 : "Tap when you've gathered all supplies"}
@@ -139,6 +141,8 @@ export function StatusToggles({ pattern, onUpdate }: StatusTogglesProps) {
       <button
         onClick={toggleWip}
         disabled={saving !== null || isFinished}
+        role="switch"
+        aria-checked={pattern.wip}
         className={`flex items-center justify-between w-full px-4 py-3.5 rounded-2xl border transition-colors active:scale-[0.99] ${
           pattern.wip
             ? "bg-[#FBF5E8] border-[#E8D5A0]"
@@ -151,7 +155,7 @@ export function StatusToggles({ pattern, onUpdate }: StatusTogglesProps) {
             <p className="font-nunito font-bold text-[14px] text-[#3A2418]">
               Work in Progress
             </p>
-            <p className="font-nunito text-[11px] text-[#896E66]">
+            <p className="font-nunito text-[11px] text-[#6B544D]">
               {pattern.wip
                 ? `${pattern.wip_pct}% complete`
                 : "Tap when you start stitching"}
@@ -165,6 +169,8 @@ export function StatusToggles({ pattern, onUpdate }: StatusTogglesProps) {
       <button
         onClick={toggleFinished}
         disabled={saving !== null}
+        role="switch"
+        aria-checked={isFinished}
         className={`flex items-center justify-between w-full px-4 py-3.5 rounded-2xl border transition-colors active:scale-[0.99] ${
           isFinished
             ? "bg-[#EBF2EC] border-[#C0D4C2]"
@@ -177,7 +183,7 @@ export function StatusToggles({ pattern, onUpdate }: StatusTogglesProps) {
             <p className="font-nunito font-bold text-[14px] text-[#3A2418]">
               Finished
             </p>
-            <p className="font-nunito text-[11px] text-[#896E66]">
+            <p className="font-nunito text-[11px] text-[#6B544D]">
               {isFinished
                 ? `Completed ${formatDate(pattern.completion_date!)}`
                 : "Tap when it's done!"}

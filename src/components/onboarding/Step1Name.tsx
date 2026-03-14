@@ -35,7 +35,7 @@ export function Step1Name({ initialName, onNext }: Step1NameProps) {
         <h1 className="font-playfair text-3xl font-bold text-[#3A2418]">
           What should we call you?
         </h1>
-        <p className="text-[#896E66] text-base leading-relaxed">
+        <p className="text-[#6B544D] text-base leading-relaxed">
           This is how your app will greet you each day.
         </p>
       </div>
@@ -48,7 +48,7 @@ export function Step1Name({ initialName, onNext }: Step1NameProps) {
           id="display_name"
           placeholder="e.g. Margaret"
           autoFocus
-          className="h-14 text-lg rounded-xl border-[#E4D6C8] bg-white focus-visible:ring-[#B36050] placeholder:text-[#C4A898] text-center"
+          className="h-14 text-lg rounded-xl border-[#E4D6C8] bg-white focus-visible:ring-[#B36050] placeholder:text-[#9A8578] text-center"
           {...register("display_name")}
         />
         {errors.display_name && (

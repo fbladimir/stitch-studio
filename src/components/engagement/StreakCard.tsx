@@ -38,11 +38,11 @@ export function StreakCard({ currentStreak, longestStreak, lastActivityDate }: S
             <span className="font-playfair text-2xl font-bold text-[#AE7C2A] leading-none">
               {currentStreak}
             </span>
-            <span className="font-nunito text-[11px] font-semibold text-[#896E66] uppercase tracking-wide">
+            <span className="font-nunito text-[11px] font-semibold text-[#6B544D] uppercase tracking-wide">
               {currentStreak === 1 ? "day" : "days"}
             </span>
           </div>
-          <p className="font-nunito text-[12px] text-[#896E66] mt-0.5 truncate">
+          <p className="font-nunito text-[12px] text-[#6B544D] mt-0.5 truncate">
             {message}
           </p>
         </div>
