@@ -897,7 +897,7 @@ NEVER force camera-only. NEVER force upload-only.
 ## ✅ PROGRESS LOG
 
 ### HANDOFF NOTE
-> Session 11 complete. **Phase 13 (App Tutorial Onboarding) is fully built.** The tutorial is a guided tour overlay with Roku (the aussie doodle from the intro) as narrator. It uses spotlight cutouts via CSS mask on targeted elements (via `data-tutorial-id` attributes), positioned tooltips with Roku's SVG avatar, and progress dots. 8 steps: greeting → quick actions → recent patterns → 4 bottom nav tabs → final "You're all set!" screen. Auto-triggers on first dashboard load when `tutorial_complete === false` (800ms delay). Skip or complete sets `tutorial_complete = true` in Supabase. "Restart App Tour" button added to Profile page (resets flag + navigates to dashboard). No schema changes needed — `tutorial_complete` and `tutorial_skipped_at` columns already existed from Phase 15 migration. **New files:** `src/hooks/useTutorial.ts`, `src/components/tutorial/TutorialOverlay.tsx`. **Modified:** appStore.ts (tutorial state), dashboard/page.tsx (data-tutorial-id attrs + auto-trigger), layout.tsx (mount TutorialOverlay), profile/page.tsx (restart button), globals.css (2 new keyframes). **Next session:** Phase 12 (Polish + Launch) or Phase 14 (cross-stitch app import). Phase 15b (digests/wrapped/nudges) still deferred.
+> Session 11 complete. **Phase 13 (App Tutorial Onboarding) is fully built and bug-fixed.** Built the guided tour overlay with Roku narrator, spotlight cutouts, positioned tooltips, and 8 steps. Initially used CSS `mask-composite` for spotlight which broke on iOS Safari — rewrote to use SVG `<mask>` approach which works on all browsers. Also fixed `touchAction: "none"` blocking mobile touch events — switched to `pointerEvents` model. **Engagement system wired into creation flows:** `recordActivity()` now called when adding patterns (PatternForm), kits (KitForm), embroidery (EmbroideryForm), and threads (threads/new) — XP, streaks, achievements, and challenge progress all fire on creation. **Dashboard top safe area fixed:** PageWrapper now uses `max(16px, env(safe-area-inset-top))` so the greeting header doesn't get cut off behind iPhone notch/dynamic island. **Next session: Phase 12 (Polish + Launch)** — toast notifications, error boundaries, 404 page, final Lighthouse audit, then share with Mom. Phase 14 (app import) and Phase 15b (digests/wrapped/nudges) still deferred.
 
 ---
 
@@ -1786,6 +1786,30 @@ src/hooks/useEngagement.ts   ← loads streak, achievements, challenges for curr
 6. `nav-shop` — "In-store helper" — Shop tab
 7. `nav-ai` — "Your AI advisor" — AI tab
 8. Final — "You're all set! Happy stitching! ✿" — center card, no spotlight
+
+---
+
+### Session 11 Bug Fixes — ✅ DONE (2026-03-14)
+
+**Tutorial overlay broken on iOS Safari:**
+- [x] CSS `mask-composite: exclude` / `-webkit-mask-composite: xor` does NOT work on iOS Safari — backdrop was fully opaque, blocking everything
+- [x] Rewrote TutorialOverlay to use SVG `<mask>` element for spotlight cutout — works on all browsers
+- [x] Removed `touchAction: "none"` from overlay container — was blocking ALL touch events on mobile
+- [x] Switched to `pointerEvents: "none"` on container, `pointerEvents: "auto"` on SVG backdrop and tooltip
+- [x] Added smart `scrollIntoView` skip for fixed elements (bottom nav) — prevents weird page scroll
+- [x] Tooltip positioning now auto-detects space above/below and picks the best side
+- [x] Increased button touch targets (h-10, px-6) for easier mobile tapping
+
+**Engagement not firing on creation:**
+- [x] PatternForm — `recordActivity("add_pattern")` on create — src/components/patterns/PatternForm.tsx
+- [x] KitForm — `recordActivity("add_pattern")` on create — src/components/kits/KitForm.tsx
+- [x] EmbroideryForm — `recordActivity("add_pattern")` on create — src/components/embroidery/EmbroideryForm.tsx
+- [x] threads/new — `recordActivity("add_thread_inventory")` on create — src/app/(app)/threads/new/page.tsx
+- [x] All four now import `useEngagement` hook and call `recordActivity` before `router.push()`
+
+**Dashboard greeting cut off on iPhone:**
+- [x] PageWrapper `pt-4` replaced with `style={{ paddingTop: "max(16px, env(safe-area-inset-top))" }}`
+- [x] Greeting header now clears iPhone notch/dynamic island on all devices
 
 ---
 
