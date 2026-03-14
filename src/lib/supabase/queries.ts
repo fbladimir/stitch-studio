@@ -1,6 +1,6 @@
 // All database query functions
 import { createClient } from "./client";
-import type { Pattern, PatternThread, WipJournalEntry } from "@/types";
+import type { Pattern, PatternThread, WipJournalEntry, ThreadInventoryItem } from "@/types";
 
 
 // ── Patterns ─────────────────────────────────────────────────
@@ -300,4 +300,75 @@ export async function deleteEmbroidery(id: string) {
   const supabase = createClient();
   const { error } = await supabase.from("patterns").delete().eq("id", id);
   return { error };
+}
+
+// ── Thread Inventory ──────────────────────────────────────────
+
+export async function getThreadInventory(userId: string) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("thread_inventory")
+    .select("*")
+    .eq("user_id", userId)
+    .order("manufacturer", { ascending: true })
+    .order("color_number", { ascending: true });
+  return { data: data as ThreadInventoryItem[] | null, error };
+}
+
+export async function getThreadInventoryItem(id: string) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("thread_inventory")
+    .select("*")
+    .eq("id", id)
+    .single();
+  return { data: data as ThreadInventoryItem | null, error };
+}
+
+export async function createThreadInventoryItem(
+  userId: string,
+  item: Omit<ThreadInventoryItem, "id" | "user_id" | "created_at" | "updated_at">
+) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("thread_inventory")
+    .insert({ ...item, user_id: userId })
+    .select()
+    .single();
+  return { data: data as ThreadInventoryItem | null, error };
+}
+
+export async function updateThreadInventoryItem(
+  id: string,
+  updates: Partial<Omit<ThreadInventoryItem, "id" | "user_id" | "created_at" | "updated_at">>
+) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("thread_inventory")
+    .update({ ...updates, updated_at: new Date().toISOString() })
+    .eq("id", id)
+    .select()
+    .single();
+  return { data: data as ThreadInventoryItem | null, error };
+}
+
+export async function deleteThreadInventoryItem(id: string) {
+  const supabase = createClient();
+  const { error } = await supabase.from("thread_inventory").delete().eq("id", id);
+  return { error };
+}
+
+export async function getPatternsUsingThread(
+  userId: string,
+  manufacturer: string,
+  colorNumber: string
+) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("pattern_threads")
+    .select("pattern_id, patterns!inner(id, name, designer, cover_photo_url, type, wip, completion_date, user_id)")
+    .eq("manufacturer", manufacturer)
+    .eq("color_number", colorNumber)
+    .eq("patterns.user_id", userId);
+  return { data, error };
 }
