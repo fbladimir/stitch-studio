@@ -898,7 +898,7 @@ NEVER force camera-only. NEVER force upload-only.
 ## ✅ PROGRESS LOG
 
 ### HANDOFF NOTE
-> Session 13. **Fixed new-user signup bug:** DailyGreeting overlay and TutorialOverlay were both firing simultaneously for new users — tutorial started while greeting covered the screen, so users couldn't see what was being highlighted. Fix: DailyGreeting now accepts `onDismiss`/`onSkipped` callbacks; dashboard defers tutorial start until greeting is dismissed (or skipped if already seen today). Also ran a code-level Lighthouse audit identifying: 4 empty alt texts, icon-only buttons missing aria-labels, modals missing `role="dialog"`, and muted text color contrast issues (#896E66 on #FAF6F0 fails WCAG AA). **Next session:** Fix Lighthouse accessibility issues, then share with Mom. Phase 14 (app import) and Phase 15b (digests/wrapped/nudges) still deferred.
+> Session 13 complete. **Fixed two new-user signup bugs:** (1) DailyGreeting + Tutorial collision — both overlays fired simultaneously for new users; fixed by adding `onDismiss`/`onSkipped` callbacks to DailyGreeting so tutorial only starts after greeting is dismissed. (2) InstallBanner overlapping onboarding — the "Add to Home Screen" banner appeared 2s after dashboard load, covering greeting/tutorial; fixed by checking `isTutorialActive` from Zustand to suppress it during tutorial. Also ran a full code-level Lighthouse audit identifying accessibility issues (alt text, aria-labels, dialog roles, contrast). **Next session:** Fix Lighthouse accessibility issues (quick wins — alt text, aria-labels, dialog roles, contrast fix from #896E66 to ~#6B544D), then share with Mom. Phase 14 (app import) and Phase 15b (digests/wrapped/nudges) still deferred.
 
 ---
 
@@ -1856,6 +1856,11 @@ Steps 1-3 same as mobile, then individual side nav items (nav-patterns, nav-stas
 - [x] Dashboard uses `needsTutorialRef` to defer tutorial start until greeting is dismissed or skipped — src/app/(app)/dashboard/page.tsx
 - [x] Flow: greeting shows → user taps "Let's stitch!" → greeting dismisses → `onDismiss` fires → tutorial starts after 800ms
 - [x] If greeting already seen today: `onSkipped` fires immediately → tutorial starts right away (no delay from greeting)
+
+**Install banner overlapping onboarding for new users:**
+- [x] Bug: InstallBanner showed 2s after landing on dashboard, overlapping DailyGreeting and tutorial for new users
+- [x] Fix: InstallBanner now reads `isTutorialActive` from Zustand — suppressed while tutorial is active — src/components/layout/InstallBanner.tsx
+- [x] Banner re-evaluates when `isTutorialActive` changes, so it shows naturally after tutorial completes (if on iOS Safari)
 
 **Lighthouse code audit completed (issues identified, fixes deferred to next session):**
 - 4 empty `alt=""` on images (store-mode, kitting)
