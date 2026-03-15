@@ -5,6 +5,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { PageWrapper } from "@/components/layout/PageWrapper";
 import { DailyGreeting } from "@/components/dashboard/DailyGreeting";
+import { WhatsNewModal } from "@/components/whats-new/WhatsNewModal";
 import { StreakCard } from "@/components/engagement/StreakCard";
 import { ChallengeSection } from "@/components/engagement/ChallengeSection";
 import { LevelBadge } from "@/components/engagement/LevelBadge";
@@ -117,6 +118,7 @@ export default function DashboardPage() {
   const [recent, setRecent] = useState<RecentPattern[] | null>(null);
   const [wipNudge, setWipNudge] = useState<RecentPattern | null>(null);
   const [challenges, setChallenges] = useState<ChallengeProgress[]>([]);
+  const [greetingDone, setGreetingDone] = useState(false);
   const setTutorialActive = useAppStore((s) => s.setTutorialActive);
   const needsTutorialRef = useRef(false);
 
@@ -220,6 +222,10 @@ export default function DashboardPage() {
     load();
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
+  const handleGreetingDone = useCallback(() => {
+    setGreetingDone(true);
+  }, []);
+
   const startTutorialIfNeeded = useCallback(() => {
     if (needsTutorialRef.current) {
       needsTutorialRef.current = false;
@@ -233,7 +239,8 @@ export default function DashboardPage() {
 
   return (
     <>
-      <DailyGreeting onDismiss={startTutorialIfNeeded} onSkipped={startTutorialIfNeeded} />
+      <DailyGreeting onDismiss={handleGreetingDone} onSkipped={handleGreetingDone} />
+      <WhatsNewModal ready={greetingDone} onDismiss={startTutorialIfNeeded} />
 
       <PageWrapper className="pb-8">
         {/* ── Greeting header ─────────────────────────────────── */}

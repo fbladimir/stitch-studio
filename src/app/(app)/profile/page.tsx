@@ -124,6 +124,13 @@ export default function ProfilePage() {
 
         {/* ── Actions ─────────────────────────────────────── */}
         <section className="space-y-3 mb-6">
+          <Link
+            href="/settings"
+            className="block w-full py-3 rounded-xl bg-white border border-[#E4D6C8] text-center font-nunito text-[14px] font-bold text-[#3A2418] active:scale-[0.98] transition-transform"
+          >
+            ⚙️ Settings & Import
+          </Link>
+
           <button
             onClick={restartTutorial}
             className="w-full py-3 rounded-xl bg-[#FDF4F1] border border-[#F0C8BB] text-center font-nunito text-[14px] font-bold text-[#B36050] active:scale-[0.98] transition-transform"
