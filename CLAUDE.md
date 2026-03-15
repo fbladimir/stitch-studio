@@ -675,6 +675,9 @@ stitch-studio/
     │   ├── profile/
     │   │   └── page.tsx               ← profile page (avatar, level, XP, streaks, achievements, sign out)
     │   │
+    │   ├── settings/
+    │   │   └── page.tsx               ← settings page (import from apps, export CSV, accessible from profile)
+    │   │
     │   ├── ai/
     │   │   └── page.tsx               ← AI advisor chat + scan tools (3 tabs: Advisor/Scan/Stash)
     │   │
@@ -746,13 +749,20 @@ stitch-studio/
     │   │   ├── LevelBadge.tsx           ← level pill with star + title (sm/md/lg)
     │   │   └── XpBar.tsx               ← progress bar toward next level
     │   │
-    │   └── store-mode/
-    │       ├── StoreModeShell.tsx       ← full-screen takeover UI
-    │       ├── ChartScanner.tsx         ← scan chart in store
-    │       ├── QuickThreadSearch.tsx
-    │       ├── QuickFabricSearch.tsx
-    │       ├── ShoppingListView.tsx
-    │       └── NearbyStores.tsx
+    │   ├── store-mode/
+    │   │   ├── StoreModeShell.tsx       ← full-screen takeover UI
+    │   │   ├── ChartScanner.tsx         ← scan chart in store
+    │   │   ├── QuickThreadSearch.tsx
+    │   │   ├── QuickFabricSearch.tsx
+    │   │   ├── ShoppingListView.tsx
+    │   │   └── NearbyStores.tsx
+    │   │
+    │   ├── import/
+    │   │   ├── ImportWizard.tsx          ← 3-step import flow (instructions → upload → results)
+    │   │   └── ImportPreviewTable.tsx    ← thread + pattern preview tables with checkboxes
+    │   │
+    │   └── whats-new/
+    │       └── WhatsNewModal.tsx         ← versioned "What's New" announcement modal
     │
     ├── lib/
     │   ├── supabase/
@@ -761,6 +771,8 @@ stitch-studio/
     │   │   └── queries.ts              ← all DB query functions
     │   ├── anthropic.ts                ← Anthropic client + helpers
     │   ├── engagement.ts               ← XP, streak, achievements, challenges, levels
+    │   ├── csv-import.ts               ← PapaParse CSV parser for PatternKeeper/R-XP/Saga
+    │   ├── csv-export.ts               ← CSV export with browser download trigger
     │   ├── image.ts                    ← client-side compress before upload
     │   ├── duplicate-detection.ts      ← fuzzy match logic for chart duplicates
     │   └── utils.ts
@@ -898,7 +910,7 @@ NEVER force camera-only. NEVER force upload-only.
 ## ✅ PROGRESS LOG
 
 ### HANDOFF NOTE
-> Session 13 complete. **Mom tested the app and loves it!** Fixed two new-user signup bugs (DailyGreeting+Tutorial collision, InstallBanner overlapping onboarding). Fixed all 5 of Mom's feedback items: editable WIP start date, AI thread dedup, 3 pet-themed challenges, PWA icons regenerated, numeric thread sorting. **Lighthouse accessibility audit completed AND all fixes applied:** color contrast across 66 files (#896E66→#6B544D, #B6A090→#9A8578, placeholder colors fixed), 4 empty alt texts fixed, aria-labels on icon-only buttons, role="dialog"+aria-modal on 5 modals, role="switch"+aria-checked on StatusToggles. **Phase 12 (Polish + Launch) is now DONE** — all checklist items complete except custom domain (deferred, user knows how on Vercel). App shared with Mom, she's actively using it. **Note:** iOS doesn't auto-update PWA home screen icons — Mom needs to remove and re-add. **Next session:** Continue iterating on Mom's feedback as she adds her WIPs. Remaining phases: Phase 14 (app import), Phase 15b (digests/wrapped), Phase 16 (community). Page-specific browser tab titles still a nice-to-have.
+> Session 14 complete. **Phase 14 (App Import/Export) is DONE.** Built full CSV import wizard for PatternKeeper, R-XP, and Saga with smart column detection (fuzzy header matching), duplicate checking against existing stash, select/deselect per item, and PapaParse for robust parsing. Both thread import and pattern import are live. CSV export for threads and patterns also added. New Settings page at `/settings` accessible from Profile. Also built a **"What's New" versioned announcement system** — premium bottom-sheet modal with gradient header, animated pill badge, staggered feature cards, and CTA linking to the new feature. Sequences properly: DailyGreeting → WhatsNew → Tutorial (no overlaps). Current announcement highlights the import feature for Mom. Future updates just need a new entry in the `UPDATES` array. **Next session:** Remaining phases: Phase 15b (weekly/monthly digests, yearly wrapped), Phase 16 (community). Page-specific browser tab titles still a nice-to-have. Mom may have feedback on the import flow once she tries it.
 
 ---
 
@@ -1184,57 +1196,28 @@ Photos load correctly in `<img>` tags via `getPublicUrl()`. Full SQL is in `supa
 - staticPageGenerationTimeout increased to 120s for offline page generation
 - Lighthouse audit deferred — app is functional, audit can be done as part of Phase 12 polish
 
-### Phase 14 — Cross-Stitch App Import (R-XP, PatternKeeper, Saga)
+### Phase 14 — Cross-Stitch App Import (R-XP, PatternKeeper, Saga) — ✅ DONE (Session 14)
 
-**Background:** Mom uses R-XP (and others in the cross stitch community use PatternKeeper and Saga).
-She wants to bring her existing data INTO Stitch Studio without re-entering everything manually.
-None of these apps have public APIs, so true live sync is not feasible. Instead, we build a
-**file-based import wizard** that reads exported data from each app.
+**Built in Session 14. Both thread import and pattern import are live.**
 
-**What each app can export:**
-- **PatternKeeper (iOS):** Exports thread lists as CSV. Columns: Manufacturer, Color #, Color Name,
-  Quantity. This maps directly to our `thread_inventory` table.
-- **R-XP (Windows):** Can export pattern data and thread lists as CSV or its own `.xpat` format.
-  We target CSV export (easiest common format).
-- **Saga:** Newer web-based app — check for CSV/JSON export option at build time.
+**Dependencies added:** `papaparse` + `@types/papaparse` for robust CSV parsing (handles quoted fields, encoding, etc.)
 
-**Implementation approach:**
+**New files:**
+- `src/lib/csv-import.ts` — CSV parser with fuzzy column detection (handles PatternKeeper, R-XP, Saga, and generic CSVs). Normalizes manufacturer names. Checks duplicates against existing stash.
+- `src/lib/csv-export.ts` — Export threads/patterns as CSV, triggers browser download
+- `src/components/import/ImportWizard.tsx` — 3-step wizard: app-specific export instructions → file upload + parse + preview → import results. Fires engagement XP (capped at 5 per import to prevent gaming). Per-app instructions for PatternKeeper, R-XP, Saga.
+- `src/components/import/ImportPreviewTable.tsx` — `ThreadPreviewTable` + `PatternPreviewTable` with select/deselect all, per-item checkboxes, "In stash" / "May exist" duplicate badges, manufacturer mini-badges, quantity display.
+- `src/app/(app)/settings/page.tsx` — Settings page with: import cards for PatternKeeper, R-XP, Saga, and generic CSV (each with thread + pattern import buttons); export section with thread/pattern CSV download buttons showing live counts.
+- `src/components/whats-new/WhatsNewModal.tsx` — Versioned "What's New" announcement system (see below).
 
-1. **Import Entry Point:** Settings page → "Import from another app" section
-   Three buttons: "Import from PatternKeeper" | "Import from R-XP" | "Import from Saga"
+**Modified files:**
+- `src/app/(app)/profile/page.tsx` — Added "⚙️ Settings & Import" link above "Restart App Tour"
+- `src/app/(app)/dashboard/page.tsx` — Added WhatsNewModal to overlay sequence: DailyGreeting → WhatsNew → Tutorial
 
-2. **Import Wizard (3 steps):**
-   - Step 1: "Export from [App Name]" — show illustrated instructions on how to export from
-     that specific app, with screenshots if possible
-   - Step 2: Upload the exported file (CSV or supported format)
-   - Step 3: Preview table — show what will be imported, let her review/deselect rows,
-     then confirm. Show: "X threads will be added to your stash"
+**Column detection strategy:**
+Smart fuzzy matching — normalizes headers (lowercase, strip non-alphanumeric) and matches against alias lists. For threads: `color_number` matches "Color #", "Number", "Color Code", "Thread Number", "Code", "No", "DMC", etc. For patterns: `name` matches "Name", "Pattern Name", "Title", "Chart Name", etc. Works across all three apps without app-specific parsers.
 
-3. **Duplicate handling during import:**
-   - Check each thread against existing inventory by manufacturer + color number
-   - If already exists: show as "Already in stash (skip)" — do not create duplicate
-   - If new: mark as "Will add"
-   - She can override (add anyway) per item
-
-4. **Pattern import (more complex — Phase 14b):**
-   - CSV with pattern name, designer, size, status — maps to `patterns` table
-   - This is harder since pattern data is less standardized across apps
-   - Consider PatternKeeper-specific CSV column mapping
-   - Build thread import first (Phase 14a), pattern import second (Phase 14b)
-
-5. **Export from Stitch Studio too:**
-   - Let her export her thread inventory and pattern list as CSV
-   - Good for backup and for switching apps in future
-   - Helps if she wants to share her stash data with a friend
-
-**Components needed:**
-- `src/app/(app)/settings/page.tsx` — settings page (also needed for Phase 13 tutorial restart)
-- `src/components/import/ImportWizard.tsx`
-- `src/components/import/ImportPreviewTable.tsx`
-- `src/components/import/AppInstructions.tsx` — per-app export instructions
-
-**Build this after Phase 12 (Polish). Thread import first, pattern import second.**
-**Priority:** PatternKeeper CSV import first — most users, most straightforward format.
+**Generic CSV option:** "Other CSV File" card on Settings page uses the same fuzzy column detection, so any CSV with recognizable headers will work regardless of source app.
 
 ---
 
@@ -1891,6 +1874,42 @@ Muted text color changed app-wide for WCAG AA compliance:
 - Secondary muted: `#B6A090` → `#9A8578` (used for tertiary text, placeholders, hints)
 - CSS variable `--muted` in globals.css left as `#896E66` for reference but all Tailwind classes updated
 - Placeholder colors unified to `#9A8578` across all form inputs
+
+---
+
+### Phase 14 — App Import/Export — ✅ DONE (Session 14)
+- [x] PapaParse installed for robust CSV parsing (quoted fields, encoding, escaping)
+- [x] CSV parser utility — fuzzy column detection for PatternKeeper, R-XP, Saga, and generic CSVs — src/lib/csv-import.ts
+- [x] CSV export utility — download threads and patterns as CSV — src/lib/csv-export.ts
+- [x] ImportWizard component — 3-step flow (instructions → upload/preview → results) — src/components/import/ImportWizard.tsx
+- [x] ImportPreviewTable — thread + pattern preview with select/deselect, duplicate badges — src/components/import/ImportPreviewTable.tsx
+- [x] Settings page — import cards for 3 apps + generic CSV, export buttons with live counts — src/app/(app)/settings/page.tsx
+- [x] Profile page — added "⚙️ Settings & Import" link — src/app/(app)/profile/page.tsx
+- [x] Thread import (14a) — upload CSV, preview with duplicate detection, bulk insert with engagement XP
+- [x] Pattern import (14b) — upload CSV, preview with name+designer duplicate detection, bulk insert
+- [x] Export threads + export patterns — CSV download with browser download trigger
+- [x] App-specific export instructions (PatternKeeper, R-XP, Saga) with tips per app
+- [x] Engagement XP fires on import (capped at 5 per import session)
+
+---
+
+### "What's New" Versioned Announcement System — ✅ DONE (Session 14)
+- [x] WhatsNewModal component — premium bottom-sheet modal (mobile) / centered card (desktop) — src/components/whats-new/WhatsNewModal.tsx
+- [x] Versioned updates — each update has a unique ID stored in localStorage (`ss_whats_new_seen`), shows only once per update
+- [x] Premium UI — gradient header with soft blob accents, animated "What's New" pill badge (rose gradient), hero emoji with `popIn` spring animation, staggered `fadeSlideUp` on feature cards, backdrop blur, warm gradient CTA button
+- [x] Overlay sequencing — DailyGreeting → WhatsNew → Tutorial (no overlaps). WhatsNew only appears after greeting is dismissed/skipped. Tutorial only starts after WhatsNew is dismissed.
+- [x] Current announcement — Import feature with 3 feature bullets, CTA "Show Me How" → /settings
+- [x] Future-proof — to add a new announcement, add an entry to the `UPDATES` array in WhatsNewModal.tsx. No other changes needed.
+
+**Key localStorage keys (Session 14):**
+- `ss_whats_new_seen` — JSON array of seen update IDs (e.g. `["2026-03-14-import"]`)
+
+**Dashboard overlay sequence (final, Session 14):**
+1. DailyGreeting (once per day, z-100)
+2. WhatsNewModal (once per update, z-110)
+3. TutorialOverlay (once per account, z-300)
+4. CelebrationOverlay (on achievement/milestone, z-200)
+5. InstallBanner (once per device, suppressed during tutorial)
 
 ---
 
