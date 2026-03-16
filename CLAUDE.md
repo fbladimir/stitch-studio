@@ -910,7 +910,7 @@ NEVER force camera-only. NEVER force upload-only.
 ## ✅ PROGRESS LOG
 
 ### HANDOFF NOTE
-> Session 14 complete. **Phase 14 (App Import/Export) is DONE.** Built full CSV import wizard for PatternKeeper, R-XP, and Saga with smart column detection (fuzzy header matching), duplicate checking against existing stash, select/deselect per item, and PapaParse for robust parsing. Both thread import and pattern import are live. CSV export for threads and patterns also added. New Settings page at `/settings` accessible from Profile. Also built a **"What's New" versioned announcement system** — premium bottom-sheet modal with gradient header, animated pill badge, staggered feature cards, and CTA linking to the new feature. Sequences properly: DailyGreeting → WhatsNew → Tutorial (no overlaps). Current announcement highlights the import feature for Mom. Future updates just need a new entry in the `UPDATES` array. **Next session:** Remaining phases: Phase 15b (weekly/monthly digests, yearly wrapped), Phase 16 (community). Page-specific browser tab titles still a nice-to-have. Mom may have feedback on the import flow once she tries it.
+> Session 15 complete (2026-03-16). **Phase 17 (Stitching Mode / R-XP Replacement) is DONE.** Built full-screen stitching session tracker: timer with start/pause/resume/stop (persists across app switches via localStorage), stitch counter with +10/+50/+100 quick-add, daily stitch target with circular progress ring, R-XP-parity stats dashboard (avg stitches/day, avg time/day, est. completion date, active days, today's stats), session history, end-session sheet with stitch logging + notes + progress photo upload. Entry points: dashboard "Log Progress" → WIP selector, and "Start Stitching" button on every WipTracker. **Also this session:** Mom's feedback fixes — pet editor on Profile ("My Fur Babies" section with add/remove), WipTracker enhanced with total stitches + auto-percentage + R-XP-style stats grid, sort dropdown on patterns list (5 sort options), What's New modal updated with Stitching Mode announcement. **Schema migration required:** `supabase-phase17-migration.sql` must be run in Supabase SQL Editor (stitch_sessions table, progress_photos table, daily_stitch_target column, progress-photos storage bucket). **Next session:** Phase 18 (Pattern Markup/Grid Viewer) — plan written in CLAUDE.md, ready to build. Remaining: Phase 15b (digests/wrapped), Phase 16 (community).
 
 ---
 
@@ -2069,6 +2069,107 @@ Muted text color changed app-wide for WCAG AA compliance:
 3. TutorialOverlay (once per account, z-300)
 4. CelebrationOverlay (on achievement/milestone, z-200)
 5. InstallBanner (once per device, suppressed during tutorial)
+
+---
+
+### Session 15 — Mom's Feedback + Phase 17 Stitching Mode — ✅ DONE (2026-03-16)
+
+**Mom's feedback fixes:**
+- [x] Pet editor on Profile — "🐾 My Fur Babies" section with add/remove, emoji picker, fun "Forgot a fur baby?" copy, saves directly to Supabase profiles.dogs — src/app/(app)/profile/page.tsx
+- [x] WipTracker total stitches — new "Total stitches" + "Stitches done" side-by-side inputs, auto-calculated percentage, R-XP-inspired stats grid (Completed %, Still To Do, Stitches Done, Total Stitches), hint banner when total not set — src/components/patterns/WipTracker.tsx
+- [x] Sort patterns — dropdown with 5 options (Recently Updated, Pattern Name, Designer, Date Added, Progress %) — src/app/(app)/patterns/page.tsx
+- [x] Skeins needed — already existed in ThreadList from Phase 4 (confirmed, no changes needed)
+
+**Phase 17 — Stitching Mode (R-XP Replacement):**
+- [x] Schema migration — `supabase-phase17-migration.sql`: stitch_sessions table, progress_photos table, daily_stitch_target column on patterns, progress-photos storage bucket + RLS
+- [x] Types — StitchSession, ProgressPhoto interfaces added to src/types/index.ts; daily_stitch_target added to Pattern interface
+- [x] Session CRUD queries — getStitchSessions, getAllUserSessions, createStitchSession, updateStitchSession, getProgressPhotos, createProgressPhoto, uploadProgressPhoto — src/lib/supabase/queries.ts
+- [x] useStitchingTimer hook — localStorage-persisted timer (survives app switches), start/pause/resume/stop, formatMs, formatMinutes — src/hooks/useStitchingTimer.ts
+- [x] StitchingTimer component — large HH:MM:SS display, color-coded states (green running, gold paused), Start/Pause/Resume/Finish buttons — src/components/stitching/StitchingTimer.tsx
+- [x] StitchCounter component — big number input with −/+ buttons, +10/+50/+100 quick-add chips — src/components/stitching/StitchCounter.tsx
+- [x] DailyTargetRing component — SVG circular progress ring, stitched today vs target, completion state — src/components/stitching/DailyTargetRing.tsx
+- [x] SessionStatsPanel component — R-XP-parity stats: Total Time, Active Days, Avg Stitches/Day, Avg Time/Day, Est. Days Left, Est. Completion Date, Today's stitches + time — src/components/stitching/SessionStatsPanel.tsx
+- [x] SessionHistory component — session list with date, stitches, duration, notes indicator — src/components/stitching/SessionHistory.tsx
+- [x] EndSessionSheet component — bottom sheet: log stitches, session notes, progress photo (camera + gallery, compressed), saves session + updates pattern stitch count + engagement XP — src/components/stitching/EndSessionSheet.tsx
+- [x] Stitching Mode page — full-screen z-50 takeover, dark header, timer + counter + daily target + stats + history — src/app/(app)/stitching/[id]/page.tsx
+- [x] WIP selector page — shows all WIPs with cover photo, name, designer, progress badge, play button — src/app/(app)/stitching/page.tsx
+- [x] WipTracker "Start Stitching" button — green gradient button at top of every WipTracker, links to /stitching/[id]
+- [x] Dashboard "Log Progress" updated — now routes to /stitching (was /patterns)
+- [x] What's New modal — updated with Stitching Mode announcement, "Designed by Miss Daisy" subtitle, 4 feature cards, CTA "Try Stitching Mode"
+
+**Key localStorage keys (Session 15):**
+- `ss_timer_state` — active stitching timer state (patternId, startedAt, accumulatedMs, running/paused)
+
+---
+
+### Phase 18 — Pattern Markup / Grid Viewer (PLANNED)
+
+**Purpose:** R-XP's core feature — load a pattern chart image and mark individual stitches on a grid overlay. This lets Mom track exactly which stitches she's completed visually, not just by count. This is the final piece to fully replace R-XP.
+
+**Approach — Canvas-based grid overlay on pattern image:**
+
+Rather than building a full CAD tool, we overlay an interactive grid on top of the pattern chart photo. The user:
+1. Uploads/photographs their pattern chart (already have cover photo)
+2. Calibrates the grid — drag corners to align with the chart's stitch grid
+3. Taps cells to mark stitches as complete (fills with a semi-transparent color)
+4. Pinch-to-zoom and pan for detail work
+5. Progress syncs with WipTracker stitch count
+
+**Schema additions:**
+```sql
+CREATE TABLE IF NOT EXISTS pattern_markups (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  pattern_id UUID REFERENCES patterns(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  chart_photo_url TEXT,           -- the chart image being marked up
+  grid_cols INTEGER NOT NULL,     -- number of columns in the grid
+  grid_rows INTEGER NOT NULL,     -- number of rows in the grid
+  -- Calibration: 4 corner points mapping grid to image coordinates
+  calibration JSONB,              -- {topLeft: {x,y}, topRight: {x,y}, bottomLeft: {x,y}, bottomRight: {x,y}}
+  -- Marked cells stored as a compact format
+  marked_cells JSONB DEFAULT '[]', -- array of {row, col} or bitfield string
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+**Components needed:**
+```
+src/app/(app)/markup/[id]/page.tsx     ← full-screen markup viewer
+src/components/markup/
+  GridCanvas.tsx                        ← HTML Canvas with grid overlay, tap-to-mark
+  GridCalibrator.tsx                    ← drag 4 corners to align grid to chart
+  MarkupToolbar.tsx                     ← tools: mark, erase, pan, zoom, undo
+  ChartUploader.tsx                     ← upload chart page photo (reuse PhotoScanner)
+  MarkupStats.tsx                       ← marked vs total, percentage overlay
+```
+
+**Technical approach:**
+- Use HTML `<canvas>` element for the grid overlay (performant for large grids)
+- Pattern chart image as background layer, grid drawn on top
+- Touch handling: single tap = mark/unmark cell, two-finger = pinch zoom, drag = pan
+- Store marked cells as a Set serialized to JSON array (or bitfield for very large patterns)
+- Auto-save marked cells to Supabase on each change (debounced)
+- Sync marked count → pattern.wip_stitches for consistency with WipTracker
+
+**Build order:**
+1. Schema migration (pattern_markups table)
+2. ChartUploader — upload the specific chart page (not cover photo)
+3. GridCalibrator — drag 4 corners to define grid bounds on the image
+4. GridCanvas — render grid overlay, handle tap-to-mark, pinch-zoom, pan
+5. MarkupToolbar — tool selection (mark/erase/pan), undo, save indicator
+6. MarkupStats — overlay showing marked/total counts
+7. Full-screen markup page wired together
+8. Sync with WipTracker stitch count
+9. Entry point from pattern detail page ("Open Markup" button)
+
+**Performance considerations:**
+- Large patterns can be 300x400+ cells (120,000+ cells) — canvas is essential, not DOM elements
+- Debounce saves (save after 2s of no changes, not on every tap)
+- Lazy-load the chart image, show loading skeleton
+- Consider storing marked cells as a compressed bitfield string for patterns with 100k+ cells
+
+**This is the most complex feature in the app. Build incrementally — start with basic grid + tap-to-mark, add calibration and zoom in follow-up passes.**
 
 ---
 

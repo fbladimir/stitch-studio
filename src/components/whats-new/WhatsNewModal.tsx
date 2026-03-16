@@ -36,34 +36,40 @@ export interface AppUpdate {
 
 const UPDATES: AppUpdate[] = [
   {
-    id: "2026-03-16-pets-stitches-sort",
+    id: "2026-03-16-stitching-mode",
     date: "March 2026",
-    headline: "Forgot a Fur Baby?",
-    subtitle: "Now you can add new fur babies anytime — plus exciting progress tracking!",
-    emoji: "🐾",
+    headline: "Stitching Mode is Here!",
+    subtitle: "Designed by Miss Daisy herself — your very own stitching session tracker, built right into Stitch Studio!",
+    emoji: "⏱️",
     features: [
       {
-        icon: "🐶",
-        title: "Add Pets Anytime",
+        icon: "🎯",
+        title: "Timer, Stitch Counter & Daily Goals",
         description:
-          "Forgot to add a fur baby during onboarding? Head to your Profile to add (or remove) pets whenever you want!",
+          "Start a timer when you sit down to stitch, log your stitches with quick-tap buttons, and set a daily target to stay on track. Just like R-XP — but cuter!",
       },
       {
         icon: "📊",
-        title: "Total Stitches + Auto Percentage",
+        title: "All Your Stats in One Place",
         description:
-          "Enter your pattern's total stitch count on any WIP and the progress percentage calculates automatically — just like R-XP!",
+          "Average stitches per day, estimated completion date, total time, active stitching days — everything R-XP shows, right here. No more switching apps!",
       },
       {
-        icon: "↕️",
-        title: "Sort Your Collection",
+        icon: "📸",
+        title: "Progress Photos & Session History",
         description:
-          "Sort patterns by name, designer, date added, or progress. Tap the sort button at the top of your patterns list.",
+          "Snap a photo at the end of each session to watch your work come to life. Every session is logged with stitches, time, and notes.",
+      },
+      {
+        icon: "🐾",
+        title: "Add Pets Anytime + Sort Patterns",
+        description:
+          "Forgot a fur baby? Head to Profile to add them! Plus, you can now sort your patterns by name, designer, or progress.",
       },
     ],
-    ctaLabel: "Add a Fur Baby 🐾",
-    ctaHref: "/profile",
-    secondaryLabel: "I'm good!",
+    ctaLabel: "Try Stitching Mode ⏱️",
+    ctaHref: "/stitching",
+    secondaryLabel: "Maybe later",
   },
   {
     id: "2026-03-14-import",
