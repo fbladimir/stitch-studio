@@ -162,6 +162,7 @@ export function KitForm({ mode, initialData }: KitFormProps) {
         fo_photo_url: initialData?.fo_photo_url ?? null,
         ffo_photo_url: initialData?.ffo_photo_url ?? null,
         stitch_types: null,
+        daily_stitch_target: 0,
       };
 
       if (mode === "create") {

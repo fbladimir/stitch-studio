@@ -208,6 +208,7 @@ export function PatternForm({ mode, initialData }: PatternFormProps) {
         kit_contents: initialData?.kit_contents ?? null,
         kit_status: initialData?.kit_status ?? null,
         stitch_types: initialData?.stitch_types ?? null,
+        daily_stitch_target: initialData?.daily_stitch_target ?? 0,
       };
 
       if (mode === "create") {

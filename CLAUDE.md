@@ -1685,6 +1685,165 @@ src/hooks/useEngagement.ts   ← loads streak, achievements, challenges for curr
 
 ---
 
+### Phase 17 — Stitching Mode (R-XP Replacement)
+
+**Purpose:** Replace R-XP ($20/year) by bringing its most-used features into Stitch Studio.
+Mom currently switches between Stitch Studio (collection management) and R-XP (active stitching
+tracking). This phase merges both into one app with a focused "Stitching Mode" — a full-screen
+experience she opens when she sits down to stitch.
+
+**Entry point:** "⏱️ Log Progress" quick action on dashboard → select WIP → enters Stitching Mode.
+Also accessible from any WIP's detail page via a prominent "Start Stitching" button.
+
+---
+
+#### 17a — Stitching Timer & Session Log
+
+**Timer:**
+- Large, prominent timer at the top of Stitching Mode (HH:MM:SS)
+- Start / Pause / Stop controls — large touch targets
+- Timer persists if she switches apps briefly (stores start time, calculates elapsed on return)
+- On stop: prompt to log stitches completed this session
+
+**Session Log:**
+- Each completed timer session creates a `stitch_session` record:
+  - pattern_id, user_id, started_at, ended_at, duration_minutes, stitches_completed, notes
+- Session history list on the pattern detail page: "Mar 14 — 45 min, 212 stitches"
+- Total time per pattern (sum of all sessions) displayed on WipTracker stats grid
+
+**Schema:**
+```sql
+CREATE TABLE stitch_sessions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  pattern_id UUID REFERENCES patterns(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  started_at TIMESTAMPTZ NOT NULL,
+  ended_at TIMESTAMPTZ,
+  duration_minutes INTEGER DEFAULT 0,
+  stitches_completed INTEGER DEFAULT 0,
+  notes TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE stitch_sessions ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users access own sessions" ON stitch_sessions
+  FOR ALL USING (user_id = auth.uid());
+CREATE INDEX idx_stitch_sessions_pattern ON stitch_sessions(pattern_id);
+CREATE INDEX idx_stitch_sessions_user ON stitch_sessions(user_id);
+```
+
+---
+
+#### 17b — Daily Target & Stats Dashboard
+
+**Daily Target:**
+- User sets a daily stitch target per pattern (e.g., 350 stitches/day)
+- Stored on the pattern: `daily_stitch_target INTEGER` column
+- Dashboard shows: "Stitched Today: 212 / 350" with progress ring
+- Resets at midnight local time (calculated from today's sessions)
+
+**Stats Dashboard (R-XP parity):**
+All of these calculated from stitch_sessions + pattern data:
+- **Avg. Stitch Rate/Day** — total stitches ÷ active stitching days
+- **Avg. Stitch Time/Day** — total time ÷ active stitching days
+- **Est. Days To Completion** — remaining stitches ÷ avg rate/day
+- **Est. Completion Date** — today + est. days to completion
+- **Active Stitching Days** — count of distinct days with sessions
+- **Total Time** — sum of all session durations (HH:MM format)
+- **Stitched Today** — sum of today's session stitches
+- **Time Spent Today** — sum of today's session durations
+
+**Schema addition:**
+```sql
+ALTER TABLE patterns ADD COLUMN daily_stitch_target INTEGER DEFAULT 0;
+```
+
+---
+
+#### 17c — Progress Photos Gallery
+
+**Purpose:** Snap a photo at the end of each stitching session to see the work evolve.
+
+- "Add progress photo" prompt after stopping the timer
+- Photos stored in a `progress-photos` Supabase storage bucket
+- Gallery view on pattern detail page — chronological grid of progress photos
+- Tap a photo to see it full-screen with date + session stats overlay
+- Optional — not required to end a session
+
+**Schema:**
+```sql
+CREATE TABLE progress_photos (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  pattern_id UUID REFERENCES patterns(id) ON DELETE CASCADE,
+  user_id UUID REFERENCES profiles(id) ON DELETE CASCADE,
+  session_id UUID REFERENCES stitch_sessions(id) ON DELETE SET NULL,
+  photo_url TEXT NOT NULL,
+  caption TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+ALTER TABLE progress_photos ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "Users access own photos" ON progress_photos
+  FOR ALL USING (user_id = auth.uid());
+```
+
+**Supabase Storage:**
+```
+progress-photos   (private, signed URLs or public like other buckets)
+```
+
+---
+
+#### 17d — Stitching Mode Full-Screen UI
+
+**Design:** Full-screen takeover (like Store Mode) — focused, distraction-free.
+
+**Layout (top to bottom):**
+1. **Header:** Pattern name + cover photo thumbnail, "✕ End Session" button
+2. **Timer:** Large centered HH:MM:SS, Start/Pause/Stop buttons below
+3. **Today's Progress:** Stitched today vs daily target (progress ring or bar)
+4. **Quick Stitch Entry:** Large number input or +10/+50/+100 tap buttons for logging stitches mid-session
+5. **Stats Panel:** Collapsible/expandable panel with full R-XP-style stats
+6. **Session Notes:** Optional text field for notes about this session
+
+**Color scheme:** Same warm palette but slightly darker background for "focus mode" feel.
+Use `--brown` (#3A2418) header like Store Mode for visual distinction.
+
+---
+
+**Components needed:**
+```
+src/app/(app)/stitching/
+  page.tsx                    ← WIP selector → enters stitching mode
+  [id]/page.tsx               ← active stitching mode for a specific pattern
+
+src/components/stitching/
+  StitchingTimer.tsx           ← large timer display + controls
+  StitchCounter.tsx            ← quick stitch entry (+10/+50/+100 buttons)
+  DailyTargetRing.tsx          ← circular progress toward daily goal
+  SessionStatsPanel.tsx        ← R-XP-style stats (avg rate, est completion, etc.)
+  SessionHistory.tsx           ← list of past sessions for a pattern
+  ProgressPhotoGallery.tsx     ← grid of progress photos
+  EndSessionSheet.tsx          ← bottom sheet: log stitches, add photo, save
+
+src/lib/supabase/queries.ts    ← add session CRUD + progress photo queries
+src/hooks/useStitchingTimer.ts ← timer logic, persist across app switches
+```
+
+**Build order:**
+1. Schema migration (stitch_sessions + progress_photos tables, daily_stitch_target column)
+2. Timer hook + StitchingTimer component
+3. Stitching Mode full-screen page
+4. StitchCounter + DailyTargetRing
+5. EndSessionSheet (log stitches, optional photo, save)
+6. SessionStatsPanel (all R-XP-parity calculations)
+7. SessionHistory on pattern detail page
+8. ProgressPhotoGallery
+9. Wire "Start Stitching" button into WipTracker + dashboard quick actions
+10. Engagement: recordActivity on session complete
+
+---
+
 ### Phase 15 — Engagement & Delight System — ✅ DONE (Session 10)
 
 **Schema migration:** `supabase-phase15-migration.sql` (ran successfully)

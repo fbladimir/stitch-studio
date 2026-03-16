@@ -79,8 +79,8 @@ const QUICK_ACTIONS = [
   {
     icon: "⏱️",
     label: "Log Progress",
-    desc: "Update a WIP",
-    href: "/patterns",
+    desc: "Start stitching",
+    href: "/stitching",
     bg: "bg-[#FBF5E8]",
     border: "border-[#E8D5A0]",
     iconBg: "bg-[#EDD898]",

@@ -179,6 +179,7 @@ export function EmbroideryForm({ mode, initialData }: EmbroideryFormProps) {
         ffo_photo_url: initialData?.ffo_photo_url ?? null,
         kit_contents: null,
         kit_status: null,
+        daily_stitch_target: 0,
       };
 
       if (mode === "create") {

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
+import Link from "next/link";
 import type { Pattern } from "@/types";
 import { updatePattern } from "@/lib/supabase/queries";
 import { useEngagement } from "@/hooks/useEngagement";
@@ -125,6 +126,18 @@ export function WipTracker({ pattern, onUpdate }: WipTrackerProps) {
 
   return (
     <div className="bg-white border border-[#E4D6C8] rounded-2xl p-4 flex flex-col gap-4">
+      {/* ── Start Stitching button ───────────────────── */}
+      <Link
+        href={`/stitching/${pattern.id}`}
+        className="w-full h-12 rounded-full text-white font-nunito font-bold text-[14px] flex items-center justify-center gap-2 active:scale-[0.97] transition-transform"
+        style={{
+          background: "linear-gradient(135deg, #5F7A63, #4A6B4E)",
+          boxShadow: "0 4px 14px rgba(95, 122, 99, 0.3)",
+        }}
+      >
+        ⏱️ Start Stitching
+      </Link>
+
       {/* ── Stats Grid (R-XP inspired) ───────────────── */}
       {hasTotalStitches && (
         <div className="grid grid-cols-2 gap-2.5">

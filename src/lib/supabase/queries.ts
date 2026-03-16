@@ -1,6 +1,6 @@
 // All database query functions
 import { createClient } from "./client";
-import type { Pattern, PatternThread, WipJournalEntry, ThreadInventoryItem, FabricInventoryItem } from "@/types";
+import type { Pattern, PatternThread, WipJournalEntry, ThreadInventoryItem, FabricInventoryItem, StitchSession, ProgressPhoto } from "@/types";
 
 
 // ── Patterns ─────────────────────────────────────────────────
@@ -444,5 +444,96 @@ export async function uploadFabricPhoto(
   if (uploadError) return { url: null, error: uploadError };
 
   const { data } = supabase.storage.from("fabric-photos").getPublicUrl(path);
+  return { url: data.publicUrl, error: null };
+}
+
+// ── Stitch Sessions (Phase 17) ──────────────────────────────
+
+export async function getStitchSessions(patternId: string) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("stitch_sessions")
+    .select("*")
+    .eq("pattern_id", patternId)
+    .order("started_at", { ascending: false });
+  return { data: data as StitchSession[] | null, error };
+}
+
+export async function getAllUserSessions(userId: string) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("stitch_sessions")
+    .select("*")
+    .eq("user_id", userId)
+    .order("started_at", { ascending: false });
+  return { data: data as StitchSession[] | null, error };
+}
+
+export async function createStitchSession(
+  session: Omit<StitchSession, "id" | "created_at">
+) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("stitch_sessions")
+    .insert(session)
+    .select()
+    .single();
+  return { data: data as StitchSession | null, error };
+}
+
+export async function updateStitchSession(
+  id: string,
+  updates: Partial<Omit<StitchSession, "id" | "created_at">>
+) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("stitch_sessions")
+    .update(updates)
+    .eq("id", id)
+    .select()
+    .single();
+  return { data: data as StitchSession | null, error };
+}
+
+// ── Progress Photos (Phase 17) ──────────────────────────────
+
+export async function getProgressPhotos(patternId: string) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("progress_photos")
+    .select("*")
+    .eq("pattern_id", patternId)
+    .order("created_at", { ascending: false });
+  return { data: data as ProgressPhoto[] | null, error };
+}
+
+export async function createProgressPhoto(
+  photo: Omit<ProgressPhoto, "id" | "created_at">
+) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("progress_photos")
+    .insert(photo)
+    .select()
+    .single();
+  return { data: data as ProgressPhoto | null, error };
+}
+
+export async function uploadProgressPhoto(
+  userId: string,
+  patternId: string,
+  file: File
+): Promise<{ url: string | null; error: Error | null }> {
+  const supabase = createClient();
+  const ext = file.name.split(".").pop() ?? "jpg";
+  const path = `${userId}/${patternId}/${Date.now()}.${ext}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("progress-photos")
+    .upload(path, file, { upsert: false });
+
+  if (uploadError) return { url: null, error: uploadError };
+
+  const { data } = supabase.storage.from("progress-photos").getPublicUrl(path);
   return { url: data.publicUrl, error: null };
 }

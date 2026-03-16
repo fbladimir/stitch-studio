@@ -278,6 +278,7 @@ export function ImportWizard({ app, importType, onClose }: ImportWizardProps) {
           kit_contents: null,
           kit_status: null,
           stitch_types: null,
+          daily_stitch_target: 0,
         });
         if (!error) count++;
       }
