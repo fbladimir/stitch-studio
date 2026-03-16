@@ -6,104 +6,43 @@ import Link from "next/link";
 // ============================================================
 // What's New — Versioned update announcements
 // ============================================================
-//
-// Each update has an id, which is stored in localStorage when
-// dismissed. The modal only shows once per update, and sequences
-// after the DailyGreeting so overlays don't collide.
-// ============================================================
-
-// ── Update definitions ───────────────────────────────────────
-// Add new updates to the TOP of this array. Only the latest
-// unseen update is shown.
 
 export interface UpdateFeature {
   icon: string;
-  title: string;
-  description: string;
+  text: string;
 }
 
 export interface AppUpdate {
-  id: string;                 // unique, monotonically increasing
-  date: string;               // display date
-  headline: string;           // main announcement
-  subtitle: string;           // warm one-liner
-  emoji: string;              // hero emoji
-  features: UpdateFeature[];  // feature bullets
-  ctaLabel: string;           // primary button text
-  ctaHref: string;            // where the CTA navigates
-  secondaryLabel?: string;    // optional dismiss text override
+  id: string;
+  headline: string;
+  subtitle: string;
+  emoji: string;
+  features: UpdateFeature[];
+  ctaLabel: string;
+  ctaHref: string;
+  dismissLabel?: string;
 }
 
 const UPDATES: AppUpdate[] = [
   {
-    id: "2026-03-16-stitching-mode",
-    date: "March 2026",
-    headline: "Stitching Mode is Here!",
-    subtitle: "Designed by Miss Daisy herself — your very own stitching session tracker, built right into Stitch Studio!",
-    emoji: "⏱️",
+    id: "2026-03-16-stitching-markup",
+    headline: "Your New Stitching Studio",
+    subtitle: "Crafted by Miss Daisy with love — everything you need, all in one place.",
+    emoji: "✨",
     features: [
-      {
-        icon: "🎯",
-        title: "Timer, Stitch Counter & Daily Goals",
-        description:
-          "Start a timer when you sit down to stitch, log your stitches with quick-tap buttons, and set a daily target to stay on track. Just like R-XP — but cuter!",
-      },
-      {
-        icon: "📊",
-        title: "All Your Stats in One Place",
-        description:
-          "Average stitches per day, estimated completion date, total time, active stitching days — everything R-XP shows, right here. No more switching apps!",
-      },
-      {
-        icon: "📸",
-        title: "Progress Photos & Session History",
-        description:
-          "Snap a photo at the end of each session to watch your work come to life. Every session is logged with stitches, time, and notes.",
-      },
-      {
-        icon: "🐾",
-        title: "Add Pets Anytime + Sort Patterns",
-        description:
-          "Forgot a fur baby? Head to Profile to add them! Plus, you can now sort your patterns by name, designer, or progress.",
-      },
+      { icon: "⏱️", text: "Stitching Mode — timer, stitch counter, daily goals & full R-XP-style stats" },
+      { icon: "📐", text: "Pattern Markup — mark stitches on your chart as you go" },
+      { icon: "📸", text: "Progress photos — snap a pic each session to see your work evolve" },
+      { icon: "📦", text: "Import & Export — bring data from PatternKeeper, R-XP, or Saga" },
+      { icon: "🐾", text: "Add pets anytime from your Profile" },
     ],
-    ctaLabel: "Try Stitching Mode ⏱️",
+    ctaLabel: "Try It Now ✿",
     ctaHref: "/stitching",
-    secondaryLabel: "Maybe later",
-  },
-  {
-    id: "2026-03-14-import",
-    date: "March 2026",
-    headline: "Import Your Collection",
-    subtitle: "Bring your stash home — no re-typing required!",
-    emoji: "📦",
-    features: [
-      {
-        icon: "📱",
-        title: "Import from PatternKeeper, R-XP & Saga",
-        description:
-          "Upload a CSV export from your favourite cross stitch app and we'll bring your threads and patterns right in.",
-      },
-      {
-        icon: "🧵",
-        title: "Smart Duplicate Detection",
-        description:
-          "We'll check your existing stash so you don't end up with doubles. Already-owned threads are flagged automatically.",
-      },
-      {
-        icon: "💾",
-        title: "Export Your Data",
-        description:
-          "Download your full thread inventory or pattern collection as a CSV any time — your data is always yours.",
-      },
-    ],
-    ctaLabel: "Show Me How ✿",
-    ctaHref: "/settings",
-    secondaryLabel: "Maybe later",
+    dismissLabel: "Maybe later",
   },
 ];
 
-// ── localStorage key ─────────────────────────────────────────
+// ── localStorage ─────────────────────────────────────────────
 
 const STORAGE_KEY = "ss_whats_new_seen";
 
@@ -111,9 +50,7 @@ function getSeenUpdates(): string[] {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     return raw ? JSON.parse(raw) : [];
-  } catch {
-    return [];
-  }
+  } catch { return []; }
 }
 
 function markSeen(id: string) {
@@ -132,9 +69,7 @@ function getLatestUnseen(): AppUpdate | null {
 // ── Component ────────────────────────────────────────────────
 
 interface WhatsNewModalProps {
-  /** Call this after the DailyGreeting has been dismissed or skipped */
   onDismiss?: () => void;
-  /** Set to true when the greeting is done and this modal can appear */
   ready?: boolean;
 }
 
@@ -148,15 +83,10 @@ export function WhatsNewModal({ onDismiss, ready = true }: WhatsNewModalProps) {
     const unseen = getLatestUnseen();
     if (unseen) {
       setUpdate(unseen);
-      // Small delay so it doesn't flash instantly after greeting
       const t1 = setTimeout(() => setVisible(true), 400);
       const t2 = setTimeout(() => setAnimateIn(true), 460);
-      return () => {
-        clearTimeout(t1);
-        clearTimeout(t2);
-      };
+      return () => { clearTimeout(t1); clearTimeout(t2); };
     } else {
-      // No update to show — pass through immediately
       onDismiss?.();
     }
   }, [ready]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -164,156 +94,104 @@ export function WhatsNewModal({ onDismiss, ready = true }: WhatsNewModalProps) {
   const dismiss = useCallback(() => {
     if (update) markSeen(update.id);
     setAnimateIn(false);
-    setTimeout(() => {
-      setVisible(false);
-      onDismiss?.();
-    }, 320);
+    setTimeout(() => { setVisible(false); onDismiss?.(); }, 320);
   }, [update, onDismiss]);
 
   if (!visible || !update) return null;
 
   return (
     <div
-      className="fixed inset-0 z-[110] flex items-end sm:items-center justify-center"
-      style={{
-        opacity: animateIn ? 1 : 0,
-        transition: "opacity 0.32s ease",
-      }}
+      className="fixed inset-0 z-[110] flex items-center justify-center p-4"
+      style={{ opacity: animateIn ? 1 : 0, transition: "opacity 0.3s ease" }}
     >
       {/* Backdrop */}
-      <div
-        className="absolute inset-0 bg-[#3A2418]/40 backdrop-blur-sm"
-        onClick={dismiss}
-      />
+      <div className="absolute inset-0 bg-[#3A2418]/50 backdrop-blur-sm" onClick={dismiss} />
 
-      {/* Modal card */}
+      {/* Modal */}
       <div
-        className="relative w-full max-w-[420px] mx-4 mb-0 sm:mb-0 rounded-t-3xl sm:rounded-3xl bg-white overflow-hidden"
+        className="relative w-full max-w-[380px] rounded-3xl bg-white overflow-hidden"
         style={{
-          transform: animateIn ? "translateY(0)" : "translateY(40px)",
-          transition: "transform 0.38s cubic-bezier(0.34, 1.56, 0.64, 1)",
-          boxShadow: "0 -8px 40px rgba(58, 36, 24, 0.15), 0 2px 12px rgba(58, 36, 24, 0.08)",
+          maxHeight: "min(92vh, 560px)",
+          transform: animateIn ? "translateY(0) scale(1)" : "translateY(24px) scale(0.97)",
+          transition: "transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1)",
+          boxShadow: "0 24px 48px rgba(58, 36, 24, 0.2), 0 0 0 1px rgba(58, 36, 24, 0.05)",
         }}
       >
-        {/* ── Decorative header gradient ─────────────── */}
-        <div
-          className="relative px-6 pt-8 pb-6 overflow-hidden"
-          style={{
-            background: "linear-gradient(155deg, #FDF4F1 0%, #FAF6F0 40%, #EBF2EC 100%)",
-          }}
-        >
-          {/* Soft blob accents */}
+        <div className="flex flex-col max-h-[min(92vh,560px)]">
+          {/* ── Header ─────────────────────────────────── */}
           <div
-            className="absolute top-[-30px] right-[-20px] w-40 h-40 rounded-full opacity-30 pointer-events-none"
-            style={{ background: "radial-gradient(circle, #F0C8BB, transparent 70%)" }}
-          />
-          <div
-            className="absolute bottom-[-20px] left-[-15px] w-32 h-32 rounded-full opacity-25 pointer-events-none"
-            style={{ background: "radial-gradient(circle, #C0D4C2, transparent 70%)" }}
-          />
+            className="relative px-6 pt-6 pb-5 flex-shrink-0"
+            style={{ background: "linear-gradient(155deg, #FDF4F1 0%, #FAF6F0 50%, #EBF2EC 100%)" }}
+          >
+            {/* Blob accents */}
+            <div className="absolute top-[-20px] right-[-10px] w-28 h-28 rounded-full opacity-25 pointer-events-none" style={{ background: "radial-gradient(circle, #F0C8BB, transparent 70%)" }} />
 
-          {/* Badge + Hero */}
-          <div className="relative flex flex-col items-center text-center">
-            {/* "New" pill */}
-            <div
-              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full mb-4"
-              style={{
-                background: "linear-gradient(135deg, #B36050, #CA8070)",
-                boxShadow: "0 2px 10px rgba(179, 96, 80, 0.3)",
-                animation: "fadeSlideUp 0.5s ease-out 0.1s both",
-              }}
-            >
-              <span className="text-white text-[10px]">✦</span>
-              <span className="font-nunito text-[11px] font-bold text-white uppercase tracking-wider">
-                What&apos;s New
-              </span>
-              <span className="text-white text-[10px]">✦</span>
+            <div className="relative flex flex-col items-center text-center">
+              {/* Pill */}
+              <div
+                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full mb-3"
+                style={{ background: "linear-gradient(135deg, #B36050, #CA8070)" }}
+              >
+                <span className="font-nunito text-[10px] font-bold text-white uppercase tracking-wider">
+                  ✦ New ✦
+                </span>
+              </div>
+
+              {/* Emoji */}
+              <div className="text-4xl mb-2" style={{ animation: "popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) 0.15s both" }}>
+                {update.emoji}
+              </div>
+
+              {/* Headline */}
+              <h2 className="font-playfair text-[22px] font-bold text-[#3A2418] leading-tight">
+                {update.headline}
+              </h2>
+
+              {/* Subtitle */}
+              <p className="font-nunito text-[13px] text-[#5F7A63] mt-1.5 leading-snug px-2">
+                {update.subtitle}
+              </p>
             </div>
-
-            {/* Hero emoji */}
-            <div
-              className="text-5xl mb-3"
-              style={{ animation: "popIn 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both" }}
-            >
-              {update.emoji}
-            </div>
-
-            {/* Headline */}
-            <h2
-              className="font-playfair text-[26px] font-bold text-[#3A2418] leading-tight"
-              style={{ animation: "fadeSlideUp 0.5s ease-out 0.25s both" }}
-            >
-              {update.headline}
-            </h2>
-
-            {/* Subtitle */}
-            <p
-              className="font-nunito text-[14px] text-[#5F7A63] mt-2 leading-relaxed"
-              style={{ animation: "fadeSlideUp 0.5s ease-out 0.35s both" }}
-            >
-              {update.subtitle}
-            </p>
           </div>
-        </div>
 
-        {/* ── Feature list ───────────────────────────── */}
-        <div className="px-6 py-5 flex flex-col gap-3.5">
-          {update.features.map((feature, i) => (
-            <div
-              key={i}
-              className="flex items-start gap-3 bg-[#FAF6F0] rounded-2xl px-4 py-3.5 border border-[#E4D6C8]/60"
+          {/* ── Features (scrollable) ──────────────────── */}
+          <div className="flex-1 overflow-y-auto overscroll-contain px-5 py-4">
+            <div className="flex flex-col gap-2">
+              {update.features.map((f, i) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-2.5 rounded-xl bg-[#FAF6F0] px-3 py-2.5"
+                  style={{ animation: `fadeSlideUp 0.35s ease-out ${0.2 + i * 0.06}s both` }}
+                >
+                  <span className="text-base flex-shrink-0">{f.icon}</span>
+                  <p className="font-nunito text-[12.5px] text-[#3A2418] leading-snug">
+                    {f.text}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* ── CTA ────────────────────────────────────── */}
+          <div className="flex-shrink-0 px-5 pb-5 pt-2 flex flex-col gap-2" style={{ paddingBottom: "max(20px, env(safe-area-inset-bottom, 20px))" }}>
+            <Link
+              href={update.ctaHref}
+              onClick={dismiss}
+              className="block w-full py-3 rounded-full text-center font-nunito font-bold text-[14px] text-white active:scale-[0.97] transition-transform"
               style={{
-                animation: `fadeSlideUp 0.45s ease-out ${0.4 + i * 0.1}s both`,
+                background: "linear-gradient(135deg, #CA8070, #B36050)",
+                boxShadow: "0 4px 16px rgba(179, 96, 80, 0.3)",
               }}
             >
-              <div className="w-10 h-10 rounded-xl bg-white flex items-center justify-center flex-shrink-0 shadow-sm border border-[#E4D6C8]/40">
-                <span className="text-lg">{feature.icon}</span>
-              </div>
-              <div className="flex-1 min-w-0">
-                <p className="font-nunito text-[13px] font-bold text-[#3A2418] leading-tight">
-                  {feature.title}
-                </p>
-                <p className="font-nunito text-[12px] text-[#6B544D] mt-0.5 leading-relaxed">
-                  {feature.description}
-                </p>
-              </div>
-            </div>
-          ))}
-        </div>
-
-        {/* ── CTA buttons ────────────────────────────── */}
-        <div
-          className="px-6 pb-6 pt-1 flex flex-col gap-2.5"
-          style={{
-            animation: `fadeSlideUp 0.45s ease-out ${0.4 + update.features.length * 0.1}s both`,
-            paddingBottom: "max(24px, env(safe-area-inset-bottom, 24px))",
-          }}
-        >
-          <Link
-            href={update.ctaHref}
-            onClick={dismiss}
-            className="block w-full py-3.5 rounded-full text-center font-nunito font-bold text-[15px] text-white active:scale-[0.97] transition-transform"
-            style={{
-              background: "linear-gradient(135deg, #CA8070, #B36050)",
-              boxShadow: "0 6px 20px rgba(179, 96, 80, 0.35)",
-            }}
-          >
-            {update.ctaLabel}
-          </Link>
-
-          <button
-            onClick={dismiss}
-            className="w-full py-2.5 rounded-full text-center font-nunito font-semibold text-[13px] text-[#6B544D] active:scale-[0.97] transition-transform"
-          >
-            {update.secondaryLabel ?? "Dismiss"}
-          </button>
-        </div>
-
-        {/* Date footnote */}
-        <div className="absolute top-3 right-4">
-          <span className="font-nunito text-[10px] text-[#9A8578] font-semibold">
-            {update.date}
-          </span>
+              {update.ctaLabel}
+            </Link>
+            <button
+              onClick={dismiss}
+              className="w-full py-2 text-center font-nunito font-semibold text-[12px] text-[#9A8578] active:scale-[0.97]"
+            >
+              {update.dismissLabel ?? "Dismiss"}
+            </button>
+          </div>
         </div>
       </div>
     </div>
