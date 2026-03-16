@@ -11,12 +11,21 @@ import { PatternCard } from "@/components/patterns/PatternCard";
 import type { Pattern } from "@/types";
 
 type FilterTab = "all" | "wip" | "kitted" | "finished";
+type SortOption = "updated" | "name" | "designer" | "newest" | "progress";
 
 const TABS: { id: FilterTab; label: string }[] = [
   { id: "all", label: "All" },
   { id: "wip", label: "WIP" },
   { id: "kitted", label: "Kitted" },
   { id: "finished", label: "Finished" },
+];
+
+const SORT_OPTIONS: { id: SortOption; label: string }[] = [
+  { id: "updated", label: "Recently Updated" },
+  { id: "name", label: "Pattern Name" },
+  { id: "designer", label: "Designer" },
+  { id: "newest", label: "Date Added" },
+  { id: "progress", label: "Progress %" },
 ];
 
 function Skeleton({ className }: { className?: string }) {
@@ -48,6 +57,8 @@ function PatternsContent() {
 
   const [patterns, setPatterns] = useState<Pattern[] | null>(null);
   const [search, setSearch] = useState("");
+  const [sortBy, setSortBy] = useState<SortOption>("updated");
+  const [showSort, setShowSort] = useState(false);
   const [activeTab, setActiveTab] = useState<FilterTab>(
     ["all", "wip", "kitted", "finished"].includes(initialFilter) ? initialFilter : "all"
   );
@@ -87,8 +98,25 @@ function PatternsContent() {
       );
     }
 
+    // Sort
+    result = [...result].sort((a, b) => {
+      switch (sortBy) {
+        case "name":
+          return a.name.localeCompare(b.name);
+        case "designer":
+          return (a.designer ?? "").localeCompare(b.designer ?? "");
+        case "newest":
+          return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+        case "progress":
+          return (b.wip_pct ?? 0) - (a.wip_pct ?? 0);
+        case "updated":
+        default:
+          return new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime();
+      }
+    });
+
     return result;
-  }, [patterns, activeTab, search]);
+  }, [patterns, activeTab, search, sortBy]);
 
   const loading = patterns === null;
   const totalCount = patterns?.length ?? 0;
@@ -142,6 +170,49 @@ function PatternsContent() {
               ×
             </button>
           )}
+        </div>
+
+        {/* Sort + Filter row */}
+        <div className="flex items-center justify-between mb-3">
+          <p className="font-nunito text-[12px] text-[#6B544D] font-semibold">
+            {!loading && `${filtered?.length ?? 0} pattern${(filtered?.length ?? 0) !== 1 ? "s" : ""}`}
+          </p>
+          <div className="relative">
+            <button
+              onClick={() => setShowSort(!showSort)}
+              className="flex items-center gap-1.5 h-8 px-3 rounded-xl bg-white border border-[#E4D6C8] font-nunito text-[12px] font-semibold text-[#6B544D] active:scale-[0.97] transition-transform"
+            >
+              <span className="text-[13px]">↕</span>
+              {SORT_OPTIONS.find((s) => s.id === sortBy)?.label}
+            </button>
+            {showSort && (
+              <>
+                <div className="fixed inset-0 z-30" onClick={() => setShowSort(false)} />
+                <div
+                  className="absolute right-0 top-full mt-1 z-40 bg-white border border-[#E4D6C8] rounded-2xl py-1.5 min-w-[180px] shadow-lg"
+                  style={{ animation: "fadeSlideUp 0.15s ease-out" }}
+                >
+                  {SORT_OPTIONS.map((opt) => (
+                    <button
+                      key={opt.id}
+                      onClick={() => {
+                        setSortBy(opt.id);
+                        setShowSort(false);
+                      }}
+                      className={`w-full text-left px-4 py-2.5 font-nunito text-[13px] transition-colors ${
+                        sortBy === opt.id
+                          ? "text-[#B36050] font-bold bg-[#FDF4F1]"
+                          : "text-[#3A2418] active:bg-[#FAF6F0]"
+                      }`}
+                    >
+                      {sortBy === opt.id && <span className="mr-1.5">✓</span>}
+                      {opt.label}
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
         {/* Filter Tabs */}
