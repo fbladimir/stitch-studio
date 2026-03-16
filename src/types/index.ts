@@ -268,6 +268,26 @@ export interface ProgressPhoto {
   created_at: string;
 }
 
+// ── Pattern Markup (Phase 18) ────────────────────────────────
+
+export interface PatternMarkup {
+  id: string;
+  pattern_id: string;
+  user_id: string;
+  chart_photo_url: string | null;
+  grid_cols: number;
+  grid_rows: number;
+  calibration: {
+    topLeft: { x: number; y: number };
+    topRight: { x: number; y: number };
+    bottomLeft: { x: number; y: number };
+    bottomRight: { x: number; y: number };
+  } | null;
+  marked_cells: string; // bitfield string
+  created_at: string;
+  updated_at: string;
+}
+
 // ── Thread Manufacturers ─────────────────────────────────────
 
 export const THREAD_MANUFACTURERS = [

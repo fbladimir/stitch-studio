@@ -1,6 +1,6 @@
 // All database query functions
 import { createClient } from "./client";
-import type { Pattern, PatternThread, WipJournalEntry, ThreadInventoryItem, FabricInventoryItem, StitchSession, ProgressPhoto } from "@/types";
+import type { Pattern, PatternThread, WipJournalEntry, ThreadInventoryItem, FabricInventoryItem, StitchSession, ProgressPhoto, PatternMarkup } from "@/types";
 
 
 // ── Patterns ─────────────────────────────────────────────────
@@ -535,5 +535,62 @@ export async function uploadProgressPhoto(
   if (uploadError) return { url: null, error: uploadError };
 
   const { data } = supabase.storage.from("progress-photos").getPublicUrl(path);
+  return { url: data.publicUrl, error: null };
+}
+
+// ── Pattern Markups (Phase 18) ──────────────────────────────
+
+export async function getPatternMarkup(patternId: string) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("pattern_markups")
+    .select("*")
+    .eq("pattern_id", patternId)
+    .single();
+  return { data: data as PatternMarkup | null, error };
+}
+
+export async function createPatternMarkup(
+  markup: Omit<PatternMarkup, "id" | "created_at" | "updated_at">
+) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("pattern_markups")
+    .insert(markup)
+    .select()
+    .single();
+  return { data: data as PatternMarkup | null, error };
+}
+
+export async function updatePatternMarkup(
+  id: string,
+  updates: Partial<Omit<PatternMarkup, "id" | "created_at">>
+) {
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("pattern_markups")
+    .update({ ...updates, updated_at: new Date().toISOString() })
+    .eq("id", id)
+    .select()
+    .single();
+  return { data: data as PatternMarkup | null, error };
+}
+
+export async function uploadChartPhoto(
+  userId: string,
+  patternId: string,
+  file: File
+): Promise<{ url: string | null; error: Error | null }> {
+  const supabase = createClient();
+  const ext = file.name.split(".").pop() ?? "jpg";
+  const path = `${userId}/${patternId}/chart.${ext}`;
+
+  const { error: uploadError } = await supabase.storage
+    .from("chart-photos")
+    .upload(path, file, { upsert: true });
+
+  if (uploadError) return { url: null, error: uploadError };
+
+  const { data } = supabase.storage.from("chart-photos").getPublicUrl(path);
   return { url: data.publicUrl, error: null };
 }

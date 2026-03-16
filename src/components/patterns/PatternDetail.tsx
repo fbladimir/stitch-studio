@@ -134,6 +134,30 @@ export function PatternDetail({ initialPattern }: PatternDetailProps) {
         </section>
       )}
 
+      {/* ── Pattern Markup ─────────────────────────────────── */}
+      {pattern.wip && !isFinished && (
+        <section>
+          <Link
+            href={`/markup/${pattern.id}`}
+            className="w-full flex items-center gap-3 bg-white border border-[#E4D6C8] rounded-2xl px-4 py-3.5 active:scale-[0.98] transition-transform"
+            style={{ boxShadow: "0 2px 10px rgba(58,36,24,0.05)" }}
+          >
+            <div className="w-10 h-10 rounded-xl bg-[#FDF4F1] flex items-center justify-center flex-shrink-0">
+              <span className="text-lg">📐</span>
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="font-nunito text-[14px] font-bold text-[#3A2418]">
+                Pattern Markup
+              </p>
+              <p className="font-nunito text-[11px] text-[#6B544D]">
+                Mark stitches on your chart as you go
+              </p>
+            </div>
+            <span className="text-[#B36050] font-bold text-lg">›</span>
+          </Link>
+        </section>
+      )}
+
       {/* ── Finished stats ──────────────────────────────────── */}
       {isFinished && (
         <section className="bg-[#EBF2EC] border border-[#C0D4C2] rounded-2xl px-4 py-4">
