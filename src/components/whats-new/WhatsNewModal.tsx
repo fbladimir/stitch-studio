@@ -36,6 +36,36 @@ export interface AppUpdate {
 
 const UPDATES: AppUpdate[] = [
   {
+    id: "2026-03-16-pets-stitches-sort",
+    date: "March 2026",
+    headline: "Forgot a Fur Baby?",
+    subtitle: "Rokuu's feelings were hurt — so we fixed it! Plus new progress tracking.",
+    emoji: "🐾",
+    features: [
+      {
+        icon: "🐶",
+        title: "Add Pets Anytime",
+        description:
+          "Forgot to add a fur baby during onboarding? Head to your Profile to add (or remove) pets whenever you want!",
+      },
+      {
+        icon: "📊",
+        title: "Total Stitches + Auto Percentage",
+        description:
+          "Enter your pattern's total stitch count on any WIP and the progress percentage calculates automatically — just like R-XP!",
+      },
+      {
+        icon: "↕️",
+        title: "Sort Your Collection",
+        description:
+          "Sort patterns by name, designer, date added, or progress. Tap the sort button at the top of your patterns list.",
+      },
+    ],
+    ctaLabel: "Add a Fur Baby 🐾",
+    ctaHref: "/profile",
+    secondaryLabel: "I'm good!",
+  },
+  {
     id: "2026-03-14-import",
     date: "March 2026",
     headline: "Import Your Collection",

@@ -121,10 +121,12 @@ export function WipTracker({ pattern, onUpdate }: WipTrackerProps) {
     setDirty(false);
   }
 
+  const hasTotalStitches = typeof totalStitches === "number" && totalStitches > 0;
+
   return (
     <div className="bg-white border border-[#E4D6C8] rounded-2xl p-4 flex flex-col gap-4">
       {/* ── Stats Grid (R-XP inspired) ───────────────── */}
-      {typeof totalStitches === "number" && totalStitches > 0 && (
+      {hasTotalStitches && (
         <div className="grid grid-cols-2 gap-2.5">
           <StatBox
             label="Completed"
@@ -146,7 +148,7 @@ export function WipTracker({ pattern, onUpdate }: WipTrackerProps) {
           />
           <StatBox
             label="Total Stitches"
-            value={totalStitches.toLocaleString()}
+            value={(totalStitches as number).toLocaleString()}
             color="text-[#3A2418]"
             bg="bg-[#F5EEE8]"
           />
@@ -190,46 +192,57 @@ export function WipTracker({ pattern, onUpdate }: WipTrackerProps) {
         )}
       </div>
 
-      {/* ── Total Stitches ───────────────────────────── */}
-      <div>
-        <label className="font-nunito font-semibold text-[13px] text-[#3A2418] block mb-1.5">
-          Total pattern stitches
-        </label>
-        <input
-          type="number"
-          min={0}
-          value={totalStitches}
-          placeholder="e.g. 18751"
-          onChange={(e) => {
-            const val = e.target.value ? Number(e.target.value) : "";
-            setTotalStitches(val);
-            setDirty(true);
-          }}
-          className="w-full h-11 px-3 rounded-xl border border-[#E4D6C8] font-nunito text-[14px] text-[#3A2418] bg-[#FAF6F0] focus:outline-none focus:border-[#B36050] placeholder:text-[#9A8578]"
-        />
-        {pattern.size_stitches && parsedTotal && typeof totalStitches !== "number" && (
-          <p className="font-nunito text-[11px] text-[#6B544D] mt-1">
-            From design size: {pattern.size_stitches} = {parsedTotal.toLocaleString()} stitches
+      {/* ── Stitch Tracking ──────────────────────────── */}
+      {!hasTotalStitches && (
+        <div className="bg-[#FBF5E8] border border-[#AE7C2A]/20 rounded-xl px-4 py-3">
+          <p className="font-nunito text-[12px] text-[#AE7C2A] font-semibold">
+            💡 Enter your total stitch count below to unlock auto-tracking — your percentage and stats will calculate automatically!
           </p>
-        )}
-      </div>
+        </div>
+      )}
 
-      {/* ── Stitches Completed ───────────────────────── */}
-      <div>
-        <label className="font-nunito font-semibold text-[13px] text-[#3A2418] block mb-1.5">
-          Stitches completed
-        </label>
-        <input
-          type="number"
-          min={0}
-          value={stitches || ""}
-          placeholder="0"
-          onChange={(e) => {
-            setStitches(Number(e.target.value));
-            setDirty(true);
-          }}
-          className="w-full h-11 px-3 rounded-xl border border-[#E4D6C8] font-nunito text-[14px] text-[#3A2418] bg-[#FAF6F0] focus:outline-none focus:border-[#B36050] placeholder:text-[#9A8578]"
-        />
+      <div className="grid grid-cols-2 gap-3">
+        {/* Total Stitches (left) */}
+        <div>
+          <label className="font-nunito font-semibold text-[13px] text-[#3A2418] block mb-1.5">
+            Total stitches
+          </label>
+          <input
+            type="number"
+            min={0}
+            value={totalStitches}
+            placeholder="e.g. 18751"
+            onChange={(e) => {
+              const val = e.target.value ? Number(e.target.value) : "";
+              setTotalStitches(val);
+              setDirty(true);
+            }}
+            className="w-full h-11 px-3 rounded-xl border border-[#E4D6C8] font-nunito text-[14px] text-[#3A2418] bg-[#FAF6F0] focus:outline-none focus:border-[#B36050] placeholder:text-[#9A8578]"
+          />
+          {pattern.size_stitches && parsedTotal && typeof totalStitches !== "number" && (
+            <p className="font-nunito text-[11px] text-[#6B544D] mt-1">
+              Design: {pattern.size_stitches} = {parsedTotal.toLocaleString()}
+            </p>
+          )}
+        </div>
+
+        {/* Stitches Completed (right) */}
+        <div>
+          <label className="font-nunito font-semibold text-[13px] text-[#3A2418] block mb-1.5">
+            Stitches done
+          </label>
+          <input
+            type="number"
+            min={0}
+            value={stitches || ""}
+            placeholder="0"
+            onChange={(e) => {
+              setStitches(Number(e.target.value));
+              setDirty(true);
+            }}
+            className="w-full h-11 px-3 rounded-xl border border-[#E4D6C8] font-nunito text-[14px] text-[#3A2418] bg-[#FAF6F0] focus:outline-none focus:border-[#B36050] placeholder:text-[#9A8578]"
+          />
+        </div>
       </div>
 
       {/* ── Dates ────────────────────────────────────── */}
