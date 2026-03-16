@@ -39,7 +39,7 @@ const UPDATES: AppUpdate[] = [
     id: "2026-03-16-pets-stitches-sort",
     date: "March 2026",
     headline: "Forgot a Fur Baby?",
-    subtitle: "Rokuu's feelings were hurt — so we fixed it! Plus new progress tracking.",
+    subtitle: "Now you can add new fur babies anytime — plus exciting progress tracking!",
     emoji: "🐾",
     features: [
       {
