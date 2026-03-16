@@ -15,7 +15,7 @@ import {
 } from "@/lib/supabase/queries";
 import { compressImage } from "@/lib/image";
 import { createBitfield, countMarked } from "@/lib/markup-cells";
-import { GridCanvas, type MarkupTool } from "@/components/markup/GridCanvas";
+import { GridCanvas, type MarkupTool, type GridCanvasHandle } from "@/components/markup/GridCanvas";
 import { MarkupToolbar } from "@/components/markup/MarkupToolbar";
 import { MarkupStats } from "@/components/markup/MarkupStats";
 import type { Pattern, PatternMarkup } from "@/types";
@@ -40,6 +40,7 @@ export default function MarkupPage() {
   const [chartFile, setChartFile] = useState<File | null>(null);
 
   // Markup state
+  const canvasRef = useRef<GridCanvasHandle>(null);
   const [tool, setTool] = useState<MarkupTool>("mark");
   const [markedCells, setMarkedCells] = useState("");
   const [saving, setSaving] = useState(false);
@@ -161,11 +162,9 @@ export default function MarkupPage() {
   };
 
   // Zoom controls
-  const handleZoomIn = () => {
-    // GridCanvas handles this internally via pinch/wheel
-    // For toolbar button, we dispatch a synthetic wheel event
-    toast("Pinch or scroll to zoom");
-  };
+  const handleZoomIn = () => canvasRef.current?.zoomIn();
+  const handleZoomOut = () => canvasRef.current?.zoomOut();
+  const handleFitToScreen = () => canvasRef.current?.fitToScreen();
 
   if (loading) {
     return (
@@ -375,6 +374,7 @@ export default function MarkupPage() {
 
       {/* Canvas */}
       <GridCanvas
+        ref={canvasRef}
         chartImageUrl={markup?.chart_photo_url ?? null}
         gridRows={gridRows}
         gridCols={gridCols}
@@ -389,8 +389,8 @@ export default function MarkupPage() {
         onToolChange={setTool}
         onUndo={handleUndo}
         onZoomIn={handleZoomIn}
-        onZoomOut={handleZoomIn}
-        onFitToScreen={handleZoomIn}
+        onZoomOut={handleZoomOut}
+        onFitToScreen={handleFitToScreen}
         canUndo={undoStack.length > 0}
         saving={saving}
       />
