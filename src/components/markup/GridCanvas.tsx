@@ -139,39 +139,64 @@ export const GridCanvas = forwardRef<GridCanvasHandle, GridCanvasProps>(function
       ctx.fillRect(0, 0, gridCols * cellW, gridRows * cellH);
     }
 
-    // Marked cells
-    for (let r = 0; r < gridRows; r++) {
-      for (let c = 0; c < gridCols; c++) {
+    // ── Viewport culling: only render visible cells ──────────
+    const visLeft = -offsetX / scale;
+    const visTop = -offsetY / scale;
+    const visRight = visLeft + cw / scale;
+    const visBottom = visTop + ch / scale;
+
+    const rStart = Math.max(0, Math.floor(visTop / cellH) - 1);
+    const rEnd = Math.min(gridRows - 1, Math.ceil(visBottom / cellH) + 1);
+    const cStart = Math.max(0, Math.floor(visLeft / cellW) - 1);
+    const cEnd = Math.min(gridCols - 1, Math.ceil(visRight / cellW) + 1);
+
+    // Marked cells — brighter color + X mark for visibility
+    for (let r = rStart; r <= rEnd; r++) {
+      for (let c = cStart; c <= cEnd; c++) {
         if (isMarked(markedCells, r, c, gridCols)) {
-          ctx.fillStyle = "rgba(95, 122, 99, 0.45)";
-          ctx.fillRect(c * cellW, r * cellH, cellW, cellH);
-          ctx.fillStyle = "rgba(255, 255, 255, 0.7)";
-          const cx = c * cellW + cellW / 2;
-          const cy = r * cellH + cellH / 2;
+          const x = c * cellW;
+          const y = r * cellH;
+          // Sage green fill — higher opacity for visibility
+          ctx.fillStyle = "rgba(95, 122, 99, 0.55)";
+          ctx.fillRect(x, y, cellW, cellH);
+          // White X mark in center (visible at any zoom)
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.85)";
+          ctx.lineWidth = Math.max(1, Math.min(cellW, cellH) * 0.08);
+          const inset = Math.min(cellW, cellH) * 0.25;
           ctx.beginPath();
-          ctx.arc(cx, cy, Math.min(cellW, cellH) * 0.2, 0, Math.PI * 2);
-          ctx.fill();
+          ctx.moveTo(x + inset, y + inset);
+          ctx.lineTo(x + cellW - inset, y + cellH - inset);
+          ctx.moveTo(x + cellW - inset, y + inset);
+          ctx.lineTo(x + inset, y + cellH - inset);
+          ctx.stroke();
         }
       }
     }
 
-    // Grid lines
+    // Grid lines — only visible range
+    const lineRStart = Math.max(0, rStart);
+    const lineREnd = Math.min(gridRows, rEnd + 1);
+    const lineCStart = Math.max(0, cStart);
+    const lineCEnd = Math.min(gridCols, cEnd + 1);
+
     ctx.strokeStyle = "rgba(58, 36, 24, 0.15)";
     ctx.lineWidth = 0.5;
-    for (let r = 0; r <= gridRows; r++) {
-      ctx.beginPath(); ctx.moveTo(0, r * cellH); ctx.lineTo(gridCols * cellW, r * cellH); ctx.stroke();
+    for (let r = lineRStart; r <= lineREnd; r++) {
+      ctx.beginPath(); ctx.moveTo(cStart * cellW, r * cellH); ctx.lineTo((cEnd + 1) * cellW, r * cellH); ctx.stroke();
     }
-    for (let c = 0; c <= gridCols; c++) {
-      ctx.beginPath(); ctx.moveTo(c * cellW, 0); ctx.lineTo(c * cellW, gridRows * cellH); ctx.stroke();
+    for (let c = lineCStart; c <= lineCEnd; c++) {
+      ctx.beginPath(); ctx.moveTo(c * cellW, rStart * cellH); ctx.lineTo(c * cellW, (rEnd + 1) * cellH); ctx.stroke();
     }
-    // Bold every 10
+    // Bold every 10 — only visible range
     ctx.strokeStyle = "rgba(58, 36, 24, 0.35)";
     ctx.lineWidth = 1;
-    for (let r = 0; r <= gridRows; r += 10) {
-      ctx.beginPath(); ctx.moveTo(0, r * cellH); ctx.lineTo(gridCols * cellW, r * cellH); ctx.stroke();
+    const boldRStart = Math.ceil(lineRStart / 10) * 10;
+    const boldCStart = Math.ceil(lineCStart / 10) * 10;
+    for (let r = boldRStart; r <= lineREnd; r += 10) {
+      ctx.beginPath(); ctx.moveTo(cStart * cellW, r * cellH); ctx.lineTo((cEnd + 1) * cellW, r * cellH); ctx.stroke();
     }
-    for (let c = 0; c <= gridCols; c += 10) {
-      ctx.beginPath(); ctx.moveTo(c * cellW, 0); ctx.lineTo(c * cellW, gridRows * cellH); ctx.stroke();
+    for (let c = boldCStart; c <= lineCEnd; c += 10) {
+      ctx.beginPath(); ctx.moveTo(c * cellW, rStart * cellH); ctx.lineTo(c * cellW, (rEnd + 1) * cellH); ctx.stroke();
     }
 
     ctx.restore();

@@ -99,7 +99,7 @@ export function PatternDetail({ initialPattern }: PatternDetailProps) {
       {/* ── Header ──────────────────────────────────────────── */}
       <div className="flex items-start justify-between gap-3">
         <div className="flex-1 min-w-0">
-          <h1 className="font-playfair text-[24px] font-bold text-[#3A2418] leading-tight">
+          <h1 className="font-playfair text-[24px] font-bold text-[#3A2418] leading-tight break-words">
             {pattern.name}
           </h1>
           {(pattern.designer || pattern.company) && (

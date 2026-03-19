@@ -10,7 +10,6 @@ import {
   getPatternMarkup,
   createPatternMarkup,
   updatePatternMarkup,
-  updatePattern,
   uploadChartPhoto,
 } from "@/lib/supabase/queries";
 import { compressImage } from "@/lib/image";
@@ -86,22 +85,19 @@ export default function MarkupPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  // Debounced save to Supabase
+  // Debounced save to Supabase — only saves markup data, does NOT
+  // overwrite pattern.wip_stitches (user controls that manually in WipTracker)
   const debouncedSave = useCallback(
     (newCells: string) => {
       if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current);
       saveTimeoutRef.current = setTimeout(async () => {
         if (!markup) return;
         setSaving(true);
-        const marked = countMarked(newCells);
-        await Promise.all([
-          updatePatternMarkup(markup.id, { marked_cells: newCells }),
-          updatePattern(patternId, { wip_stitches: marked }),
-        ]);
+        await updatePatternMarkup(markup.id, { marked_cells: newCells });
         setSaving(false);
       }, 1500);
     },
-    [markup, patternId]
+    [markup]
   );
 
   const handleCellToggle = useCallback(

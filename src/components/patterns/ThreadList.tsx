@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { PatternThread, StitchType, AIScanThreadResult } from "@/types";
 import { THREAD_MANUFACTURERS } from "@/types";
 import {
@@ -14,6 +14,8 @@ import { compressImage, fileToBase64 } from "@/lib/image";
 interface ThreadListProps {
   patternId: string;
 }
+
+type ThreadSort = "added" | "number_asc" | "number_desc" | "name_asc";
 
 const STITCH_TYPES: { value: StitchType; label: string }[] = [
   { value: "full", label: "Full Stitch" },
@@ -39,6 +41,7 @@ export function ThreadList({ patternId }: ThreadListProps) {
   const [form, setForm] = useState(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [sortBy, setSortBy] = useState<ThreadSort>("added");
 
   // AI scan state
   const scanCameraRef = useRef<HTMLInputElement>(null);
@@ -54,6 +57,32 @@ export function ThreadList({ patternId }: ThreadListProps) {
       setLoading(false);
     });
   }, [patternId]);
+
+  const sortedThreads = useMemo(() => {
+    const copy = [...threads];
+    switch (sortBy) {
+      case "number_asc":
+        return copy.sort((a, b) => {
+          const na = parseInt(a.color_number ?? "", 10);
+          const nb = parseInt(b.color_number ?? "", 10);
+          if (!isNaN(na) && !isNaN(nb)) return na - nb;
+          return (a.color_number ?? "").localeCompare(b.color_number ?? "");
+        });
+      case "number_desc":
+        return copy.sort((a, b) => {
+          const na = parseInt(a.color_number ?? "", 10);
+          const nb = parseInt(b.color_number ?? "", 10);
+          if (!isNaN(na) && !isNaN(nb)) return nb - na;
+          return (b.color_number ?? "").localeCompare(a.color_number ?? "");
+        });
+      case "name_asc":
+        return copy.sort((a, b) =>
+          (a.color_name ?? "").localeCompare(b.color_name ?? "")
+        );
+      default:
+        return copy; // insertion order
+    }
+  }, [threads, sortBy]);
 
   function openAdd() {
     setEditingId(null);
@@ -211,10 +240,30 @@ export function ThreadList({ patternId }: ThreadListProps) {
 
   return (
     <div className="flex flex-col gap-3">
+      {/* Sort dropdown */}
+      {threads.length > 1 && (
+        <div className="flex items-center justify-between">
+          <p className="font-nunito text-[12px] text-[#6B544D]">
+            {threads.length} thread{threads.length !== 1 ? "s" : ""}
+          </p>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as ThreadSort)}
+            className="h-8 px-2.5 rounded-lg border border-[#E4D6C8] bg-white font-nunito text-[12px] text-[#3A2418] focus:outline-none focus:border-[#B36050] appearance-none"
+            style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236B544D' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E\")", backgroundRepeat: "no-repeat", backgroundPosition: "right 8px center", paddingRight: "24px" }}
+          >
+            <option value="added">As Added</option>
+            <option value="number_asc">Color # ↑</option>
+            <option value="number_desc">Color # ↓</option>
+            <option value="name_asc">Name A→Z</option>
+          </select>
+        </div>
+      )}
+
       {/* Thread rows */}
-      {threads.length > 0 && (
+      {sortedThreads.length > 0 && (
         <div className="flex flex-col gap-2">
-          {threads.map((thread) => (
+          {sortedThreads.map((thread) => (
             <div key={thread.id}>
               {editingId === thread.id ? (
                 <ThreadForm
