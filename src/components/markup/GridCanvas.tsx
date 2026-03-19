@@ -84,6 +84,9 @@ export const GridCanvas = forwardRef<GridCanvasHandle, GridCanvasProps>(function
   // Tap detection
   const tapRef = useRef<{ x: number; y: number; time: number; id: number } | null>(null);
 
+  // Suppress synthetic mouse events after touch (prevents double-fire)
+  const lastTouchEndRef = useRef(0);
+
   // Store latest props in refs for the render loop
   const markedCellsRef = useRef(markedCells);
   markedCellsRef.current = markedCells;
@@ -514,6 +517,7 @@ export const GridCanvas = forwardRef<GridCanvasHandle, GridCanvasProps>(function
   }, []);
 
   const handleTouchEnd = useCallback((e: React.TouchEvent) => {
+    lastTouchEndRef.current = Date.now();
     const g = gestureRef.current;
 
     // If going from 2 fingers to 1, end the pinch but don't trigger tap
@@ -558,6 +562,8 @@ export const GridCanvas = forwardRef<GridCanvasHandle, GridCanvasProps>(function
   const mouseDraggingRef = useRef(false);
 
   const handleMouseDown = useCallback((e: React.MouseEvent) => {
+    // Ignore synthetic mouse events fired after touch
+    if (Date.now() - lastTouchEndRef.current < 500) return;
     mouseDownRef.current = { x: e.clientX, y: e.clientY, time: Date.now(), button: e.button };
     mouseDraggingRef.current = false;
     velocityRef.current = { x: 0, y: 0 };
