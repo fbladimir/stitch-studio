@@ -5,6 +5,7 @@ import { useParams } from "next/navigation";
 import Link from "next/link";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import { useAppStore } from "@/store/appStore";
 import {
   getPattern,
   getPatternMarkup,
@@ -18,36 +19,106 @@ import { GridCanvas, type MarkupTool, type GridCanvasHandle } from "@/components
 import { MarkupToolbar } from "@/components/markup/MarkupToolbar";
 import { MarkupStats } from "@/components/markup/MarkupStats";
 import { useEngagement } from "@/hooks/useEngagement";
-import type { Pattern, PatternMarkup, Dog } from "@/types";
+import type { Pattern, PatternMarkup, Dog, CelebrationData } from "@/types";
 
 type SetupStep = "upload" | "grid-size" | "ready";
 
 // ── Markup milestone messages ──────────────────────────────────
-// Each milestone: [markCount, getMessage(dogName)]
-const MILESTONES: [number, (dog: string) => string][] = [
+
+const MARK_MILESTONES: [number, (dog: string) => string][] = [
   [5,   (d) => `${d} says: Nice start! Keep going! 🐾`],
-  [10,  (d) => `${d} is wagging their tail — 10 stitches marked! ✨`],
+  [10,  (d) => `${d} is wagging their tail — 10 stitches! ✨`],
   [25,  (d) => `25 stitches! ${d} is doing a happy dance 💃🐾`],
   [50,  (d) => `Halfway to 100! ${d} brought you a treat 🦴`],
-  [100, (d) => `🎉 100 stitches marked! ${d} is SO proud of you!`],
-  [200, (d) => `200! You're on a roll — ${d} can barely contain the excitement 🐾✨`],
+  [100, (d) => `🎉 100 stitches! ${d} is SO proud of you!`],
+  [200, (d) => `200! ${d} can barely contain the excitement 🐾✨`],
   [500, (d) => `FIVE HUNDRED! ${d} is howling with joy! 🎉🐕`],
 ];
 
-function getMilestoneMessage(count: number, dogs: Dog[]): string | null {
-  const milestone = MILESTONES.find(([n]) => n === count);
-  if (!milestone) {
-    // Every 100 after 500
-    if (count > 500 && count % 100 === 0) {
-      const dog = dogs.length > 0 ? dogs[Math.floor(Math.random() * dogs.length)] : null;
-      const name = dog ? `${dog.emoji} ${dog.name}` : "Your fur babies";
-      return `${count} stitches! ${name} can't believe it 🐾🔥`;
-    }
-    return null;
-  }
-  const dog = dogs.length > 0 ? dogs[Math.floor(Math.random() * dogs.length)] : null;
-  const name = dog ? `${dog.emoji} ${dog.name}` : "Your fur babies";
-  return milestone[1](name);
+const PCT_MILESTONES = [25, 50, 75];
+const PCT_MESSAGES: Record<number, (dog: string) => string> = {
+  25: (d) => `Quarter done! ${d} is cheering you on! 🎉`,
+  50: (d) => `HALFWAY THERE! ${d} can see the finish line! 🐾🔥`,
+  75: (d) => `75%! Almost there — ${d} is losing their mind with excitement! 🎊`,
+};
+
+function pickDog(dogs: Dog[]): string {
+  if (dogs.length === 0) return "Your fur babies";
+  const d = dogs[Math.floor(Math.random() * dogs.length)];
+  return `${d.emoji} ${d.name}`;
+}
+
+function getMarkMilestone(count: number, dogs: Dog[]): string | null {
+  const m = MARK_MILESTONES.find(([n]) => n === count);
+  if (m) return m[1](pickDog(dogs));
+  if (count > 500 && count % 100 === 0) return `${count} stitches! ${pickDog(dogs)} can't believe it 🐾🔥`;
+  return null;
+}
+
+// ── In-page notification component ────────────────────────────
+
+function MarkupNotification({ message, onDone }: { message: string; onDone: () => void }) {
+  useEffect(() => {
+    const t = setTimeout(onDone, 3500);
+    return () => clearTimeout(t);
+  }, [onDone]);
+
+  return (
+    <div
+      className="absolute left-3 right-3 z-20 flex items-center justify-center pointer-events-none"
+      style={{ bottom: "calc(env(safe-area-inset-bottom, 0px) + 76px)" }}
+    >
+      <div
+        className="px-5 py-3 rounded-2xl bg-[#3A2418]/90 backdrop-blur-sm shadow-lg pointer-events-auto"
+        style={{ animation: "fadeSlideUp 0.3s ease-out, fadeOut 0.4s ease-in 3s forwards" }}
+      >
+        <p className="font-nunito text-[14px] text-white text-center font-semibold leading-snug">
+          {message}
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ── Session summary overlay ───────────────────────────────────
+
+function SessionSummary({ marks, minutes, patternName, onClose }: {
+  marks: number; minutes: number; patternName: string; onClose: () => void;
+}) {
+  if (marks === 0) return null;
+  return (
+    <div className="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-6" onClick={onClose}>
+      <div
+        className="bg-white rounded-3xl p-6 max-w-[320px] w-full text-center shadow-2xl"
+        onClick={(e) => e.stopPropagation()}
+        style={{ animation: "fadeSlideUp 0.3s ease-out" }}
+      >
+        <span className="text-4xl block mb-2">✿</span>
+        <h2 className="font-playfair text-[22px] font-bold text-[#3A2418] mb-1">
+          Great session!
+        </h2>
+        <p className="font-nunito text-[14px] text-[#6B544D] mb-4">
+          {patternName}
+        </p>
+        <div className="flex gap-3 justify-center mb-5">
+          <div className="bg-[#FDF4F1] rounded-2xl px-4 py-3 flex-1">
+            <p className="font-nunito text-[22px] font-bold text-[#B36050]">{marks}</p>
+            <p className="font-nunito text-[11px] text-[#6B544D]">stitches marked</p>
+          </div>
+          <div className="bg-[#EBF2EC] rounded-2xl px-4 py-3 flex-1">
+            <p className="font-nunito text-[22px] font-bold text-[#5F7A63]">{minutes}</p>
+            <p className="font-nunito text-[11px] text-[#6B544D]">minutes</p>
+          </div>
+        </div>
+        <button
+          onClick={onClose}
+          className="w-full h-12 rounded-full bg-[#B36050] text-white font-nunito font-bold text-[15px] active:scale-[0.97] transition-transform"
+        >
+          Done ✿
+        </button>
+      </div>
+    </div>
+  );
 }
 
 export default function MarkupPage() {
@@ -59,6 +130,11 @@ export default function MarkupPage() {
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [dogs, setDogs] = useState<Dog[]>([]);
+  const [notification, setNotification] = useState<string | null>(null);
+  const [showSummary, setShowSummary] = useState(false);
+  const sessionStartRef = useRef(Date.now());
+  const pctMilestonesHitRef = useRef(new Set<number>());
+  const pushCelebration = useAppStore((s) => s.pushCelebration);
 
   // Setup state (for new markups)
   const [setupStep, setSetupStep] = useState<SetupStep | null>(null);
@@ -148,22 +224,57 @@ export default function MarkupPage() {
       setMarkedCells(newBitfield);
       debouncedSave(newBitfield);
 
-      // Track session marks and show milestone celebrations
       const oldCount = countMarked(markedCells);
       const newCount = countMarked(newBitfield);
-      if (newCount > oldCount) {
-        sessionMarksRef.current += (newCount - oldCount);
-        const msg = getMilestoneMessage(sessionMarksRef.current, dogs);
-        if (msg) {
-          toast(msg, { duration: 3000 });
-          // Award XP at key milestones
-          if (sessionMarksRef.current === 10 || sessionMarksRef.current === 50 || sessionMarksRef.current === 100) {
-            recordActivity("log_wip_progress");
+      if (newCount <= oldCount) return; // erasing, skip celebrations
+
+      sessionMarksRef.current += (newCount - oldCount);
+      const total = gridRows * gridCols;
+
+      // ── 100% completion → full confetti celebration ──────────
+      if (total > 0 && newCount >= total) {
+        const dogName = pickDog(dogs);
+        const celebration: CelebrationData = {
+          type: "pattern_finished",
+          title: "✿ Pattern Complete! ✿",
+          subtitle: "Every single stitch — marked!",
+          patternName: pattern?.name,
+          coverPhotoUrl: pattern?.cover_photo_url ?? undefined,
+          dogLine: `${dogName} is doing zoomies! 🐾🎉`,
+          stats: [
+            { label: "Stitches", value: total.toLocaleString() },
+            { label: "This Session", value: sessionMarksRef.current.toLocaleString() },
+          ],
+        };
+        pushCelebration(celebration);
+        recordActivity("mark_finished");
+        return;
+      }
+
+      // ── Percentage milestones (25%, 50%, 75%) ────────────────
+      if (total > 0) {
+        const pct = Math.floor((newCount / total) * 100);
+        for (const milestone of PCT_MILESTONES) {
+          if (pct >= milestone && !pctMilestonesHitRef.current.has(milestone)) {
+            pctMilestonesHitRef.current.add(milestone);
+            const msg = PCT_MESSAGES[milestone](pickDog(dogs));
+            setNotification(msg);
+            if (milestone === 50) recordActivity("log_wip_progress");
+            return; // one notification at a time
           }
         }
       }
+
+      // ── Mark count milestones ────────────────────────────────
+      const msg = getMarkMilestone(sessionMarksRef.current, dogs);
+      if (msg) {
+        setNotification(msg);
+        if (sessionMarksRef.current === 10 || sessionMarksRef.current === 50 || sessionMarksRef.current === 100) {
+          recordActivity("log_wip_progress");
+        }
+      }
     },
-    [markedCells, debouncedSave, dogs, recordActivity]
+    [markedCells, debouncedSave, dogs, recordActivity, gridRows, gridCols, pattern, pushCelebration]
   );
 
   const handleUndo = useCallback(() => {
@@ -412,12 +523,18 @@ export default function MarkupPage() {
         <p className="flex-1 font-nunito text-[13px] font-bold text-white truncate">
           {pattern.name}
         </p>
-        <Link
-          href={`/patterns/${patternId}`}
+        <button
+          onClick={() => {
+            if (sessionMarksRef.current > 0) {
+              setShowSummary(true);
+            } else {
+              window.location.href = `/patterns/${patternId}`;
+            }
+          }}
           className="h-8 px-3 rounded-lg bg-white/10 text-white font-nunito text-[11px] font-bold flex items-center active:scale-95"
         >
           ← Exit
-        </Link>
+        </button>
       </div>
 
       {/* Stats overlay */}
@@ -436,6 +553,15 @@ export default function MarkupPage() {
         onCellToggle={handleCellToggle}
       />
 
+      {/* In-page notification (above toolbar) */}
+      {notification && (
+        <MarkupNotification
+          key={notification}
+          message={notification}
+          onDone={() => setNotification(null)}
+        />
+      )}
+
       {/* Toolbar */}
       <MarkupToolbar
         tool={tool}
@@ -447,6 +573,16 @@ export default function MarkupPage() {
         canUndo={undoStack.length > 0}
         saving={saving}
       />
+
+      {/* Session summary on exit */}
+      {showSummary && (
+        <SessionSummary
+          marks={sessionMarksRef.current}
+          minutes={Math.round((Date.now() - sessionStartRef.current) / 60000)}
+          patternName={pattern.name}
+          onClose={() => { window.location.href = `/patterns/${patternId}`; }}
+        />
+      )}
     </div>
   );
 }
