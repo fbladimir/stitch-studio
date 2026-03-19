@@ -327,14 +327,17 @@ export const GridCanvas = forwardRef<GridCanvasHandle, GridCanvasProps>(function
 
     if (stillActive || isActiveRef.current) {
       rafRef.current = requestAnimationFrame(loop);
+    } else {
+      // Loop is done — clear the ref so startLoop() can restart it
+      rafRef.current = 0;
     }
   }, [draw]);
 
   function startLoop() {
     needsDrawRef.current = true;
-    if (!rafRef.current) {
-      rafRef.current = requestAnimationFrame(loop);
-    }
+    // Always schedule a new frame — cancel stale one if needed
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    rafRef.current = requestAnimationFrame(loop);
   }
 
   // Kick the loop whenever markedCells change (external update)
@@ -352,22 +355,7 @@ export const GridCanvas = forwardRef<GridCanvasHandle, GridCanvasProps>(function
     };
   }, []);
 
-  // Stop loop when idle
-  useEffect(() => {
-    // After each loop frame, if nothing is active, stop
-    const checkStop = () => {
-      if (!isActiveRef.current && !animZoomRef.current &&
-          Math.abs(velocityRef.current.x) <= MIN_VEL &&
-          Math.abs(velocityRef.current.y) <= MIN_VEL) {
-        if (rafRef.current) {
-          cancelAnimationFrame(rafRef.current);
-          rafRef.current = 0;
-        }
-      }
-    };
-    const id = setInterval(checkStop, 500);
-    return () => clearInterval(id);
-  }, []);
+  // No idle-check interval needed — loop self-terminates and clears rafRef
 
   // ── Screen coords → grid cell ────────────────────────────────
 
