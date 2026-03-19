@@ -17,9 +17,38 @@ import { createBitfield, countMarked } from "@/lib/markup-cells";
 import { GridCanvas, type MarkupTool, type GridCanvasHandle } from "@/components/markup/GridCanvas";
 import { MarkupToolbar } from "@/components/markup/MarkupToolbar";
 import { MarkupStats } from "@/components/markup/MarkupStats";
-import type { Pattern, PatternMarkup } from "@/types";
+import { useEngagement } from "@/hooks/useEngagement";
+import type { Pattern, PatternMarkup, Dog } from "@/types";
 
 type SetupStep = "upload" | "grid-size" | "ready";
+
+// ── Markup milestone messages ──────────────────────────────────
+// Each milestone: [markCount, getMessage(dogName)]
+const MILESTONES: [number, (dog: string) => string][] = [
+  [5,   (d) => `${d} says: Nice start! Keep going! 🐾`],
+  [10,  (d) => `${d} is wagging their tail — 10 stitches marked! ✨`],
+  [25,  (d) => `25 stitches! ${d} is doing a happy dance 💃🐾`],
+  [50,  (d) => `Halfway to 100! ${d} brought you a treat 🦴`],
+  [100, (d) => `🎉 100 stitches marked! ${d} is SO proud of you!`],
+  [200, (d) => `200! You're on a roll — ${d} can barely contain the excitement 🐾✨`],
+  [500, (d) => `FIVE HUNDRED! ${d} is howling with joy! 🎉🐕`],
+];
+
+function getMilestoneMessage(count: number, dogs: Dog[]): string | null {
+  const milestone = MILESTONES.find(([n]) => n === count);
+  if (!milestone) {
+    // Every 100 after 500
+    if (count > 500 && count % 100 === 0) {
+      const dog = dogs.length > 0 ? dogs[Math.floor(Math.random() * dogs.length)] : null;
+      const name = dog ? `${dog.emoji} ${dog.name}` : "Your fur babies";
+      return `${count} stitches! ${name} can't believe it 🐾🔥`;
+    }
+    return null;
+  }
+  const dog = dogs.length > 0 ? dogs[Math.floor(Math.random() * dogs.length)] : null;
+  const name = dog ? `${dog.emoji} ${dog.name}` : "Your fur babies";
+  return milestone[1](name);
+}
 
 export default function MarkupPage() {
   const params = useParams();
@@ -29,6 +58,7 @@ export default function MarkupPage() {
   const [markup, setMarkup] = useState<PatternMarkup | null>(null);
   const [userId, setUserId] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [dogs, setDogs] = useState<Dog[]>([]);
 
   // Setup state (for new markups)
   const [setupStep, setSetupStep] = useState<SetupStep | null>(null);
@@ -48,11 +78,23 @@ export default function MarkupPage() {
   // Debounced save
   const saveTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
+  // Session mark counter for milestone celebrations
+  const sessionMarksRef = useRef(0);
+  const { recordActivity } = useEngagement();
+
   const load = useCallback(async () => {
     const supabase = createClient();
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return;
     setUserId(user.id);
+
+    // Load dogs from profile for milestone messages
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("dogs")
+      .eq("id", user.id)
+      .single();
+    if (profile?.dogs) setDogs(profile.dogs as Dog[]);
 
     const [patternRes, markupRes] = await Promise.all([
       getPattern(patternId),
@@ -105,8 +147,23 @@ export default function MarkupPage() {
       setUndoStack((prev) => [...prev.slice(-50), markedCells]); // Keep last 50
       setMarkedCells(newBitfield);
       debouncedSave(newBitfield);
+
+      // Track session marks and show milestone celebrations
+      const oldCount = countMarked(markedCells);
+      const newCount = countMarked(newBitfield);
+      if (newCount > oldCount) {
+        sessionMarksRef.current += (newCount - oldCount);
+        const msg = getMilestoneMessage(sessionMarksRef.current, dogs);
+        if (msg) {
+          toast(msg, { duration: 3000 });
+          // Award XP at key milestones
+          if (sessionMarksRef.current === 10 || sessionMarksRef.current === 50 || sessionMarksRef.current === 100) {
+            recordActivity("log_wip_progress");
+          }
+        }
+      }
     },
-    [markedCells, debouncedSave]
+    [markedCells, debouncedSave, dogs, recordActivity]
   );
 
   const handleUndo = useCallback(() => {
